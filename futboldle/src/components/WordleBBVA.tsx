@@ -244,7 +244,7 @@ export default function WordleBBVA({onBack}:Props) {
     <div className="flex flex-col gap-5 pb-10">
 
       {/* ── Back ── */}
-      <button onClick={onBack} className="self-start flex items-center gap-1.5 text-sm font-semibold transition-opacity opacity-60 hover:opacity-100" style={{color:"#18181b"}}>
+      <button onClick={onBack} className="self-start flex items-center gap-1.5 text-sm font-semibold transition-opacity opacity-60 hover:opacity-100" style={{color:"var(--cream)"}}>
         ← Volver
       </button>
 
@@ -253,16 +253,16 @@ export default function WordleBBVA({onBack}:Props) {
         <div className="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full" style={{background:"var(--gold-dim)",border:"1px solid var(--b-gold)"}}>
           <span className="text-[10px] font-oswald font-semibold uppercase tracking-[0.22em]" style={{color:"var(--gold)"}}>{modeLabel}</span>
           {mode==="daily"&&dailyDone&&(
-            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{background:"var(--ok-bg)",color:"var(--ok-txt)",border:"1px solid var(--ok-bd)"}}>Completado ✅</span>
+            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{background:"var(--green-bg)",color:"var(--green-text)",border:"1px solid var(--green-border)"}}>Completado ✅</span>
           )}
         </div>
-        <h2 className="font-display text-4xl leading-none" style={{color:"#18181b"}}>WORDLE BBVA</h2>
-        <p className="text-[12px] mt-1.5" style={{color:"var(--txt3)"}}>Adivina el apellido · <span style={{color:"var(--gold)"}}>{ansLen} letras</span> · {MAX} intentos</p>
+        <h2 className="font-display text-4xl leading-none" style={{color:"var(--cream)"}}>WORDLE BBVA</h2>
+        <p className="text-[12px] mt-1.5" style={{color:"var(--cream-dim)"}}>Adivina el apellido · <span style={{color:"var(--gold)"}}>{ansLen} letras</span> · {MAX} intentos</p>
       </div>
 
       {/* ── Pre-game prompt ── */}
-      <div className="rounded-xl px-4 py-3 text-center" style={{background:"white",border:"1px solid var(--b2)"}}>
-        <p className="text-[13px]" style={{color:"var(--txt3)"}}>
+      <div className="rounded-xl px-4 py-3 text-center" style={{background:"var(--bg4)",border:"1px solid var(--b2)"}}>
+        <p className="text-[13px]" style={{color:"var(--cream-dim)"}}>
           Adivina el apellido de un{" "}
           <span className="font-oswald font-semibold" style={{color:"var(--gold)"}}>Hombre BBVA</span>
         </p>
@@ -270,17 +270,17 @@ export default function WordleBBVA({onBack}:Props) {
 
       {/* ── Post-3 hint ── */}
       {showHint&&!gameOver&&(
-        <div className="rounded-xl px-4 py-3 anim-in" style={{background:"white",border:"1px solid var(--b-gold)"}}>
+        <div className="rounded-xl px-4 py-3 anim-in" style={{background:"var(--bg4)",border:"1px solid var(--b-gold)"}}>
           <div className="text-[9px] font-oswald font-semibold uppercase tracking-[0.22em] mb-1.5" style={{color:"var(--gold)"}}>💡 Pista</div>
-          <p className="text-[13px] font-semibold mb-0.5" style={{color:"#18181b"}}>{player.mainClub} · {player.position}</p>
-          <p className="text-[12px] italic leading-relaxed" style={{color:"var(--txt3)"}}>&ldquo;{player.hint}&rdquo;</p>
+          <p className="text-[13px] font-semibold mb-0.5" style={{color:"var(--cream)"}}>{player.mainClub} · {player.position}</p>
+          <p className="text-[12px] italic leading-relaxed" style={{color:"var(--cream-dim)"}}>&ldquo;{player.hint}&rdquo;</p>
         </div>
       )}
 
       {/* ── Toast ── */}
       {toast&&(
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-xl text-sm font-semibold anim-pop"
-          style={{background:"white",border:"1px solid var(--b3)",color:"#18181b",whiteSpace:"nowrap",boxShadow:"0 12px 40px rgba(0,0,0,0.7)"}}>
+          style={{background:"var(--bg5)",border:"1px solid var(--b3)",color:"var(--cream)",whiteSpace:"nowrap",boxShadow:"0 12px 40px rgba(0,0,0,0.7)"}}>
           {toast}
         </div>
       )}
@@ -295,18 +295,14 @@ export default function WordleBBVA({onBack}:Props) {
               const state=sub?row.states[ci]:letter?"active":"empty";
               const isRev=revealed[ri];
 
-              // Static styles — EMPTY always pure white
-              let bg="white", border="1px solid rgba(0,0,0,0.13)", color="#18181b";
+              // Static styles (pre-flip)
+              let bg="var(--bg4)", border="1px solid var(--b2)", color="var(--cream)";
               if(!sub){
-                if(state==="active"){ border="2px solid rgba(0,0,0,0.35)"; }
-                // state==="empty": white bg, thin border — no color
+                if(state==="active"){ border="1px solid var(--b3)"; }
               } else if(isRev){
-                if(state==="correct"){  bg="rgba(26,107,42,0.16)"; border="2px solid rgba(26,107,42,0.55)"; color="#0e4a1c"; }
-                else if(state==="partial"){ bg="rgba(160,96,0,0.14)"; border="2px solid rgba(160,96,0,0.50)"; color="#6b4000"; }
-                else { bg="#ebebeb"; border="2px solid rgba(0,0,0,0.20)"; color="rgba(0,0,0,0.40)"; }
-              } else {
-                // submitted but flip animation pending — white
-                bg="white"; border="1px solid rgba(0,0,0,0.13)";
+                if(state==="correct"){ bg="var(--green-bg)"; border="1px solid var(--green-border)"; color="var(--green-text)"; }
+                else if(state==="partial"){ bg="var(--amber-bg)"; border="1px solid var(--amber-border)"; color="var(--amber-text)"; }
+                else { bg="var(--wrong-bg)"; border="1px solid var(--wrong-border)"; color="var(--wrong-text)"; }
               }
 
               const flipCls=sub&&isRev
@@ -341,10 +337,10 @@ export default function WordleBBVA({onBack}:Props) {
             <div key={ri} className="flex gap-[5px]">
               {row.map(key=>{
                 const ks=keyState(key,rows);
-                let bg="white", color="var(--txt3)", border="1px solid var(--b1)";
-                if(ks==="correct"){ bg="var(--ok-bg)"; color="var(--ok-txt)"; border="1px solid var(--ok-bd)"; }
-                else if(ks==="partial"){ bg="var(--amb-bg)"; color="var(--amb-txt)"; border="1px solid var(--amb-bd)"; }
-                else if(ks==="wrong"){ bg="rgba(0,0,0,.3)"; color="rgba(0,0,0,0.40)"; border="1px solid var(--b1)"; }
+                let bg="var(--bg5)", color="var(--cream-dim)", border="1px solid var(--b1)";
+                if(ks==="correct"){ bg="var(--green-bg)"; color="var(--green-text)"; border="1px solid var(--green-border)"; }
+                else if(ks==="partial"){ bg="var(--amber-bg)"; color="var(--amber-text)"; border="1px solid var(--amber-border)"; }
+                else if(ks==="wrong"){ bg="rgba(0,0,0,.3)"; color="var(--wrong-text)"; border="1px solid var(--b1)"; }
                 const wide=key==="ENTER"||key==="⌫";
                 return (
                   <button key={key} onClick={()=>handleKey(key)}
@@ -367,41 +363,41 @@ export default function WordleBBVA({onBack}:Props) {
       {/* ── RESULT PANEL ── */}
       {showResult&&(
         <div className="rounded-2xl p-5 anim-in"
-          style={{background:"white",border:"1px solid var(--b3)",boxShadow:"0 20px 60px rgba(0,0,0,.6)"}}>
+          style={{background:"var(--bg3)",border:"1px solid var(--b3)",boxShadow:"0 20px 60px rgba(0,0,0,.6)"}}>
 
           {/* Win/Lose header */}
           <div className="text-center mb-5">
             {won?(
               <>
                 <div className="font-display text-5xl mb-1" style={{color:"var(--gold)"}}>¡CRACK!</div>
-                <p className="text-sm font-semibold" style={{color:"var(--ok-txt)"}}>
+                <p className="text-sm font-semibold" style={{color:"var(--green-text)"}}>
                   {rows.filter(r=>r.submitted).length}/{MAX} intentos
                 </p>
               </>
             ):(
               <>
-                <div className="font-display text-5xl mb-1" style={{color:"#18181b"}}>CASI...</div>
-                <p className="text-sm" style={{color:"var(--txt3)"}}>Mañana puede ser tu día</p>
+                <div className="font-display text-5xl mb-1" style={{color:"var(--cream)"}}>CASI...</div>
+                <p className="text-sm" style={{color:"var(--cream-dim)"}}>Mañana puede ser tu día</p>
               </>
             )}
           </div>
 
           {/* Cromo card */}
-          <div className="rounded-xl p-4 mb-4 relative overflow-hidden" style={{background:"white",border:"1px solid var(--b-gold)"}}>
+          <div className="rounded-xl p-4 mb-4 relative overflow-hidden" style={{background:"var(--bg5)",border:"1px solid var(--b-gold)"}}>
             <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl" style={{background:"linear-gradient(90deg,var(--gold2),var(--gold),var(--gold2))"}}/>
             <div className="pt-1">
               <div className="text-[9px] font-oswald font-semibold uppercase tracking-[0.22em] mb-1" style={{color:"var(--gold)"}}>El jugador era</div>
-              <div className="font-display text-3xl leading-none mb-0.5" style={{color:"#18181b"}}>{player.displayName.toUpperCase()}</div>
-              <div className="text-[12px] mb-3" style={{color:"var(--txt3)"}}>{player.fullName} · {player.nationality}</div>
+              <div className="font-display text-3xl leading-none mb-0.5" style={{color:"var(--cream)"}}>{player.displayName.toUpperCase()}</div>
+              <div className="text-[12px] mb-3" style={{color:"var(--cream-dim)"}}>{player.fullName} · {player.nationality}</div>
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {player.clubs.map(c=>(
                   <span key={c} className="text-[11px] font-semibold px-2 py-0.5 rounded"
-                    style={{background:"white",color:"var(--txt3)",border:"1px solid var(--b2)"}}>
+                    style={{background:"var(--bg4)",color:"var(--cream-dim)",border:"1px solid var(--b2)"}}>
                     {c}
                   </span>
                 ))}
               </div>
-              <p className="text-[12px] italic leading-relaxed" style={{color:"var(--txt3)"}}>&ldquo;{player.hint}&rdquo;</p>
+              <p className="text-[12px] italic leading-relaxed" style={{color:"var(--cream-dim)"}}>&ldquo;{player.hint}&rdquo;</p>
             </div>
           </div>
 
@@ -411,10 +407,10 @@ export default function WordleBBVA({onBack}:Props) {
               <button onClick={handleShare}
                 className="w-full py-3.5 rounded-xl font-oswald font-semibold uppercase tracking-wider text-sm transition-all active:scale-[.98]"
                 style={{
-                  background:copied?"var(--ok-bg)":"var(--gold)",
-                  color:copied?"var(--ok-txt)":"#111",
-                  border:copied?"1px solid var(--ok-bd)":"none",
-                  boxShadow:copied?"none":"0 4px 20px rgba(184,136,32,0.25)",
+                  background:copied?"var(--green-bg)":"var(--gold)",
+                  color:copied?"var(--green-text)":"#111",
+                  border:copied?"1px solid var(--green-border)":"none",
+                  boxShadow:copied?"none":"0 4px 20px var(--gold-glow)",
                 }}>
                 {copied?"✓ COPIADO":"COMPARTIR RESULTADO"}
               </button>
@@ -428,8 +424,8 @@ export default function WordleBBVA({onBack}:Props) {
             )}
             <button onClick={playExtra}
               className="w-full py-3 rounded-xl font-oswald font-semibold uppercase tracking-wider text-sm transition-all active:scale-[.98]"
-              style={{background:"white",border:"1px solid var(--b3)",color:"var(--txt3)"}}
-              onMouseEnter={e=>{ (e.currentTarget as HTMLElement).style.borderColor="var(--b-gold)"; (e.currentTarget as HTMLElement).style.color="#18181b"; }}
+              style={{background:"var(--bg5)",border:"1px solid var(--b3)",color:"var(--cream-dim)"}}
+              onMouseEnter={e=>{ (e.currentTarget as HTMLElement).style.borderColor="var(--b-gold)"; (e.currentTarget as HTMLElement).style.color="var(--cream)"; }}
               onMouseLeave={e=>{ (e.currentTarget as HTMLElement).style.borderColor=""; (e.currentTarget as HTMLElement).style.color=""; }}>
               {mode==="daily"
                 ? `JUGAR EXTRA #${(dayState?.extras.length??0)+1} →`

@@ -1,100 +1,51 @@
 "use client";
 
-interface GameCardProps {
-  icon: string;
-  title: string;
-  description: string;
-  tag?: string;
-  available: boolean;
-  accent?: string;
-  onClick?: () => void;
-}
+const GAME_STYLES: Record<string, { accent: string; bg: string; bd: string; icon: string; badge?: string }> = {
+  "TOP 10 BBVA":       { accent: "#1a4fa0", bg: "#f0f5ff", bd: "rgba(26,79,160,0.20)", icon: "🏆", badge: "En desarrollo" },
+  "ADIVINA EL CRACK":  { accent: "#7c3aed", bg: "#faf5ff", bd: "rgba(124,58,237,0.20)", icon: "🌍", badge: "En desarrollo" },
+  "XI IDEAL BBVA":     { accent: "#b81c14", bg: "#fff5f5", bd: "rgba(184,28,20,0.20)", icon: "👕", badge: "Próximo" },
+};
 
-export default function GameCard({
-  icon,
-  title,
-  description,
-  tag,
-  available,
-  onClick,
-}: GameCardProps) {
+interface Props { icon:string; title:string; description:string; available:boolean; onClick?:()=>void; }
+
+export default function GameCard({ icon, title, description, available, onClick }: Props) {
+  const style = GAME_STYLES[title] || { accent: "#6b6b72", bg: "#f6f6f6", bd: "rgba(0,0,0,0.12)", icon };
+
   return (
-    <button
-      onClick={available ? onClick : undefined}
-      disabled={!available}
-      className="w-full text-left rounded-2xl p-4 transition-all duration-200 group relative overflow-hidden"
-      style={{
-        background: "var(--surface-3)",
-        border: available
-          ? "1px solid var(--border-md)"
-          : "1px solid var(--border)",
-        opacity: available ? 1 : 0.65,
-        cursor: available ? "pointer" : "default",
-      }}
-      onMouseEnter={(e) => {
-        if (available) {
-          (e.currentTarget as HTMLElement).style.borderColor =
-            "rgba(232,0,29,0.4)";
-          (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "";
-        (e.currentTarget as HTMLElement).style.transform = "";
-      }}
+    <div
+      className="rounded-xl overflow-hidden"
+      style={{ background: style.bg, border: `1.5px solid ${style.bd}`, opacity: available ? 1 : 0.85 }}
     >
-      {/* Tag */}
-      {tag && (
-        <span
-          className="absolute top-3 right-3 text-[9px] font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded-full"
-          style={
-            available
-              ? {
-                  background: "rgba(22,163,74,0.15)",
-                  color: "#4ade80",
-                  border: "1px solid rgba(22,163,74,0.3)",
-                }
-              : {
-                  background: "rgba(245,197,24,0.1)",
-                  color: "var(--gold)",
-                  border: "1px solid rgba(245,197,24,0.2)",
-                }
-          }
-        >
-          {tag}
-        </span>
+      {!available && (
+        <div className="h-[2px]" style={{ background: style.accent, opacity: 0.4 }} />
       )}
-
-      {/* Icon */}
-      <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl mb-3"
-        style={{ background: "var(--surface-4)" }}
-      >
-        {icon}
-      </div>
-
-      {/* Title */}
-      <h3
-        className="font-display text-xl mb-1 text-white leading-none"
-        style={{ letterSpacing: "0.04em" }}
-      >
-        {title}
-      </h3>
-
-      {/* Description */}
-      <p className="text-[12px] leading-snug" style={{ color: "var(--text-muted)" }}>
-        {description}
-      </p>
-
-      {/* CTA */}
       {available && (
-        <div
-          className="mt-3 text-[11px] font-bold uppercase tracking-wider"
-          style={{ color: "var(--red)" }}
-        >
-          Jugar ahora →
-        </div>
+        <div className="h-[2px]" style={{ background: style.accent }} />
       )}
-    </button>
+      <div className="p-4">
+        {/* Badge */}
+        {style.badge && (
+          <div className="inline-block text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full mb-2"
+            style={{ background: style.accent + "18", color: style.accent }}>
+            {style.badge}
+          </div>
+        )}
+
+        {/* Icon grande */}
+        <div className="text-3xl mb-2">{style.icon || icon}</div>
+
+        {/* Nombre */}
+        <div className="font-bebas text-[20px] leading-none mb-1" style={{ color: "#18181b" }}>{title}</div>
+        <p className="text-[10px] leading-snug" style={{ color: "#6b6b72" }}>{description}</p>
+
+        {available && onClick && (
+          <button onClick={onClick}
+            className="mt-3 w-full font-oswald font-semibold uppercase tracking-wider text-[10px] py-2 rounded-lg"
+            style={{ background: style.accent, color: "white" }}>
+            Jugar →
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
