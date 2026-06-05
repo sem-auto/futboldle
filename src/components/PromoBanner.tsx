@@ -70,7 +70,7 @@ export default function PromoBanner() {
     <div className="xl:hidden flex flex-col gap-2">
       {ADS.map((ad, i) => (
         <a key={ad.id} href={ad.url} target="_blank" rel="noopener noreferrer"
-          className="flex items-center rounded-xl overflow-hidden transition-all duration-200"
+          className="flex items-center rounded-xl overflow-hidden transition-all duration-200 max-md:max-h-[132px]"
           style={{
             background: "white",
             border: `1.5px solid ${i === idx ? ad.accent : "rgba(0,0,0,0.08)"}`,
@@ -80,14 +80,14 @@ export default function PromoBanner() {
           {/* Accent strip */}
           <div className="w-[4px] self-stretch flex-shrink-0" style={{ background: ad.accent }} />
           {/* Content */}
-          <div className="flex-1 px-3.5 py-3">
+          <div className="flex-1 min-w-0 px-3.5 py-3 max-md:px-3 max-md:py-2">
             <div className="text-[8px] font-semibold uppercase tracking-[0.15em] mb-0.5" style={{ color: ad.accent }}>{ad.eyebrow}</div>
-            <div className="font-oswald font-semibold text-[14px] leading-tight" style={{ color: "#18181b" }}>{ad.title}</div>
-            <div className="text-[10px] mt-0.5" style={{ color: "#888" }}>{ad.desc}</div>
+            <div className="font-oswald font-semibold text-[14px] max-md:text-[13px] leading-tight" style={{ color: "#18181b" }}>{ad.title}</div>
+            <div className="text-[10px] max-md:text-[9px] mt-0.5 leading-snug max-md:line-clamp-2" style={{ color: "#888" }}>{ad.desc}</div>
           </div>
           {/* CTA */}
-          <div className="flex-shrink-0 mx-3">
-            <div className="font-oswald font-semibold text-[10px] uppercase tracking-wider px-3.5 py-2 rounded-lg whitespace-nowrap"
+          <div className="flex-shrink-0 mx-3 max-md:mx-2">
+            <div className="font-oswald font-semibold text-[10px] max-md:text-[9px] uppercase tracking-wider px-3.5 max-md:px-2.5 py-2 max-md:py-1.5 rounded-lg whitespace-nowrap"
               style={{ background: ad.accent, color: "white" }}>
               {ad.cta} →
             </div>

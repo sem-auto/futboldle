@@ -336,9 +336,9 @@ export default function WordleBBVA({onBack}:Props) {
 
       {/* ── KEYBOARD ── */}
       {!showResult&&(
-        <div className="flex flex-col gap-1.5 items-center mt-2">
+        <div className="flex flex-col gap-1 md:gap-1.5 items-center mt-2">
           {KB.map((row,ri)=>(
-            <div key={ri} className="flex gap-[5px]">
+            <div key={ri} className="flex gap-[3px] md:gap-[5px]">
               {row.map(key=>{
                 const ks=keyState(key,rows);
                 let bg="white", color="var(--txt3)", border="1px solid var(--b1)";
@@ -348,11 +348,9 @@ export default function WordleBBVA({onBack}:Props) {
                 const wide=key==="ENTER"||key==="⌫";
                 return (
                   <button key={key} onClick={()=>handleKey(key)}
-                    className="rounded-lg font-oswald font-semibold transition-all active:scale-95 select-none"
+                    className={`h-10 md:h-[50px] rounded-lg font-oswald font-semibold transition-all active:scale-95 select-none ${wide ? "w-auto min-w-[44px] md:min-w-[52px] px-1.5 md:px-2 text-[9px] md:text-[10px]" : "w-[27px] md:w-[34px] px-0 text-[13px] md:text-[15px]"}`}
                     style={{
-                      width:wide?"auto":34, minWidth:wide?52:34, height:50,
-                      padding:wide?"0 8px":0,
-                      fontSize:wide?10:15, letterSpacing:wide?"0.08em":"0.02em",
+                      letterSpacing:wide?"0.08em":"0.02em",
                       background:bg, color, border,
                     }}>
                     {key}

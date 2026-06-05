@@ -153,7 +153,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
   const PURPLE_BD = "rgba(124,58,237,0.22)";
 
   return (
-    <div className="flex flex-col gap-4 pb-10">
+    <div className="flex flex-col gap-4 pb-10 min-w-0 overflow-x-hidden">
       {/* Back */}
       <button onClick={onBack} className="self-start flex items-center gap-1.5 text-[11px] font-semibold opacity-60 hover:opacity-100 transition-opacity" style={{ color: "#3a3a3f" }}>
         ← Volver
@@ -166,7 +166,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
             style={{ background: "rgba(255,255,255,0.2)", color: "white" }}>
             Reto del día · #{getDayNumber()}
           </div>
-          <h2 className="font-bebas text-[32px] leading-none text-white mb-1">ADIVINA EL CRACK</h2>
+          <h2 className="font-bebas text-[32px] leading-none text-white mb-1 break-words">ADIVINA EL CRACK</h2>
           <p className="text-[11px] text-white/70">Las pistas se revelan con cada fallo · {MAX} intentos</p>
         </div>
         {/* Attempt bar */}
@@ -182,7 +182,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
       {/* Hint cards */}
       <div className="grid grid-cols-2 gap-2">
         {visibleHints.slice(0, 4).map((h, i) => (
-          <div key={i} className="rounded-xl px-3.5 py-3 transition-all duration-300"
+          <div key={i} className="rounded-xl px-3.5 py-3 transition-all duration-300 min-w-0"
             style={{
               background: h.revealed ? "white" : "#f4f1eb",
               border: `1px solid ${h.revealed ? PURPLE_BD : "rgba(0,0,0,0.07)"}`,
@@ -193,7 +193,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
               Pista {i + 1} · {h.label}
             </div>
             {h.revealed ? (
-              <div className="font-oswald font-semibold text-[14px]" style={{ color: "#18181b" }}>{h.value}</div>
+              <div className="font-oswald font-semibold text-[14px] break-words" style={{ color: "#18181b" }}>{h.value}</div>
             ) : (
               <div className="flex gap-1 mt-1">
                 {[36, 24].map((w, j) => <div key={j} className="h-2 rounded-full" style={{ width: w, background: "#e0dbd8" }} />)}
@@ -210,7 +210,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
           <div className="text-[8px] font-semibold uppercase tracking-[0.18em] mb-1" style={{ color: PURPLE }}>
             Pista 5 · Descripción
           </div>
-          <div className="font-oswald font-semibold text-[13px] italic" style={{ color: "#18181b" }}>
+          <div className="font-oswald font-semibold text-[13px] italic break-words" style={{ color: "#18181b" }}>
             &ldquo;{player.hint}&rdquo;
           </div>
         </div>
@@ -221,10 +221,10 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
         <div className="flex flex-col gap-1">
           <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Intentos fallidos</div>
           {guesses.map((g, i) => (
-            <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl"
+            <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl min-w-0"
               style={{ background: "#fff5f5", border: "1px solid rgba(184,28,20,0.15)" }}>
               <span style={{ color: "#b81c14" }}>✗</span>
-              <span className="font-oswald font-semibold text-[12px]" style={{ color: "#3a3a3f" }}>{g}</span>
+              <span className="font-oswald font-semibold text-[12px] min-w-0 break-words" style={{ color: "#3a3a3f" }}>{g}</span>
             </div>
           ))}
         </div>
@@ -244,7 +244,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
             onBlur={e => { (e.target as HTMLInputElement).style.borderColor = "rgba(0,0,0,0.12)"; }}
             autoComplete="off" spellCheck={false} />
           {suggestions.length > 0 && (
-            <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden"
+            <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-64 overflow-y-auto"
               style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
               {suggestions.map(p => (
                 <button key={p.id} onMouseDown={() => guess(p)}

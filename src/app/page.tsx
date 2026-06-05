@@ -264,7 +264,7 @@ function TrayCard({ onClick, done, won }: { onClick: () => void; done: boolean; 
                   style={{ background: i===0?"#f0faf2":"#f6f3ee",
                     border:`1px solid ${i===0?"rgba(30,107,46,0.18)":"rgba(0,0,0,0.06)"}`,
                     color: i===0?"#1e6b2e":"#bbb" }}>
-                  {i===0 ? "Primer club visible desde el inicio" : label}
+                  {i===0 ? "Primer club" : label}
                 </div>
               </div>
             ))}
@@ -505,7 +505,7 @@ export default function HomePage() {
         </div>
 
         {/* ── FILA 1: Wordle + Trayectoria (igual importancia) ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <WordleCard onClick={() => setView("wordle")} done={wordleDone} won={wordleWon} extras={extras} />
           <TrayCard onClick={() => setView("trayectoria")} done={trayDone} won={trayWon} />
         </div>
