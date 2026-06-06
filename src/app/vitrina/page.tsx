@@ -1,22 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getTrophyShowcase } from "@/lib/album";
+import { getHistoricalClubShield, getTrophyShowcase } from "@/lib/album";
 import { trackEvent } from "@/lib/analytics";
 
 type Trophy = ReturnType<typeof getTrophyShowcase>[number];
 
 function trophyBadge(trophy: Trophy) {
-  if ("club" in trophy && trophy.club) {
-    return trophy.club
-      .replace("Atlético de Madrid", "Atlético")
-      .replace("Athletic Club", "Athletic")
-      .split(/\s+/)
-      .map(part => part[0])
-      .join("")
-      .slice(0, 3)
-      .toUpperCase();
-  }
+  if ("club" in trophy && trophy.club) return getHistoricalClubShield(trophy.club);
   return "🏆";
 }
 
@@ -63,8 +54,8 @@ export default function VitrinaPage() {
                 <div key={trophy.id} className="rounded-lg px-3 py-2"
                   style={{ background: trophy.unlocked ? "#fff8e6" : "#f3efe8", border: `1px solid ${trophy.unlocked ? "rgba(200,146,10,0.30)" : "rgba(0,0,0,0.06)"}` }}>
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bebas"
-                      style={{ background: trophy.unlocked ? "#c8920a" : "#ddd7ca", color: "white" }}>{trophyBadge(trophy)}</span>
+                    <span className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bebas"
+                      style={{ background: trophy.unlocked ? "linear-gradient(135deg,#c8920a,#18181b)" : "#ddd7ca", color: "white", border: "2px solid rgba(255,255,255,0.7)" }}>{trophyBadge(trophy)}</span>
                     <div className="flex-1">
                       <div className="font-oswald font-semibold text-[13px]" style={{ color: trophy.unlocked ? "#18181b" : "#aaa" }}>{trophy.label}</div>
                       <div className="text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: trophy.unlocked ? "#c8920a" : "#bbb" }}>

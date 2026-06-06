@@ -1,6 +1,7 @@
 type AnalyticsEvent =
   | "game_started"
   | "game_completed"
+  | "top10_completed"
   | "card_unlocked"
   | "trophy_unlocked"
   | "album_visit"

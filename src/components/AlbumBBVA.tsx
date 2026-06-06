@@ -8,6 +8,7 @@ import {
   getAlbumRarityProgress,
   getCollectorLevel,
   getFeaturedClubProgress,
+  getPlayerCuriosity,
   getUnlockedPlayers,
   toggleFavoritePlayer,
 } from "@/lib/album";
@@ -40,6 +41,26 @@ function rarityStyle(rarity: AlbumRarity) {
   if (rarity === "LEGENDARIO") return { label: "LEGENDARIO", stars: "★★★", bar: "#c8920a", bg: "#fffbf0", color: "#8a6200" };
   if (rarity === "CORE") return { label: "CORE", stars: "★★", bar: "#1e6b2e", bg: "#f0faf2", color: "#1e6b2e" };
   return { label: "CULTO", stars: "★", bar: "#7c3aed", bg: "#f5f0ff", color: "#6d28d9" };
+}
+
+function PlayerPortrait({ name, color, locked = false, size = "card" }: { name: string; color: string; locked?: boolean; size?: "card" | "modal" }) {
+  const dimensions = size === "modal" ? "w-20 h-20" : "w-14 h-14";
+  const head = size === "modal" ? "w-8 h-8" : "w-6 h-6";
+  const body = size === "modal" ? "w-12 h-7" : "w-9 h-5";
+  return (
+    <div className={`${dimensions} rounded-full flex items-center justify-center relative overflow-hidden`}
+      style={{ background: locked ? "#e5ded2" : "linear-gradient(135deg,#fffdf5,#efe1b8)", border: "1px solid rgba(0,0,0,0.10)", boxShadow: locked ? "none" : "inset 0 0 0 2px rgba(255,255,255,0.45)" }}>
+      {locked ? (
+        <span className="font-bebas text-[24px]" style={{ color: "#b8b0a4" }}>?</span>
+      ) : (
+        <>
+          <div className={`${head} rounded-full absolute top-2`} style={{ background: color, opacity: 0.82 }} />
+          <div className={`${body} rounded-t-full absolute bottom-2`} style={{ background: color, opacity: 0.72 }} />
+          <span className="font-bebas text-[13px] absolute bottom-1" style={{ color: "#18181b" }}>{name.slice(0, 1).toUpperCase()}</span>
+        </>
+      )}
+    </div>
+  );
 }
 
 export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
@@ -180,7 +201,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
         {filtered.map(({ player, isUnlocked, isFavorite, unlockedAt, rarity }) => {
           const style = rarityStyle(rarity);
           return (
-            <div key={player.id} className={`rounded-xl overflow-hidden min-h-[190px] relative ${isUnlocked ? "anim-pop" : ""}`}
+            <div key={player.id} className={`rounded-xl overflow-hidden min-h-[190px] relative ${isUnlocked ? "album-card-unlocked anim-pop" : ""}`}
               style={{ background: isUnlocked ? style.bg : "#f3efe8", border: `1px solid ${isUnlocked ? "rgba(0,0,0,0.10)" : "rgba(0,0,0,0.08)"}`, boxShadow: isUnlocked ? "0 4px 14px rgba(0,0,0,0.08)" : "0 2px 8px rgba(0,0,0,0.04)" }}>
               <div className="h-[5px]" style={{ background: isUnlocked ? style.bar : "#ddd7ca" }} />
               {isUnlocked && (
@@ -190,11 +211,8 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                 </button>
               )}
               <button onClick={() => setSelectedId(player.id)} className="w-full text-left p-3 pt-2">
-                <div className="mx-auto mb-2 w-14 h-14 rounded-full flex items-center justify-center"
-                  style={{ background: isUnlocked ? "rgba(255,255,255,0.72)" : "#e5ded2", border: "1px solid rgba(0,0,0,0.08)" }}>
-                  <span className="font-bebas text-[24px]" style={{ color: isUnlocked ? style.color : "#b8b0a4" }}>
-                    {isUnlocked ? player.displayName.slice(0, 1).toUpperCase() : "?"}
-                  </span>
+                <div className="mx-auto mb-2">
+                  <PlayerPortrait name={player.displayName} color={style.bar} locked={!isUnlocked} />
                 </div>
                 <div className="mb-2">
                   <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: isUnlocked ? style.color : "#aaa" }}>
@@ -212,6 +230,9 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                       {player.clubs.map(clubName => (
                         <span key={clubName} className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.65)", color: "#6b6b72", border: "1px solid rgba(0,0,0,0.06)" }}>{clubName}</span>
                       ))}
+                    </div>
+                    <div className="text-[10px] leading-snug mb-2" style={{ color: "#8a6200" }}>
+                      <strong>Dato curioso:</strong> {getPlayerCuriosity(player)}
                     </div>
                     {unlockedAt && <div className="text-[9px] font-semibold mt-2" style={{ color: "#9a9a8a" }}>Desbloqueado: {unlockedAt}</div>}
                   </>
@@ -240,11 +261,8 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                 </div>
                 <button onClick={() => setSelectedId(null)} className="text-[18px]" style={{ color: "#9a9a8a" }}>×</button>
               </div>
-              <div className="my-4 w-20 h-20 rounded-full flex items-center justify-center mx-auto"
-                style={{ background: rarityStyle(selected.rarity).bg, border: "1px solid rgba(0,0,0,0.08)" }}>
-                <span className="font-bebas text-[36px]" style={{ color: rarityStyle(selected.rarity).color }}>
-                  {selected.isUnlocked ? selected.player.displayName.slice(0, 1).toUpperCase() : "?"}
-                </span>
+              <div className="my-4 flex justify-center">
+                <PlayerPortrait name={selected.player.displayName} color={rarityStyle(selected.rarity).bar} locked={!selected.isUnlocked} size="modal" />
               </div>
               <div className="grid gap-2 text-[12px]" style={{ color: "#6b6b72" }}>
                 <div><strong>Rareza:</strong> {selected.rarity}</div>
@@ -255,6 +273,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                   <>
                     <div><strong>Desbloqueado mediante:</strong> {selected.source ?? "Futboldle"}</div>
                     <div><strong>Fecha:</strong> {selected.unlockedAt ?? "Guardado"}</div>
+                    <div><strong>Dato curioso:</strong> {getPlayerCuriosity(selected.player)}</div>
                     <div><strong>Logros relacionados:</strong> Top Goleadores · Top Asistencias · Colección {selected.player.mainClub}</div>
                   </>
                 ) : (

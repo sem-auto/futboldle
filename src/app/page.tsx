@@ -464,6 +464,7 @@ function ProfileCompact({ played, won, streak, albumProgress, onAlbum }: {
       </button>
       <div className="col-span-4 flex gap-2 pt-1">
         <a href="/perfil" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Perfil</a>
+        <a href="/tops" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Tops</a>
         <a href="/vitrina" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Vitrina</a>
       </div>
     </div>

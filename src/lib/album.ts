@@ -53,8 +53,57 @@ const CORE_PLAYERS = new Set([
   "ROSSI",
 ]);
 
+const PLAYER_CURIOSITIES: Record<string, string> = {
+  MESSI: "Dominó la era BBVA con Balones de Oro, goles y asistencias desde Barcelona.",
+  RONALDO: "Firmó una de las etapas goleadoras más salvajes de la historia del Real Madrid.",
+  VILLA: "Ganó Mundial 2010 y Eurocopas 2008 y 2012 con España.",
+  SILVA: "Fue pieza clave del Valencia y de la España campeona de Europa y del mundo.",
+  FORLAN: "Bota de Oro europea y Balón de Oro del Mundial 2010.",
+  KANOUTE: "Elegido mejor jugador africano mientras brillaba en el Sevilla.",
+  FALCAO: "Su etapa en el Atlético dejó una final europea histórica ante el Athletic.",
+  TORRES: "Ídolo del Atlético antes y después de su etapa en la Premier.",
+  XAVI: "Cerebro del Barça y de la selección española más dominante.",
+  INIESTA: "Autor del gol del Mundial 2010 y leyenda absoluta del centro del campo.",
+  NAVAS: "Canterano eterno del Sevilla y campeón del mundo con España.",
+  JOAQUIN: "Uno de los extremos más reconocibles y longevos de LaLiga.",
+  CAZORLA: "Talento diferencial del Villarreal y campeón de Eurocopa con España.",
+  VALERON: "El Flaco fue uno de los mediapuntas más elegantes del fútbol español.",
+  SOLDADO: "Vivió en Valencia su etapa más goleadora en Primera.",
+  NEGREDO: "El Tiburón explotó como goleador en el Sevilla.",
+  JONAS: "Delantero brasileño de enorme rendimiento en Valencia.",
+  PIATTI: "Pasó por Almería, Valencia y Espanyol en la era BBVA.",
+  BRUNO: "Capitán y símbolo del Villarreal durante más de una década.",
+  SENNA: "Campeón de Europa 2008 y leyenda del Villarreal.",
+  CASILLAS: "Capitán del Real Madrid y de la España campeona de todo.",
+  VALDES: "Portero del Barça de Guardiola y especialista en juego con los pies.",
+  PALOP: "Portero decisivo del Sevilla europeo, incluso marcó un gol histórico.",
+  KAMENI: "Guardameta icónico del Espanyol y del Málaga.",
+};
+
+const CLUB_SHIELDS: Record<string, string> = {
+  Valencia: "VCF",
+  "Atlético de Madrid": "ATM",
+  Sevilla: "SFC",
+  Barcelona: "FCB",
+  Villarreal: "VIL",
+  Deportivo: "DEP",
+  Málaga: "MCF",
+  "Athletic Club": "ATH",
+};
+
 function playerKeys(player: Pick<(typeof bbvaPlayers)[number], "answer" | "displayName" | "fullName">) {
   return [player.answer, player.displayName, player.fullName].map(normalize);
+}
+
+export function getPlayerCuriosity(player: Pick<(typeof bbvaPlayers)[number], "answer" | "displayName" | "fullName" | "mainClub">) {
+  const keys = playerKeys(player);
+  const found = keys.map(key => PLAYER_CURIOSITIES[key]).find(Boolean);
+  return found ?? `Cromo clásico de la era BBVA asociado a ${player.mainClub}.`;
+}
+
+export function getHistoricalClubShield(clubName?: string) {
+  if (!clubName) return "BBVA";
+  return CLUB_SHIELDS[clubName] ?? clubName.split(/\s+/).map(part => part[0]).join("").slice(0, 3).toUpperCase();
 }
 
 function todayIso() {

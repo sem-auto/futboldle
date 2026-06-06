@@ -153,6 +153,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
       try { localStorage.setItem(`fbl-top10-done-${getDayKey()}`, "won"); } catch {}
       recordGameCompletion("top10", `${getDayKey()}-${challenge.id}`);
       trackEvent("game_completed", { game: "top10", challenge: challenge.id, total: challenge.answers.length });
+      trackEvent("top10_completed", { challenge: challenge.id, category: challenge.category, total: challenge.answers.length });
       try {
         const raw = localStorage.getItem("fbl-top-completed-v1");
         const parsed = raw ? JSON.parse(raw) : [];
