@@ -15,17 +15,17 @@ type Props = {
 
 function scorePlayer(player: BBVAPlayer, query: string) {
   const q = normalize(query);
-  const fields = [
+  const nameFields = [
     normalize(player.displayName),
     normalize(player.fullName),
-    normalize(player.answer),
     ...player.fullName.split(/\s+/).map(normalize),
     ...player.displayName.split(/\s+/).map(normalize),
   ].filter(Boolean);
+  const aliasFields = [normalize(player.answer)].filter(Boolean);
 
-  if (fields.some(f => f === q || f.startsWith(q))) return 0;
-  if (fields.some(f => f.includes(q))) return 1;
-  if (normalize(player.answer).includes(q)) return 2;
+  if (nameFields.some(f => f === q || f.startsWith(q))) return 0;
+  if (nameFields.some(f => f.includes(q))) return 1;
+  if (aliasFields.some(f => f === q || f.startsWith(q) || f.includes(q))) return 2;
   return 99;
 }
 
@@ -37,7 +37,7 @@ function getSuggestions(players: BBVAPlayer[], query: string, usedIds: number[])
     .map(player => ({ player, score: scorePlayer(player, query) }))
     .filter(item => item.score < 99)
     .sort((a, b) => a.score - b.score || a.player.displayName.localeCompare(b.player.displayName, "es"))
-    .slice(0, 5)
+    .slice(0, 8)
     .map(item => item.player);
 }
 
@@ -93,7 +93,7 @@ export default function PlayerSearch({
       />
 
       {(suggestions.length > 0 || showEmpty) && (
-        <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-64 overflow-y-auto"
+        <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-80 overflow-y-auto"
           style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
           {suggestions.map(player => (
             <button
@@ -107,7 +107,7 @@ export default function PlayerSearch({
               <div className="font-oswald font-semibold text-[13px]" style={{ color: "#18181b" }}>
                 <Highlight text={player.displayName} query={value} />
               </div>
-              <div className="text-[10px] mt-0.5" style={{ color: "#9a9a8a" }}>{player.nationality} · {player.position}</div>
+              <div className="text-[10px] mt-0.5 truncate" style={{ color: "#9a9a8a" }}>{player.clubs.slice(0, 3).join(" · ")}</div>
             </button>
           ))}
           {showEmpty && (

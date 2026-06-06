@@ -5,6 +5,7 @@ import TrayectoriaBBVA from "@/components/TrayectoriaBBVA";
 import Top10BBVA from "@/components/Top10BBVA";
 import AdivinaElCrack from "@/components/AdivinaElCrack";
 import AlbumBBVA from "@/components/AlbumBBVA";
+import IconUnlockToast from "@/components/IconUnlockToast";
 import PromoBanner, { SidebarAds } from "@/components/PromoBanner";
 import { getDayNumber, getDayKey } from "@/lib/daily";
 import { useStats } from "@/lib/useStats";
@@ -436,12 +437,17 @@ function ProfileCompact({ played, won, streak, albumProgress, onAlbum }: {
   const winPct = played > 0 ? Math.round((won / played) * 100) : 0;
 
   return (
-    <div className="grid grid-cols-3 gap-2 rounded-xl px-3 py-2"
+    <div className="grid grid-cols-4 gap-2 rounded-xl px-3 py-2"
       style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
       <div>
         <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Partidas</div>
         <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>{played}</div>
-        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>{winPct}% victorias</div>
+        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>jugadas</div>
+      </div>
+      <div>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Victorias</div>
+        <div className="font-bebas text-[18px] leading-none" style={{ color: "#1e6b2e" }}>{winPct}%</div>
+        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>{won}/{played}</div>
       </div>
       <div>
         <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Racha</div>
@@ -456,6 +462,10 @@ function ProfileCompact({ played, won, streak, albumProgress, onAlbum }: {
         </div>
         <div className="text-[9px]" style={{ color: "#9a9a8a" }}>{albumProgress.percent}%</div>
       </button>
+      <div className="col-span-4 flex gap-2 pt-1">
+        <a href="/perfil" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Perfil</a>
+        <a href="/vitrina" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Vitrina</a>
+      </div>
     </div>
   );
 }
@@ -475,6 +485,7 @@ export default function HomePage() {
   if (view === "top10") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
+      <IconUnlockToast />
       <Header onLogoClick={goHome} />
       <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <Top10BBVA onBack={goHome} />
@@ -485,6 +496,7 @@ export default function HomePage() {
   if (view === "crack") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
+      <IconUnlockToast />
       <Header onLogoClick={goHome} />
       <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <AdivinaElCrack onBack={goHome} />
@@ -495,6 +507,7 @@ export default function HomePage() {
   if (view === "wordle") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
+      <IconUnlockToast />
       <Header onLogoClick={goHome} />
       <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <WordleBBVA onBack={goHome} />
@@ -505,6 +518,7 @@ export default function HomePage() {
   if (view === "trayectoria") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
+      <IconUnlockToast />
       <Header onLogoClick={goHome} />
       <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <TrayectoriaBBVA onBack={goHome} />
@@ -515,6 +529,7 @@ export default function HomePage() {
   if (view === "album") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
+      <IconUnlockToast />
       <Header onLogoClick={goHome} />
       <main className="max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <AlbumBBVA onBack={goHome} />
@@ -525,6 +540,7 @@ export default function HomePage() {
   return (
     <div className="min-h-dvh flex flex-col" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
+      <IconUnlockToast />
       <Header onLogoClick={goHome} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5 flex flex-col gap-3 md:gap-4 overflow-x-hidden">

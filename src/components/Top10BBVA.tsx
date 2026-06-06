@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
-import { getDailyTop10 } from "@/data/top10Challenges";
+import { getDailyTop10, top10Challenges } from "@/data/top10Challenges";
 import type { Top10Answer } from "@/data/top10Challenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
+import { recordGameCompletion } from "@/lib/profile";
 import PlayerSearch from "@/components/PlayerSearch";
 
 function norm(s: string) {
@@ -60,6 +61,8 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   const [query,          setQuery]          = useState("");
   const [copied,         setCopied]         = useState(false);
   const [loaded,         setLoaded]         = useState(false);
+  const [showDirectory,  setShowDirectory]  = useState(false);
+  const [completedTops,  setCompletedTops]  = useState<string[]>([]);
 
   useEffect(() => {
     const saved = loadSaved(challenge.id);
@@ -70,6 +73,11 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
       setSurrendered(saved.surrendered);
       setHintsUsed(saved.hintsUsed);
     }
+    try {
+      const raw = localStorage.getItem("fbl-top-completed-v1");
+      const parsed = raw ? JSON.parse(raw) : [];
+      setCompletedTops(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : []);
+    } catch {}
     setLoaded(true);
   }, [challenge.id]);
 
@@ -88,7 +96,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
         try { localStorage.setItem(STORE().replace("top10","top10"), ""); } catch {} // handled in persist
       }
       const playerToUnlock = findPlayerForTop10(hit);
-      if (playerToUnlock) unlockPlayer(playerToUnlock.id);
+      if (playerToUnlock) unlockPlayer(playerToUnlock.id, challenge.title);
       persist({ challengeId: challenge.id, guessedAnswers: newGuessed, allGuesses: newAll, finished: done, surrendered: false, hintsUsed });
     } else {
       setWrongFlash(displayName);
@@ -131,12 +139,25 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (finished && !surrendered) {
       try { localStorage.setItem(`fbl-top10-done-${getDayKey()}`, "won"); } catch {}
+      recordGameCompletion("top10", `${getDayKey()}-${challenge.id}`);
+      if (challenge.answers.length > 10) recordGameCompletion("top20", `${getDayKey()}-${challenge.id}`);
+      try {
+        const raw = localStorage.getItem("fbl-top-completed-v1");
+        const parsed = raw ? JSON.parse(raw) : [];
+        const ids = Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : [];
+        if (!ids.includes(challenge.id)) {
+          const next = [...ids, challenge.id];
+          localStorage.setItem("fbl-top-completed-v1", JSON.stringify(next));
+          setCompletedTops(next);
+        }
+      } catch {}
     }
-  }, [finished, surrendered]);
+  }, [finished, surrendered, challenge.id]);
 
   const wrongCount = allGuesses.length - guessedAnswers.length;
   const pct = Math.round((guessedAnswers.length / challenge.answers.length) * 100);
   const done = finished;
+  const wrongFlashPlayer = wrongFlash ? bbvaPlayers.find(p => norm(p.displayName) === norm(wrongFlash) || norm(p.fullName) === norm(wrongFlash)) : null;
 
   // Which hints are visible for "current unsolved item"
   // Find first unsolved item and show hints for it
@@ -169,16 +190,42 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
         ← Volver
       </button>
 
+      <button onClick={() => setShowDirectory(v => !v)} className="self-start font-oswald font-semibold uppercase tracking-wider text-[10px] px-3 py-1.5 rounded-lg"
+        style={{ background: "white", border: "1px solid rgba(26,79,160,0.18)", color: "#1a4fa0" }}>
+        Tops históricos
+      </button>
+
+      {showDirectory && (
+        <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+          <div className="font-bebas text-[22px] leading-none mb-2" style={{ color: "#18181b" }}>TOPS HISTÓRICOS</div>
+          <div className="flex flex-col gap-1">
+            {top10Challenges.map(top => {
+              const completed = completedTops.includes(top.id);
+              const active = top.id === challenge.id;
+              return (
+                <div key={top.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: active ? "#eff4ff" : "#f8f5f0" }}>
+                  <span className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{top.title}</span>
+                  <span className="text-[10px] font-semibold" style={{ color: completed ? "#1e6b2e" : active ? "#c8920a" : "#9a9a8a" }}>
+                    {completed ? "✓ Completado" : active ? "🟡 En progreso" : "🔒 Bloqueado"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg,#1a3a80 0%,#2260c8 100%)", boxShadow: "0 4px 20px rgba(26,79,160,0.30)" }}>
         <div className="px-5 py-4">
           <div className="inline-block text-[9px] font-semibold uppercase tracking-[0.2em] px-2.5 py-1 rounded-full mb-2.5"
             style={{ background: "rgba(255,255,255,0.2)", color: "white" }}>
-            {challenge.emoji} Reto del día · #{getDayNumber()}
+            {challenge.emoji} {challenge.kind} · #{getDayNumber()}
           </div>
           <h2 className="font-bebas text-[28px] leading-none text-white mb-1">{challenge.title.toUpperCase()}</h2>
           <p className="text-white/70 text-[11px] mb-1">{challenge.subtitle}</p>
           <p className="text-white/90 text-[12px] font-semibold">{challenge.consigna}</p>
+          <p className="text-white/55 text-[10px] mt-2">{challenge.source}</p>
         </div>
         <div className="px-5 pb-3">
           <div className="flex items-center justify-between mb-1">
@@ -191,6 +238,19 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       </div>
+
+      {!done && (
+        <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(26,79,160,0.12)" }}>
+          <div className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: "#1a4fa0" }}>Recompensas</div>
+          <div className="flex flex-wrap gap-1.5">
+            {challenge.answers.slice(0, 8).map(item => (
+              <span key={item.position} className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#eff4ff", color: "#1a4fa0" }}>
+                🏆 {item.displayName}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="flex items-center gap-3 text-[10px]" style={{ color: "#9a9a8a" }}>
@@ -224,7 +284,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
                       <div className="font-oswald font-semibold text-[13px] leading-none" style={{ color: found ? "#18181b" : "#b81c14" }}>
                         {item.displayName}
                       </div>
-                      <div className="text-[9px] mt-0.5" style={{ color: "#9a9a8a" }}>{item.detail}</div>
+                      {done && <div className="text-[9px] mt-0.5" style={{ color: "#9a9a8a" }}>{item.detail}</div>}
                     </div>
                   </div>
                 ) : (
@@ -232,7 +292,6 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
                     <div className="flex gap-1">
                       {[44, 28].map((w, j) => <div key={j} className="h-2 rounded-full" style={{ width: w, background: "#e8e4dc" }} />)}
                     </div>
-                    {item.detail && <div className="text-[10px] font-semibold" style={{ color: "#6b6b72" }}>{item.detail}</div>}
                   </div>
                 )}
               </div>
@@ -263,7 +322,12 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
       {wrongFlash && (
         <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 anim-pop px-5 py-2.5 rounded-xl text-[12px] font-semibold"
           style={{ background: "#fff5f5", border: "1px solid rgba(184,28,20,0.25)", color: "#b81c14", boxShadow: "0 4px 16px rgba(0,0,0,0.10)", whiteSpace: "nowrap" }}>
-          ✗ {wrongFlash} — no está en esta lista
+          <div>✗ {wrongFlash} — no está en esta lista</div>
+          {wrongFlashPlayer && (
+            <div className="text-[10px] mt-0.5" style={{ color: "#9a9a8a" }}>
+              {wrongFlashPlayer.nationality} · {wrongFlashPlayer.position}
+            </div>
+          )}
         </div>
       )}
 

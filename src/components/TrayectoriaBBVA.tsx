@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayNumber, getDayKey } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
+import { recordGameCompletion } from "@/lib/profile";
 import PlayerSearch from "@/components/PlayerSearch";
 
 const MAX = 5;
@@ -121,7 +122,8 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
 
     if (correct) {
       setWon(true);
-      unlockPlayer(player.id);
+      unlockPlayer(player.id, "Trayectoria BBVA");
+      recordGameCompletion("trayectoria", getDayKey());
     }
     if (isOver) setGameOver(true);
 

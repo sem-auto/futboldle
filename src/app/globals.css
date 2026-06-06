@@ -52,16 +52,16 @@
 
     /* Wordle game vars */
     --ok:     #1a6b2a;
-    --ok-bg:  rgba(26,107,42,0.18);
-    --ok-bd:  rgba(26,107,42,0.60);
+    --ok-bg:  rgba(26,107,42,0.28);
+    --ok-bd:  rgba(26,107,42,0.82);
     --ok-txt: #0e4a1c;
     --amb:    #a06000;
-    --amb-bg: rgba(160,96,0,0.16);
-    --amb-bd: rgba(160,96,0,0.55);
+    --amb-bg: rgba(200,146,10,0.30);
+    --amb-bd: rgba(160,96,0,0.82);
     --amb-txt:#6b4000;
-    --no-bg:  rgba(24,24,27,0.07);
-    --no-bd:  rgba(24,24,27,0.22);
-    --no-txt: rgba(24,24,27,0.35);
+    --no-bg:  rgba(24,24,27,0.12);
+    --no-bd:  rgba(24,24,27,0.34);
+    --no-txt: rgba(24,24,27,0.48);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

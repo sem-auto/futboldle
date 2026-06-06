@@ -1,29 +1,80 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
-import { getPlayerRarity, getUnlockedPlayers } from "@/lib/album";
+import {
+  getAlbumEntries,
+  getAlbumObjectives,
+  getAlbumProgress,
+  getAlbumRarityProgress,
+  getCollectorLevel,
+  getFeaturedClubProgress,
+  getUnlockedPlayers,
+  toggleFavoritePlayer,
+} from "@/lib/album";
+import type { AlbumRarity } from "@/lib/album";
 
 type Filter = "all" | "unlocked" | "locked";
 
+const BBVA_FILTER_CLUBS = new Set([
+  "Alavés", "Almería", "Athletic", "Athletic Club", "Atlético", "Atlético de Madrid", "Barcelona",
+  "Betis", "Celta", "Celta de Vigo", "Deportivo", "Deportivo de La Coruña", "Eibar", "Espanyol",
+  "Getafe", "Granada", "Las Palmas", "Levante", "Málaga", "Mallorca", "Osasuna", "Racing",
+  "Rayo", "Rayo Vallecano", "Real Madrid", "Real Madrid B", "Real Sociedad", "Sevilla",
+  "Valencia", "Valladolid", "Villarreal", "Zaragoza",
+]);
+
+function clubBadge(clubName: string) {
+  return clubName
+    .replace("Atlético de Madrid", "Atlético")
+    .replace("Athletic Club", "Athletic")
+    .split(/\s+/)
+    .map(part => part[0])
+    .join("")
+    .slice(0, 3)
+    .toUpperCase();
+}
+
+function rarityStyle(rarity: AlbumRarity) {
+  if (rarity === "ICONO") return { label: "ICONO", stars: "★★★★", bar: "#18181b", bg: "#fff8e6", color: "#111" };
+  if (rarity === "LEGENDARIO") return { label: "LEGENDARIO", stars: "★★★", bar: "#c8920a", bg: "#fffbf0", color: "#8a6200" };
+  if (rarity === "CORE") return { label: "CORE", stars: "★★", bar: "#1e6b2e", bg: "#f0faf2", color: "#1e6b2e" };
+  return { label: "CULTO", stars: "★", bar: "#7c3aed", bg: "#f5f0ff", color: "#6d28d9" };
+}
+
 export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
   const [unlocked, setUnlocked] = useState<number[]>([]);
+  const [version, setVersion] = useState(0);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [club, setClub] = useState("Todos");
   const [position, setPosition] = useState("Todas");
 
-  useEffect(() => setUnlocked(getUnlockedPlayers()), []);
+  useEffect(() => setUnlocked(getUnlockedPlayers()), [version]);
 
-  const clubs = useMemo(() => ["Todos", ...Array.from(new Set(bbvaPlayers.map(p => p.mainClub))).sort()], []);
+  const clubs = useMemo(() => ["Todos", ...Array.from(new Set(
+    bbvaPlayers.flatMap(p => p.clubs).filter(clubName => BBVA_FILTER_CLUBS.has(clubName))
+  )).sort((a, b) => a.localeCompare(b, "es"))], []);
   const positions = useMemo(() => ["Todas", ...Array.from(new Set(bbvaPlayers.map(p => p.position))).sort()], []);
-  const unlockedSet = new Set(unlocked);
-  const filtered = bbvaPlayers.filter(player => {
-    const isUnlocked = unlockedSet.has(player.id);
-    if (filter === "unlocked" && !isUnlocked) return false;
-    if (filter === "locked" && isUnlocked) return false;
-    if (club !== "Todos" && player.mainClub !== club) return false;
-    if (position !== "Todas" && player.position !== position) return false;
+
+  const albumProgress = getAlbumProgress();
+  const collectorLevel = getCollectorLevel(albumProgress.unlockedCount);
+  const rarityProgress = getAlbumRarityProgress();
+  const clubProgress = getFeaturedClubProgress(["Valencia", "Atlético de Madrid", "Sevilla", "Barcelona", "Villarreal"]);
+  const objectives = getAlbumObjectives();
+  const entries = getAlbumEntries();
+  const filtered = entries.filter(entry => {
+    if (filter === "unlocked" && !entry.isUnlocked) return false;
+    if (filter === "locked" && entry.isUnlocked) return false;
+    if (club !== "Todos" && !entry.player.clubs.includes(club)) return false;
+    if (position !== "Todas" && entry.player.position !== position) return false;
     return true;
   });
+  const selected = selectedId ? entries.find(entry => entry.player.id === selectedId) : null;
+
+  function toggleFavorite(playerId: number) {
+    toggleFavoritePlayer(playerId);
+    setVersion(v => v + 1);
+  }
 
   return (
     <div className="flex flex-col gap-4 pb-10">
@@ -35,7 +86,28 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
         <div className="px-5 py-4">
           <div className="text-[9px] font-semibold uppercase tracking-[0.2em] mb-2 text-white/80">Colección persistente</div>
           <h2 className="font-bebas text-[34px] leading-none text-white">ÁLBUM BBVA</h2>
-          <p className="text-white/80 text-[12px] mt-1">{unlocked.length} / {bbvaPlayers.length} jugadores desbloqueados</p>
+          <p className="text-white/80 text-[12px] mt-1">
+            {albumProgress.unlockedCount} / {albumProgress.total} jugadores desbloqueados · {albumProgress.percent}%
+          </p>
+          <div className="grid grid-cols-4 gap-2 mt-3">
+            {(["ICONO", "LEGENDARIO", "CORE", "CULTO"] as const).map(rarity => (
+              <div key={rarity} className="rounded-lg px-2 py-1.5" style={{ background: "rgba(255,255,255,0.16)" }}>
+                <div className="text-[8px] font-semibold uppercase tracking-[0.12em] text-white/75">{rarity}</div>
+                <div className="font-bebas text-[17px] leading-none text-white">
+                  {rarityProgress[rarity].unlocked}/{rarityProgress[rarity].total}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 rounded-lg px-3 py-2" style={{ background: "rgba(255,255,255,0.16)" }}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-oswald font-semibold text-[11px] text-white">Nivel {collectorLevel.level}</span>
+              <span className="text-[10px] text-white/80">{collectorLevel.current}/{collectorLevel.nextTarget} cromos</span>
+            </div>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.22)" }}>
+              <div className="h-full rounded-full" style={{ width: `${collectorLevel.percent}%`, background: "white" }} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -62,38 +134,134 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
         </select>
       </div>
 
+      <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+        <div className="font-bebas text-[20px] leading-none mb-2" style={{ color: "#18181b" }}>PROGRESO POR EQUIPOS</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {clubProgress.map(item => (
+            <button key={item.club} onClick={() => setClub(item.club)} className="text-left rounded-lg px-3 py-2"
+              style={{ background: club === item.club ? "#fffbf5" : "#f8f5f0", border: `1px solid ${club === item.club ? "rgba(200,146,10,0.35)" : "rgba(0,0,0,0.06)"}` }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bebas"
+                  style={{ background: "#18181b", color: "white" }}>{clubBadge(item.club)}</span>
+                <span className="font-oswald font-semibold text-[12px] flex-1" style={{ color: "#18181b" }}>{item.club.replace("Atlético de Madrid", "Atlético")}</span>
+                <span className="text-[10px] font-semibold" style={{ color: "#9a9a8a" }}>{item.unlocked}/{item.total} · {item.percent}%</span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#ece8e0" }}>
+                <div className="h-full rounded-full" style={{ width: `${item.percent}%`, background: "#c8920a" }} />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+        <div className="font-bebas text-[20px] leading-none mb-2" style={{ color: "#18181b" }}>OBJETIVOS</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {objectives.map(objective => (
+            <div key={objective.id} className="rounded-lg px-3 py-2" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{objective.label}</span>
+                <span className="text-[10px] font-semibold" style={{ color: "#9a9a8a" }}>{objective.current}/{objective.target}</span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#ece8e0" }}>
+                <div className="h-full rounded-full" style={{ width: `${objective.percent}%`, background: objective.percent >= 100 ? "#1e6b2e" : "#c8920a" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        {filtered.map(player => {
-          const isUnlocked = unlockedSet.has(player.id);
+        {filtered.map(({ player, isUnlocked, isFavorite, unlockedAt, rarity }) => {
+          const style = rarityStyle(rarity);
           return (
-            <div key={player.id} className="rounded-xl overflow-hidden min-h-[142px]" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-              <div className="h-[4px]" style={{ background: isUnlocked ? "#c8920a" : "#ddd7ca" }} />
-              <div className="p-3">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="font-bebas text-[22px] leading-none" style={{ color: isUnlocked ? "#18181b" : "#c8c1b6" }}>
+            <div key={player.id} className="rounded-xl overflow-hidden min-h-[190px] relative"
+              style={{ background: isUnlocked ? style.bg : "#f3efe8", border: `1px solid ${isUnlocked ? "rgba(0,0,0,0.10)" : "rgba(0,0,0,0.08)"}`, boxShadow: isUnlocked ? "0 4px 14px rgba(0,0,0,0.08)" : "0 2px 8px rgba(0,0,0,0.04)" }}>
+              <div className="h-[5px]" style={{ background: isUnlocked ? style.bar : "#ddd7ca" }} />
+              {isUnlocked && (
+                <button onClick={() => toggleFavorite(player.id)} className="absolute top-2 right-2 w-7 h-7 rounded-full text-[13px]"
+                  style={{ background: "rgba(255,255,255,0.75)", color: isFavorite ? "#c8920a" : "#b8b0a4", border: "1px solid rgba(0,0,0,0.08)" }}>
+                  ★
+                </button>
+              )}
+              <button onClick={() => setSelectedId(player.id)} className="w-full text-left p-3 pt-2">
+                <div className="mx-auto mb-2 w-14 h-14 rounded-full flex items-center justify-center"
+                  style={{ background: isUnlocked ? "rgba(255,255,255,0.72)" : "#e5ded2", border: "1px solid rgba(0,0,0,0.08)" }}>
+                  <span className="font-bebas text-[24px]" style={{ color: isUnlocked ? style.color : "#b8b0a4" }}>
+                    {isUnlocked ? player.displayName.slice(0, 1).toUpperCase() : "?"}
+                  </span>
+                </div>
+                <div className="mb-2">
+                  <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: isUnlocked ? style.color : "#aaa" }}>
+                    {isUnlocked ? `${style.stars} ${style.label}` : "CROMO OCULTO"}
+                  </div>
+                  <div className="font-bebas text-[25px] leading-none mt-1 pr-7" style={{ color: isUnlocked ? "#18181b" : "#c8c1b6" }}>
                     {isUnlocked ? player.displayName.toUpperCase() : "?????"}
                   </div>
-                  <span className="text-[8px] font-semibold px-1.5 py-0.5 rounded" style={{ background: isUnlocked ? "#fff8e6" : "#f1eee8", color: isUnlocked ? "#c8920a" : "#aaa" }}>
-                    {isUnlocked ? getPlayerRarity(player.category) : "LOCK"}
-                  </span>
                 </div>
                 {isUnlocked ? (
                   <>
-                    <div className="text-[10px] mb-2" style={{ color: "#6b6b72" }}>{player.nationality} · {player.position}</div>
-                    <div className="flex flex-wrap gap-1">
-                      {player.clubs.slice(0, 3).map(clubName => (
-                        <span key={clubName} className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{ background: "#f6f2ea", color: "#6b6b72" }}>{clubName}</span>
+                    <div className="text-[11px] mb-1.5" style={{ color: "#6b6b72" }}>⚑ {player.nationality}</div>
+                    <div className="text-[11px] mb-2" style={{ color: "#6b6b72" }}>⚽ {player.position}</div>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {player.clubs.map(clubName => (
+                        <span key={clubName} className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.65)", color: "#6b6b72", border: "1px solid rgba(0,0,0,0.06)" }}>{clubName}</span>
                       ))}
                     </div>
+                    {unlockedAt && <div className="text-[9px] font-semibold mt-2" style={{ color: "#9a9a8a" }}>Desbloqueado: {unlockedAt}</div>}
                   </>
                 ) : (
-                  <div className="text-[11px] font-semibold" style={{ color: "#aaa" }}>No desbloqueado</div>
+                  <div className="flex flex-col gap-1 text-[11px] font-semibold" style={{ color: "#9a9a8a" }}>
+                    <span>{player.nationality}</span>
+                    <span>{player.position}</span>
+                    <span>{player.clubs.slice(0, 2).join(" · ")}</span>
+                  </div>
                 )}
-              </div>
+              </button>
             </div>
           );
         })}
       </div>
+
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(0,0,0,0.40)" }} onClick={() => setSelectedId(null)}>
+          <div className="w-full max-w-sm rounded-2xl overflow-hidden anim-in" style={{ background: "white", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }} onClick={e => e.stopPropagation()}>
+            <div className="h-1.5" style={{ background: rarityStyle(selected.rarity).bar }} />
+            <div className="p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: rarityStyle(selected.rarity).color }}>{selected.rarity}</div>
+                  <div className="font-bebas text-[34px] leading-none" style={{ color: "#18181b" }}>
+                    {selected.isUnlocked ? selected.player.displayName.toUpperCase() : "?????"}
+                  </div>
+                </div>
+                <button onClick={() => setSelectedId(null)} className="text-[18px]" style={{ color: "#9a9a8a" }}>×</button>
+              </div>
+              <div className="my-4 w-20 h-20 rounded-full flex items-center justify-center mx-auto"
+                style={{ background: rarityStyle(selected.rarity).bg, border: "1px solid rgba(0,0,0,0.08)" }}>
+                <span className="font-bebas text-[36px]" style={{ color: rarityStyle(selected.rarity).color }}>
+                  {selected.isUnlocked ? selected.player.displayName.slice(0, 1).toUpperCase() : "?"}
+                </span>
+              </div>
+              <div className="grid gap-2 text-[12px]" style={{ color: "#6b6b72" }}>
+                <div><strong>Rareza:</strong> {selected.rarity}</div>
+                <div><strong>Equipos:</strong> {selected.player.clubs.join(" · ")}</div>
+                <div><strong>Posición:</strong> {selected.player.position}</div>
+                <div><strong>Nacionalidad:</strong> {selected.player.nationality}</div>
+                {selected.isUnlocked ? (
+                  <>
+                    <div><strong>Desbloqueado mediante:</strong> {selected.source ?? "Futboldle"}</div>
+                    <div><strong>Fecha:</strong> {selected.unlockedAt ?? "Guardado"}</div>
+                    <div><strong>Logros relacionados:</strong> Top Goleadores · Top Asistencias · Colección {selected.player.mainClub}</div>
+                  </>
+                ) : (
+                  <div><strong>Estado:</strong> todavía no desbloqueado</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

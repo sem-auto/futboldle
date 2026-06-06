@@ -4,6 +4,8 @@ import { BBVAPlayer, getPlayerOfDay, getExtraPlayer } from "@/data/bbvaPlayers";
 import { normalize } from "@/lib/normalize";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
+import { loadGameCounts, recordGameCompletion } from "@/lib/profile";
+import { useStats } from "@/lib/useStats";
 
 const MAX = 6;
 const KB  = [
@@ -130,6 +132,12 @@ export default function WordleBBVA({onBack}:Props) {
   const [dayState,  setDayState]  = useState<DayState|null>(null);
   const [loaded,    setLoaded]    = useState(false);
   const [compactMobile, setCompactMobile] = useState(false);
+  const [wordlesCompleted, setWordlesCompleted] = useState(0);
+  const { stats } = useStats();
+
+  useEffect(() => {
+    setWordlesCompleted(loadGameCounts().wordle);
+  }, [showResult]);
 
   function flash(msg:string){ setToast(msg); setTimeout(()=>setToast(null),1800); }
 
@@ -190,7 +198,10 @@ export default function WordleBBVA({onBack}:Props) {
 
     if(over){
       setWon(w); setGameOver(true);
-      if (w) unlockPlayer(player.id);
+      if (w) {
+        unlockPlayer(player.id, "Wordle BBVA");
+        if (mode === "daily") recordGameCompletion("wordle", getDayKey());
+      }
       const result:GameResult={
         letters: newRows.filter(r=>r.submitted).map(r=>r.letters),
         states:  newRows.filter(r=>r.submitted).map(r=>r.states),
@@ -390,9 +401,9 @@ export default function WordleBBVA({onBack}:Props) {
 
       {/* ── KEYBOARD ── */}
       {!showResult&&(
-        <div className="flex flex-col gap-0.5 md:gap-1.5 items-center mt-1.5 md:mt-2 w-full max-w-[100vw] overflow-hidden">
+        <div className="flex flex-col gap-[3px] md:gap-1.5 items-center mt-1.5 md:mt-2 w-full max-w-[100vw] overflow-hidden px-0">
           {KB.map((row,ri)=>(
-            <div key={ri} className="flex gap-[2px] md:gap-[5px] max-w-full">
+            <div key={ri} className="flex gap-[3px] md:gap-[5px] max-w-full">
               {row.map(key=>{
                 const ks=keyState(key,rows);
                 let bg="white", color="var(--txt3)", border="1px solid var(--b1)";
@@ -402,7 +413,7 @@ export default function WordleBBVA({onBack}:Props) {
                 const wide=key==="ENTER"||key==="⌫";
                 return (
                   <button key={key} onClick={()=>handleKey(key)}
-                    className={`h-[41px] md:h-[50px] rounded-lg font-oswald font-semibold transition-all active:scale-95 select-none ${wide ? "w-auto min-w-[47px] md:min-w-[52px] px-1.5 md:px-2 text-[9px] md:text-[10px]" : "w-[29px] md:w-[34px] px-0 text-[13px] md:text-[15px]"}`}
+                    className={`h-[48px] md:h-[50px] rounded-lg font-oswald font-semibold transition-all active:scale-95 select-none ${wide ? "w-auto min-w-[56px] md:min-w-[52px] px-1 md:px-2 text-[9px] md:text-[10px]" : "w-[33px] md:w-[34px] px-0 text-[14px] md:text-[15px]"}`}
                     style={{
                       letterSpacing:wide?"0.08em":"0.02em",
                       background:bg, color, border,
@@ -418,50 +429,61 @@ export default function WordleBBVA({onBack}:Props) {
 
       {/* ── RESULT PANEL ── */}
       {showResult&&(
-        <div className="rounded-2xl p-4 md:p-5 anim-in"
+        <div className="rounded-2xl p-3 md:p-5 anim-in"
           style={{background:"white",border:"1px solid var(--b3)",boxShadow:"0 20px 60px rgba(0,0,0,.6)"}}>
 
           {/* Win/Lose header */}
-          <div className="text-center mb-3 md:mb-5">
+          <div className="text-center mb-2 md:mb-5">
             {won?(
               <>
-                <div className="font-display text-4xl md:text-5xl mb-1" style={{color:"var(--gold)"}}>¡CRACK!</div>
-                <p className="text-sm font-semibold" style={{color:"var(--ok-txt)"}}>
+                <div className="font-display text-3xl md:text-5xl mb-0.5 md:mb-1" style={{color:"var(--gold)"}}>¡CRACK!</div>
+                <p className="text-xs md:text-sm font-semibold" style={{color:"var(--ok-txt)"}}>
                   {rows.filter(r=>r.submitted).length}/{MAX} intentos
                 </p>
               </>
             ):(
               <>
-                <div className="font-display text-4xl md:text-5xl mb-1" style={{color:"#18181b"}}>CASI...</div>
-                <p className="text-sm" style={{color:"var(--txt3)"}}>Mañana puede ser tu día</p>
+                <div className="font-display text-3xl md:text-5xl mb-0.5 md:mb-1" style={{color:"#18181b"}}>CASI...</div>
+                <p className="text-xs md:text-sm" style={{color:"var(--txt3)"}}>Mañana puede ser tu día</p>
               </>
             )}
           </div>
 
+          <div className="grid grid-cols-2 gap-2 mb-2 md:mb-4">
+            <div className="rounded-lg px-2 py-1.5 text-center" style={{ background: "var(--gold-bg)", border: "1px solid var(--gold-bd)" }}>
+              <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--gold)" }}>Wordles</div>
+              <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>{wordlesCompleted}</div>
+            </div>
+            <div className="rounded-lg px-2 py-1.5 text-center" style={{ background: "var(--grass-bg)", border: "1px solid var(--grass-bd)" }}>
+              <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--grass)" }}>Racha max.</div>
+              <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>{stats.bestStreak}</div>
+            </div>
+          </div>
+
           {/* Cromo card */}
-          <div className="rounded-xl p-3 md:p-4 mb-3 md:mb-4 relative overflow-hidden" style={{background:"white",border:"1px solid var(--b-gold)"}}>
+          <div className="rounded-xl p-2.5 md:p-4 mb-2 md:mb-4 relative overflow-hidden" style={{background:"white",border:"1px solid var(--b-gold)"}}>
             <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl" style={{background:"linear-gradient(90deg,var(--gold2),var(--gold),var(--gold2))"}}/>
             <div className="pt-1">
               <div className="text-[9px] font-oswald font-semibold uppercase tracking-[0.22em] mb-1" style={{color:"var(--gold)"}}>El jugador era</div>
-              <div className="font-display text-2xl md:text-3xl leading-none mb-0.5" style={{color:"#18181b"}}>{player.displayName.toUpperCase()}</div>
-              <div className="text-[12px] mb-3" style={{color:"var(--txt3)"}}>{player.fullName} · {player.nationality}</div>
-              <div className="flex flex-wrap gap-1 md:gap-1.5 mb-2 md:mb-3">
+              <div className="font-display text-xl md:text-3xl leading-none mb-0.5" style={{color:"#18181b"}}>{player.displayName.toUpperCase()}</div>
+              <div className="text-[11px] md:text-[12px] mb-2 md:mb-3" style={{color:"var(--txt3)"}}>{player.fullName} · {player.nationality}</div>
+              <div className="flex flex-wrap gap-1 md:gap-1.5 mb-1.5 md:mb-3">
                 {player.clubs.map(c=>(
-                  <span key={c} className="text-[11px] font-semibold px-2 py-0.5 rounded"
+                  <span key={c} className="text-[10px] md:text-[11px] font-semibold px-1.5 md:px-2 py-0.5 rounded"
                     style={{background:"white",color:"var(--txt3)",border:"1px solid var(--b2)"}}>
                     {c}
                   </span>
                 ))}
               </div>
-              <p className="text-[11px] md:text-[12px] italic leading-snug md:leading-relaxed" style={{color:"var(--txt3)"}}>&ldquo;{player.hint}&rdquo;</p>
+              <p className="text-[10px] md:text-[12px] italic leading-snug md:leading-relaxed" style={{color:"var(--txt3)"}}>&ldquo;{player.hint}&rdquo;</p>
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 pb-[env(safe-area-inset-bottom)]">
             {mode==="daily"&&(
               <button onClick={handleShare}
-                className="w-full py-3 md:py-3.5 rounded-xl font-oswald font-semibold uppercase tracking-wider text-sm transition-all active:scale-[.98]"
+                className="w-full py-2.5 md:py-3.5 rounded-xl font-oswald font-semibold uppercase tracking-wider text-xs md:text-sm transition-all active:scale-[.98]"
                 style={{
                   background:copied?"var(--ok-bg)":"var(--gold)",
                   color:copied?"var(--ok-txt)":"#111",

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
+import { recordGameCompletion } from "@/lib/profile";
 import PlayerSearch from "@/components/PlayerSearch";
 
 const MAX = 5;
@@ -102,7 +103,8 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
 
     if (correct) {
       setWon(true);
-      unlockPlayer(player.id);
+      unlockPlayer(player.id, "Adivina el Crack");
+      recordGameCompletion("crack", getDayKey());
     }
     if (isOver) setGameOver(true);
 
@@ -167,7 +169,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
             <div key={i} className="flex-1 h-[5px] rounded-full transition-all"
               style={{ background: i < attempt ? "rgba(255,255,255,0.40)" : i === attempt && !gameOver ? "white" : "rgba(255,255,255,0.15)" }} />
           ))}
-          <span className="text-white/50 text-[9px] font-semibold ml-1">{gameOver ? "—" : `${MAX - attempt} left`}</span>
+          <span className="text-white/50 text-[9px] font-semibold ml-1">{gameOver ? "—" : `${MAX - attempt} intentos`}</span>
         </div>
       </div>
 
