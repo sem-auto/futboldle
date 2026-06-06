@@ -6,6 +6,7 @@ import type { Top10Answer } from "@/data/top10Challenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameCompletion } from "@/lib/profile";
+import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 
 function norm(s: string) {
@@ -49,6 +50,12 @@ function findPlayerForTop10(item: Top10Answer) {
     bbvaPlayers.find(p => norm(p.answer) === norm(item.answer));
 }
 
+function difficultyLabel(kind: "FÁCIL" | "MEDIO" | "DIFÍCIL") {
+  if (kind === "FÁCIL") return "🎯 Fácil";
+  if (kind === "MEDIO") return "🔥 Medio";
+  return "💀 Difícil";
+}
+
 export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   const challenge = getDailyTop10();
 
@@ -63,6 +70,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   const [loaded,         setLoaded]         = useState(false);
   const [showDirectory,  setShowDirectory]  = useState(false);
   const [completedTops,  setCompletedTops]  = useState<string[]>([]);
+  const [showFullTop,    setShowFullTop]    = useState(false);
 
   useEffect(() => {
     const saved = loadSaved(challenge.id);
@@ -79,6 +87,10 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
       setCompletedTops(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : []);
     } catch {}
     setLoaded(true);
+  }, [challenge.id]);
+
+  useEffect(() => {
+    trackEvent("game_started", { game: "top10", challenge: challenge.id });
   }, [challenge.id]);
 
   const handleGuess = useCallback((displayName: string, answer: string) => {
@@ -140,7 +152,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
     if (finished && !surrendered) {
       try { localStorage.setItem(`fbl-top10-done-${getDayKey()}`, "won"); } catch {}
       recordGameCompletion("top10", `${getDayKey()}-${challenge.id}`);
-      if (challenge.answers.length > 10) recordGameCompletion("top20", `${getDayKey()}-${challenge.id}`);
+      trackEvent("game_completed", { game: "top10", challenge: challenge.id, total: challenge.answers.length });
       try {
         const raw = localStorage.getItem("fbl-top-completed-v1");
         const parsed = raw ? JSON.parse(raw) : [];
@@ -152,7 +164,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
         }
       } catch {}
     }
-  }, [finished, surrendered, challenge.id]);
+  }, [finished, surrendered, challenge.id, challenge.answers.length]);
 
   const wrongCount = allGuesses.length - guessedAnswers.length;
   const pct = Math.round((guessedAnswers.length / challenge.answers.length) * 100);
@@ -220,9 +232,10 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
         <div className="px-5 py-4">
           <div className="inline-block text-[9px] font-semibold uppercase tracking-[0.2em] px-2.5 py-1 rounded-full mb-2.5"
             style={{ background: "rgba(255,255,255,0.2)", color: "white" }}>
-            {challenge.emoji} {challenge.kind} · #{getDayNumber()}
+            {challenge.emoji} {difficultyLabel(challenge.kind)} · #{getDayNumber()}
           </div>
           <h2 className="font-bebas text-[28px] leading-none text-white mb-1">{challenge.title.toUpperCase()}</h2>
+          <p className="text-white/80 text-[10px] font-semibold uppercase tracking-[0.14em] mb-1">{challenge.topType}</p>
           <p className="text-white/70 text-[11px] mb-1">{challenge.subtitle}</p>
           <p className="text-white/90 text-[12px] font-semibold">{challenge.consigna}</p>
           <p className="text-white/55 text-[10px] mt-2">{challenge.source}</p>
@@ -242,12 +255,13 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
       {!done && (
         <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(26,79,160,0.12)" }}>
           <div className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: "#1a4fa0" }}>Recompensas</div>
-          <div className="flex flex-wrap gap-1.5">
-            {challenge.answers.slice(0, 8).map(item => (
-              <span key={item.position} className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#eff4ff", color: "#1a4fa0" }}>
-                🏆 {item.displayName}
-              </span>
-            ))}
+          <div className="flex flex-col gap-1.5">
+            <div className="font-oswald font-semibold text-[13px]" style={{ color: "#18181b" }}>
+              🎴 {challenge.answers.length} cromos desbloqueables
+            </div>
+            <div className="text-[11px] font-semibold" style={{ color: "#9a9a8a" }}>
+              ⭐ Incluye cromos de distintas rarezas
+            </div>
           </div>
         </div>
       )}
@@ -373,6 +387,38 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
               style={{ background: copied ? "#1e6b2e" : "#1a4fa0", color: "white" }}>
               {copied ? "✓ Copiado" : "Compartir resultado"}
             </button>
+            {challenge.extendedAnswers && (
+              <button
+                onClick={() => {
+                  setShowFullTop(v => !v);
+                  if (!showFullTop) {
+                    recordGameCompletion("top20", `${getDayKey()}-${challenge.id}`);
+                    trackEvent("game_completed", { game: "top20", challenge: challenge.id, total: 20 });
+                  }
+                }}
+                className="w-full mt-2 font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
+                style={{ background: "#f8f5f0", color: "#1a4fa0", border: "1px solid rgba(26,79,160,0.16)" }}
+              >
+                {showFullTop ? "Ocultar Top20 completo" : "Ver Top20 completo"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {done && showFullTop && challenge.extendedAnswers && (
+        <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(26,79,160,0.12)" }}>
+          <div className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: "#1a4fa0" }}>Top20 completo</div>
+          <div className="flex flex-col gap-1">
+            {challenge.extendedAnswers.map(item => (
+              <div key={item.position} className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: "#f8f5f0" }}>
+                <span className="w-6 h-6 rounded-full flex items-center justify-center font-bebas text-[12px]" style={{ background: "#1a4fa0", color: "white" }}>{item.position}</span>
+                <div>
+                  <div className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{item.displayName}</div>
+                  <div className="text-[9px]" style={{ color: "#9a9a8a" }}>{item.detail}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

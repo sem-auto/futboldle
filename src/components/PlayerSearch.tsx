@@ -37,7 +37,7 @@ function getSuggestions(players: BBVAPlayer[], query: string, usedIds: number[])
     .map(player => ({ player, score: scorePlayer(player, query) }))
     .filter(item => item.score < 99)
     .sort((a, b) => a.score - b.score || a.player.displayName.localeCompare(b.player.displayName, "es"))
-    .slice(0, 8)
+    .slice(0, 10)
     .map(item => item.player);
 }
 
@@ -93,7 +93,7 @@ export default function PlayerSearch({
       />
 
       {(suggestions.length > 0 || showEmpty) && (
-        <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-80 overflow-y-auto"
+        <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-96 overflow-y-auto"
           style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
           {suggestions.map(player => (
             <button

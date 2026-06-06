@@ -4,6 +4,7 @@ import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameCompletion } from "@/lib/profile";
+import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 
 const MAX = 5;
@@ -88,6 +89,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
       setWon(saved.won);
       if (saved.gameOver) setShowResult(true);
     }
+    trackEvent("game_started", { game: "crack" });
     setLoaded(true);
   }, [player.id]);
 
@@ -106,6 +108,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
       unlockPlayer(player.id, "Adivina el Crack");
       recordGameCompletion("crack", getDayKey());
     }
+    if (isOver) trackEvent("game_completed", { game: "crack", won: correct, attempts: newGuesses.length });
     if (isOver) setGameOver(true);
 
     saveCrack({

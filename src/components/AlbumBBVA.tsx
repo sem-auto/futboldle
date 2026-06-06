@@ -12,6 +12,7 @@ import {
   toggleFavoritePlayer,
 } from "@/lib/album";
 import type { AlbumRarity } from "@/lib/album";
+import { trackEvent } from "@/lib/analytics";
 
 type Filter = "all" | "unlocked" | "locked";
 
@@ -50,6 +51,10 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
   const [position, setPosition] = useState("Todas");
 
   useEffect(() => setUnlocked(getUnlockedPlayers()), [version]);
+
+  useEffect(() => {
+    trackEvent("album_visit");
+  }, []);
 
   const clubs = useMemo(() => ["Todos", ...Array.from(new Set(
     bbvaPlayers.flatMap(p => p.clubs).filter(clubName => BBVA_FILTER_CLUBS.has(clubName))
@@ -175,7 +180,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
         {filtered.map(({ player, isUnlocked, isFavorite, unlockedAt, rarity }) => {
           const style = rarityStyle(rarity);
           return (
-            <div key={player.id} className="rounded-xl overflow-hidden min-h-[190px] relative"
+            <div key={player.id} className={`rounded-xl overflow-hidden min-h-[190px] relative ${isUnlocked ? "anim-pop" : ""}`}
               style={{ background: isUnlocked ? style.bg : "#f3efe8", border: `1px solid ${isUnlocked ? "rgba(0,0,0,0.10)" : "rgba(0,0,0,0.08)"}`, boxShadow: isUnlocked ? "0 4px 14px rgba(0,0,0,0.08)" : "0 2px 8px rgba(0,0,0,0.04)" }}>
               <div className="h-[5px]" style={{ background: isUnlocked ? style.bar : "#ddd7ca" }} />
               {isUnlocked && (
@@ -212,9 +217,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                   </>
                 ) : (
                   <div className="flex flex-col gap-1 text-[11px] font-semibold" style={{ color: "#9a9a8a" }}>
-                    <span>{player.nationality}</span>
-                    <span>{player.position}</span>
-                    <span>{player.clubs.slice(0, 2).join(" · ")}</span>
+                    <span>Pista mínima: {player.position}</span>
                   </div>
                 )}
               </button>

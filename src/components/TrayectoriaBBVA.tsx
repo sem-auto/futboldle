@@ -4,6 +4,7 @@ import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayNumber, getDayKey } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameCompletion } from "@/lib/profile";
+import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 
 const MAX = 5;
@@ -107,6 +108,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
       setWon(saved.won);
       if (saved.gameOver) setShowResult(true);
     }
+    trackEvent("game_started", { game: "trayectoria" });
     setLoaded(true);
   }, [player.id]);
 
@@ -125,6 +127,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
       unlockPlayer(player.id, "Trayectoria BBVA");
       recordGameCompletion("trayectoria", getDayKey());
     }
+    if (isOver) trackEvent("game_completed", { game: "trayectoria", won: correct, attempts: newGuesses.length });
     if (isOver) setGameOver(true);
 
     saveTray({

@@ -1,4 +1,5 @@
 import { bbvaPlayers } from "@/data/bbvaPlayers";
+import { trackEvent } from "./analytics";
 import { normalize } from "./normalize";
 
 const ALBUM_KEY = "fbl-album-unlocked-v1";
@@ -108,7 +109,8 @@ export function unlockPlayer(playerId: number, source = "Futboldle") {
     if (player) {
       const rarity = getPlayerRarity(player);
       localStorage.setItem("fbl-last-card-unlock-v1", JSON.stringify({ id: player.id, name: player.displayName, rarity, at: Date.now() }));
-      window.dispatchEvent(new CustomEvent("fbl-card-unlocked", { detail: { id: player.id, name: player.displayName, rarity } }));
+      window.dispatchEvent(new CustomEvent("fbl-card-unlocked", { detail: { id: player.id, name: player.displayName, rarity, clubs: player.clubs, position: player.position } }));
+      trackEvent("card_unlocked", { playerId: player.id, player: player.displayName, rarity, source });
     }
     syncTrophies();
   } catch {}
@@ -269,6 +271,7 @@ export function getCollectorLevel(unlockedCount = getAlbumProgress().unlockedCou
 }
 
 const TROPHY_KEY = "fbl-trophies-v1";
+const TROPHY_META_KEY = "fbl-trophy-meta-v1";
 
 export const TROPHY_DEFINITIONS = [
   ...["Valencia", "Atlético de Madrid", "Sevilla", "Barcelona", "Villarreal", "Deportivo", "Málaga", "Athletic Club"].map(club => ({
@@ -311,6 +314,18 @@ function loadTrophyIds(): string[] {
   }
 }
 
+function loadTrophyMeta(): Record<string, { unlockedAt: string }> {
+  try {
+    const raw = localStorage.getItem(TROPHY_META_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    return parsed as Record<string, { unlockedAt: string }>;
+  } catch {
+    return {};
+  }
+}
+
 export function syncTrophies() {
   try {
     const earned = new Set(loadTrophyIds());
@@ -326,6 +341,7 @@ export function syncTrophies() {
       const stats = JSON.parse(localStorage.getItem("fbl-stats-v1") ?? "{}");
       bestStreak = typeof stats.bestStreak === "number" ? stats.bestStreak : 0;
     } catch {}
+    const before = new Set(earned);
     for (const trophy of TROPHY_DEFINITIONS) {
       if ("club" in trophy) {
         const clubProgress = getClubProgress(trophy.club);
@@ -349,6 +365,14 @@ export function syncTrophies() {
     if (bestStreak >= 30) earned.add("streak-30");
     if (bestStreak >= 100) earned.add("streak-100");
     localStorage.setItem(TROPHY_KEY, JSON.stringify([...earned]));
+    const trophyMeta = loadTrophyMeta();
+    for (const id of earned) {
+      if (!before.has(id)) {
+        trophyMeta[id] = { unlockedAt: todayIso() };
+        trackEvent("trophy_unlocked", { trophyId: id });
+      }
+    }
+    localStorage.setItem(TROPHY_META_KEY, JSON.stringify(trophyMeta));
     return [...earned];
   } catch {
     return loadTrophyIds();
@@ -357,8 +381,10 @@ export function syncTrophies() {
 
 export function getTrophyShowcase() {
   const earned = new Set(syncTrophies());
+  const meta = loadTrophyMeta();
   return TROPHY_DEFINITIONS.map(trophy => ({
     ...trophy,
     unlocked: earned.has(trophy.id),
+    unlockedAt: meta[trophy.id]?.unlockedAt ?? null,
   }));
 }

@@ -5,6 +5,7 @@ import { normalize } from "@/lib/normalize";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { loadGameCounts, recordGameCompletion } from "@/lib/profile";
+import { trackEvent } from "@/lib/analytics";
 import { useStats } from "@/lib/useStats";
 
 const MAX = 6;
@@ -170,6 +171,7 @@ export default function WordleBBVA({onBack}:Props) {
     setMode("daily");
     setExtraIdx(0);
     startGame(dailyPlayer, ds.daily);
+    trackEvent("game_started", { game: "wordle", mode: "daily" });
     setLoaded(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
@@ -202,6 +204,7 @@ export default function WordleBBVA({onBack}:Props) {
         unlockPlayer(player.id, "Wordle BBVA");
         if (mode === "daily") recordGameCompletion("wordle", getDayKey());
       }
+      trackEvent("game_completed", { game: "wordle", mode, won: w });
       const result:GameResult={
         letters: newRows.filter(r=>r.submitted).map(r=>r.letters),
         states:  newRows.filter(r=>r.submitted).map(r=>r.states),
@@ -219,7 +222,7 @@ export default function WordleBBVA({onBack}:Props) {
       setDayState(newDs);
       setTimeout(()=>setShowResult(true),flipDelay);
     }
-  },[rows,curRow,answer,dayState,mode,extraIdx]);
+  },[rows,curRow,answer,dayState,mode,extraIdx,player.id]);
 
   // ── Key handler ──
   const handleKey=useCallback((key:string)=>{

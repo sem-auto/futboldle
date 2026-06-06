@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getTrophyShowcase } from "@/lib/album";
+import { trackEvent } from "@/lib/analytics";
 
 type Trophy = ReturnType<typeof getTrophyShowcase>[number];
 
@@ -22,7 +23,10 @@ function trophyBadge(trophy: Trophy) {
 export default function VitrinaPage() {
   const [trophies, setTrophies] = useState<Trophy[]>([]);
 
-  useEffect(() => setTrophies(getTrophyShowcase()), []);
+  useEffect(() => {
+    setTrophies(getTrophyShowcase());
+    trackEvent("showcase_visit");
+  }, []);
 
   const groups = useMemo(() => {
     return trophies.reduce<Record<string, Trophy[]>>((acc, trophy) => {
@@ -66,6 +70,9 @@ export default function VitrinaPage() {
                       <div className="text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: trophy.unlocked ? "#c8920a" : "#bbb" }}>
                         {trophy.unlocked ? "Desbloqueado" : "Bloqueado"}
                       </div>
+                      {trophy.unlocked && trophy.unlockedAt && (
+                        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>Fecha: {trophy.unlockedAt}</div>
+                      )}
                     </div>
                     {trophy.unlocked && (
                       <button onClick={() => shareTrophy(trophy)} className="text-[9px] font-semibold px-2 py-1 rounded" style={{ background: "white", color: "#c8920a" }}>

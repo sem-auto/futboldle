@@ -566,6 +566,15 @@ export default function HomePage() {
         {/* Barra de progreso diaria */}
         <DailyProgress wordleDone={wordleDone} wordleWon={wordleWon} trayDone={trayDone} trayWon={trayWon} top10Done={top10Done} top10Won={top10Won} crackDone={crackDone} crackWon={crackWon} streak={stats.streak} />
 
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
+          {["Retos diarios Liga BBVA 2005-2016", "Desbloquea cromos", "Completa trofeos", "Construye tu colección"].map(item => (
+            <div key={item} className="text-center text-[9px] font-semibold px-2 py-1.5 rounded-lg"
+              style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)", color: "#6b6b72" }}>
+              {item}
+            </div>
+          ))}
+        </div>
+
         <ProfileCompact
           played={stats.played}
           won={stats.won}
