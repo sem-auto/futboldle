@@ -4,11 +4,13 @@ import WordleBBVA from "@/components/WordleBBVA";
 import TrayectoriaBBVA from "@/components/TrayectoriaBBVA";
 import Top10BBVA from "@/components/Top10BBVA";
 import AdivinaElCrack from "@/components/AdivinaElCrack";
+import AlbumBBVA from "@/components/AlbumBBVA";
 import PromoBanner, { SidebarAds } from "@/components/PromoBanner";
 import { getDayNumber, getDayKey } from "@/lib/daily";
 import { useStats } from "@/lib/useStats";
+import { getAlbumProgress } from "@/lib/album";
 
-type View = "home" | "wordle" | "trayectoria" | "top10" | "crack";
+type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "album";
 
 const BBVA_PHRASES = [
   "¿Te acuerdas de Apoño?",
@@ -424,12 +426,51 @@ function TodayStrip({ wordleDone, trayDone, onWordle, onTray }: {
 }
 
 /* ════════════════════════════════════════════ */
+function ProfileCompact({ played, won, streak, albumProgress, onAlbum }: {
+  played: number;
+  won: number;
+  streak: number;
+  albumProgress: { unlockedCount: number; total: number; percent: number };
+  onAlbum: () => void;
+}) {
+  const winPct = played > 0 ? Math.round((won / played) * 100) : 0;
+
+  return (
+    <div className="grid grid-cols-3 gap-2 rounded-xl px-3 py-2"
+      style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+      <div>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Partidas</div>
+        <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>{played}</div>
+        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>{winPct}% victorias</div>
+      </div>
+      <div>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Racha</div>
+        <div className="font-bebas text-[18px] leading-none" style={{ color: "#c8920a" }}>{streak}</div>
+        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>actual</div>
+      </div>
+      <button onClick={onAlbum} className="text-left rounded-lg px-2 py-1 transition-colors"
+        style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.20)" }}>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#c8920a" }}>Album</div>
+        <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>
+          {albumProgress.unlockedCount}/{albumProgress.total}
+        </div>
+        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>{albumProgress.percent}%</div>
+      </button>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [view, setView] = useState<View>("home");
+  const [albumProgress, setAlbumProgress] = useState({ unlockedCount: 0, total: 0, percent: 0 });
   const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon } = useDailyStatus();
   const { stats } = useStats();
   const n = getDayNumber() % BBVA_PHRASES.length;
   const goHome = () => setView("home");
+
+  useEffect(() => {
+    setAlbumProgress(getAlbumProgress());
+  }, [view]);
 
   if (view === "top10") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
@@ -471,6 +512,16 @@ export default function HomePage() {
     </div>
   );
 
+  if (view === "album") return (
+    <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
+      <SidebarAds />
+      <Header onLogoClick={goHome} />
+      <main className="max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
+        <AlbumBBVA onBack={goHome} />
+      </main>
+    </div>
+  );
+
   return (
     <div className="min-h-dvh flex flex-col" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
@@ -489,15 +540,23 @@ export default function HomePage() {
           <div className="sm:ml-3 flex-1">
             <TodayStrip wordleDone={wordleDone} trayDone={trayDone} onWordle={()=>setView("wordle")} onTray={()=>setView("trayectoria")}/>
           </div>
-          {stats.played > 0 && (
-            <div className="flex-shrink-0 text-[10px]" style={{ color: "#9a9a8a" }}>
-              {stats.played} jugados · {Math.round((stats.won/stats.played)*100)}% victorias
-            </div>
-          )}
+          <button onClick={() => setView("album")}
+            className="flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-lg"
+            style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.18)", color: "#c8920a" }}>
+            Album · {albumProgress.unlockedCount}
+          </button>
         </div>
 
         {/* Barra de progreso diaria */}
         <DailyProgress wordleDone={wordleDone} wordleWon={wordleWon} trayDone={trayDone} trayWon={trayWon} top10Done={top10Done} top10Won={top10Won} crackDone={crackDone} crackWon={crackWon} streak={stats.streak} />
+
+        <ProfileCompact
+          played={stats.played}
+          won={stats.won}
+          streak={stats.streak}
+          albumProgress={albumProgress}
+          onAlbum={() => setView("album")}
+        />
 
         {/* Frase nostalgia */}
         <div className="text-[10px] md:text-[11px] italic text-center py-0 md:py-1" style={{ color: "#9a9a8a" }}>

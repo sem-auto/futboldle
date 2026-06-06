@@ -4,6 +4,8 @@ import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDailyTop10 } from "@/data/top10Challenges";
 import type { Top10Answer } from "@/data/top10Challenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
+import { unlockPlayer } from "@/lib/album";
+import PlayerSearch from "@/components/PlayerSearch";
 
 function norm(s: string) {
   return s.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, "");
@@ -23,37 +25,6 @@ function answerAliases(answer: string) {
   return TOP10_ALIASES[normalized] ?? [normalized];
 }
 
-function matchesAnswer(q: string, item: Top10Answer) {
-  const nq = norm(q);
-  return norm(item.answer).includes(nq) ||
-    norm(item.displayName).includes(nq) ||
-    answerAliases(item.answer).some(alias => alias.includes(nq));
-}
-
-function suggestPlayers(q: string, allGuesses: string[], answers: Top10Answer[]) {
-  if (q.trim().length < 2) return [];
-  const nq = norm(q);
-  const seen = new Set<string>();
-  const challengeSuggestions = answers
-    .filter(a => !allGuesses.includes(norm(a.answer)) && matchesAnswer(q, a))
-    .map(a => {
-      seen.add(norm(a.answer));
-      return { displayName: a.displayName, answer: a.answer };
-    });
-
-  const playerSuggestions = bbvaPlayers
-    .filter(p => {
-      const a = norm(p.answer);
-      if (allGuesses.includes(a)) return false;
-      if (seen.has(a)) return false;
-      seen.add(a);
-      return norm(p.displayName).includes(nq) || a.includes(nq) || norm(p.fullName).includes(nq);
-    })
-    .map(p => ({ displayName: p.displayName, answer: p.answer }));
-
-  return [...challengeSuggestions, ...playerSuggestions].slice(0, 6);
-}
-
 interface SavedTop10 { date: string; challengeId: string; guessedAnswers: string[]; allGuesses: string[]; finished: boolean; surrendered: boolean; hintsUsed: number; }
 const STORE = () => `fbl-top10-${getDayKey()}`;
 
@@ -71,6 +42,12 @@ function persist(state: Omit<SavedTop10, "date">) {
   try { localStorage.setItem(STORE(), JSON.stringify({ ...state, date: getDayKey() })); } catch {}
 }
 
+function findPlayerForTop10(item: Top10Answer) {
+  return bbvaPlayers.find(p => norm(p.displayName) === norm(item.displayName)) ??
+    bbvaPlayers.find(p => norm(p.fullName) === norm(item.displayName)) ??
+    bbvaPlayers.find(p => norm(p.answer) === norm(item.answer));
+}
+
 export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   const challenge = getDailyTop10();
 
@@ -81,7 +58,6 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   const [surrendered,    setSurrendered]    = useState(false);
   const [wrongFlash,     setWrongFlash]     = useState("");
   const [query,          setQuery]          = useState("");
-  const [suggestions,    setSuggestions]    = useState<{displayName:string;answer:string}[]>([]);
   const [copied,         setCopied]         = useState(false);
   const [loaded,         setLoaded]         = useState(false);
 
@@ -97,10 +73,8 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
     setLoaded(true);
   }, [challenge.id]);
 
-  useEffect(() => { setSuggestions(suggestPlayers(query, allGuesses, challenge.answers)); }, [query, allGuesses, challenge.answers]);
-
   const handleGuess = useCallback((displayName: string, answer: string) => {
-    setQuery(""); setSuggestions([]);
+    setQuery("");
     const normAnswer = norm(answer);
     const newAll = [...allGuesses, normAnswer];
     setAllGuesses(newAll);
@@ -113,6 +87,8 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
         setFinished(true);
         try { localStorage.setItem(STORE().replace("top10","top10"), ""); } catch {} // handled in persist
       }
+      const playerToUnlock = findPlayerForTop10(hit);
+      if (playerToUnlock) unlockPlayer(playerToUnlock.id);
       persist({ challengeId: challenge.id, guessedAnswers: newGuessed, allGuesses: newAll, finished: done, surrendered: false, hintsUsed });
     } else {
       setWrongFlash(displayName);
@@ -121,17 +97,21 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
     }
   }, [allGuesses, guessedAnswers, challenge, hintsUsed]);
 
-  function submitQuery() {
-    if (suggestions.length > 0) {
-      handleGuess(suggestions[0].displayName, suggestions[0].answer);
-      return;
-    }
-
+  function submitQueryFromText() {
     const exactAlias = challenge.answers.find(item =>
       !guessedAnswers.includes(norm(item.answer)) &&
       answerAliases(item.answer).some(alias => alias === norm(query))
     );
     if (exactAlias) handleGuess(exactAlias.displayName, exactAlias.answer);
+  }
+
+  function submitPlayer(player: typeof bbvaPlayers[0]) {
+    const challengeAnswer = challenge.answers.find(item =>
+      norm(item.answer) === norm(player.answer) ||
+      norm(item.displayName) === norm(player.displayName) ||
+      norm(item.displayName) === norm(player.fullName)
+    );
+    handleGuess(challengeAnswer?.displayName ?? player.displayName, challengeAnswer?.answer ?? player.answer);
   }
 
   function handleHint() {
@@ -291,29 +271,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
       {!done && (
         <div className="flex flex-col gap-2">
           <div className="relative">
-            <input type="text" value={query} onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter") submitQuery(); }}
-              placeholder="Escribe el nombre del jugador..."
-              className="w-full px-4 py-3 rounded-xl text-[14px] font-medium outline-none"
-              style={{ background: "white", border: "2px solid rgba(0,0,0,0.12)", color: "#18181b" }}
-              onFocus={e => { (e.target as HTMLInputElement).style.borderColor = "#1a4fa0"; }}
-              onBlur={e => { (e.target as HTMLInputElement).style.borderColor = "rgba(0,0,0,0.12)"; }}
-              autoComplete="off" spellCheck={false} />
-            {suggestions.length > 0 && (
-              <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-64 overflow-y-auto"
-                style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
-                {suggestions.map((s, i) => (
-                  <button key={i} onMouseDown={() => handleGuess(s.displayName, s.answer)}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-left border-b last:border-0 transition-colors"
-                    style={{ borderColor: "rgba(0,0,0,0.06)" }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#eff4ff"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "white"; }}>
-                    <span className="font-oswald font-semibold text-[13px]" style={{ color: "#18181b" }}>{s.displayName}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: "rgba(26,79,160,0.08)", color: "#1a4fa0" }}>↵</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            <PlayerSearch value={query} onChange={setQuery} players={bbvaPlayers} usedIds={bbvaPlayers.filter(p => allGuesses.includes(norm(p.answer))).map(p => p.id)} accent="#1a4fa0" onSelect={submitPlayer} onEnterNoMatch={submitQueryFromText} />
           </div>
 
           {/* Hint + Surrender */}

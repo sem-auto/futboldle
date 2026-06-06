@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayKey, getDayNumber } from "@/lib/daily";
+import { unlockPlayer } from "@/lib/album";
+import PlayerSearch from "@/components/PlayerSearch";
 
 const MAX = 5;
 const STORE_KEY = () => `fbl-crack-${getDayKey()}`;
@@ -48,16 +50,6 @@ function saveCrack(state: Omit<SavedCrack, "date">) {
   } catch {}
 }
 
-function suggestPlayers(q: string, usedIds: number[]) {
-  if (q.trim().length < 2) return [];
-  const nq = norm(q);
-  return bbvaPlayers
-    .filter(p => !usedIds.includes(p.id) && (
-      norm(p.displayName).includes(nq) || norm(p.fullName).includes(nq)
-    ))
-    .slice(0, 6);
-}
-
 /** Approximate age during BBVA era (2005-2016) — midpoint 2010 */
 
 interface Hint { label: string; value: string; revealed: boolean; }
@@ -82,7 +74,6 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
   const [won,         setWon]         = useState(false);
   const [showResult,  setShowResult]  = useState(false);
   const [query,       setQuery]       = useState("");
-  const [suggestions, setSuggestions] = useState<Player[]>([]);
   const [copied,      setCopied]      = useState(false);
   const [loaded,      setLoaded]      = useState(false);
 
@@ -99,10 +90,8 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
     setLoaded(true);
   }, [player.id]);
 
-  useEffect(() => { setSuggestions(suggestPlayers(query, usedIds)); }, [query, usedIds]);
-
   const guess = useCallback((p: Player) => {
-    setQuery(""); setSuggestions([]);
+    setQuery("");
     const newUsedIds = [...usedIds, p.id];
     setUsedIds(newUsedIds);
     const correct = p.id === player.id;
@@ -111,7 +100,10 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
     const newAttempt = attempt + 1;
     const isOver = correct || newAttempt >= MAX;
 
-    if (correct) setWon(true);
+    if (correct) {
+      setWon(true);
+      unlockPlayer(player.id);
+    }
     if (isOver) setGameOver(true);
 
     saveCrack({
@@ -224,7 +216,13 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
             <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl min-w-0"
               style={{ background: "#fff5f5", border: "1px solid rgba(184,28,20,0.15)" }}>
               <span style={{ color: "#b81c14" }}>✗</span>
-              <span className="font-oswald font-semibold text-[12px] min-w-0 break-words" style={{ color: "#3a3a3f" }}>{g}</span>
+              <span className="min-w-0">
+                <span className="block font-oswald font-semibold text-[12px] break-words" style={{ color: "#3a3a3f" }}>{g}</span>
+                {(() => {
+                  const guessed = bbvaPlayers.find(x => x.displayName === g);
+                  return guessed ? <span className="block text-[10px]" style={{ color: "#9a9a8a" }}>{guessed.nationality} · {guessed.position}</span> : null;
+                })()}
+              </span>
             </div>
           ))}
         </div>
@@ -236,30 +234,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
           <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-1.5" style={{ color: "#9a9a8a" }}>
             Intento {attempt + 1} de {MAX}
           </div>
-          <input type="text" value={query} onChange={e => setQuery(e.target.value)}
-            placeholder="Escribe el nombre del jugador..."
-            className="w-full px-4 py-3 rounded-xl text-[14px] font-medium outline-none"
-            style={{ background: "white", border: "2px solid rgba(0,0,0,0.12)", color: "#18181b" }}
-            onFocus={e => { (e.target as HTMLInputElement).style.borderColor = PURPLE; }}
-            onBlur={e => { (e.target as HTMLInputElement).style.borderColor = "rgba(0,0,0,0.12)"; }}
-            autoComplete="off" spellCheck={false} />
-          {suggestions.length > 0 && (
-            <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-64 overflow-y-auto"
-              style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
-              {suggestions.map(p => (
-                <button key={p.id} onMouseDown={() => guess(p)}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-left border-b last:border-0 transition-colors"
-                  style={{ borderColor: "rgba(0,0,0,0.06)" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#faf5ff"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "white"; }}>
-                  <div>
-                    <div className="font-oswald font-semibold text-[13px]" style={{ color: "#18181b" }}>{p.displayName}</div>
-                    <div className="text-[10px]" style={{ color: "#9a9a8a" }}>{p.mainClub} · {p.nationality}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
+          <PlayerSearch value={query} onChange={setQuery} players={bbvaPlayers} usedIds={usedIds} accent={PURPLE} onSelect={guess} />
         </div>
       )}
 
