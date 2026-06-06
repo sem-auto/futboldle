@@ -4,7 +4,7 @@ import { BBVAPlayer, getPlayerOfDay, getExtraPlayer } from "@/data/bbvaPlayers";
 import { normalize } from "@/lib/normalize";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
-import { loadGameCounts, recordGameCompletion } from "@/lib/profile";
+import { loadGameCounts, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import { useStats } from "@/lib/useStats";
 
@@ -202,8 +202,8 @@ export default function WordleBBVA({onBack}:Props) {
       setWon(w); setGameOver(true);
       if (w) {
         unlockPlayer(player.id, "Wordle BBVA");
-        if (mode === "daily") recordGameCompletion("wordle", getDayKey());
       }
+      if (mode === "daily") recordGameResult("wordle", getDayKey(), w);
       trackEvent("game_completed", { game: "wordle", mode, won: w });
       const result:GameResult={
         letters: newRows.filter(r=>r.submitted).map(r=>r.letters),

@@ -5,7 +5,7 @@ import { getDailyTop10, top10Challenges } from "@/data/top10Challenges";
 import type { Top10Answer } from "@/data/top10Challenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
-import { recordGameCompletion } from "@/lib/profile";
+import { recordGameCompletion, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 
@@ -148,6 +148,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
     setSurrendered(true);
     setFinished(true);
     try { localStorage.setItem(`fbl-top10-done-${getDayKey()}`, "lost"); } catch {}
+    recordGameResult("top10", `${getDayKey()}-${challenge.id}`, false);
     persist({ challengeId: challenge.id, guessedAnswers, allGuesses, finished: true, surrendered: true, hintsUsed });
   }
 
@@ -155,7 +156,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (finished && !surrendered) {
       try { localStorage.setItem(`fbl-top10-done-${getDayKey()}`, "won"); } catch {}
-      recordGameCompletion("top10", `${getDayKey()}-${challenge.id}`);
+      recordGameResult("top10", `${getDayKey()}-${challenge.id}`, true);
       trackEvent("game_completed", { game: "top10", challenge: challenge.id, total: challenge.answers.length });
       trackEvent("top10_completed", { challenge: challenge.id, category: challenge.category, total: challenge.answers.length });
       try {

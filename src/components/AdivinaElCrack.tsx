@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
-import { recordGameCompletion } from "@/lib/profile";
+import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 
@@ -106,8 +106,8 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
     if (correct) {
       setWon(true);
       unlockPlayer(player.id, "Adivina el Crack");
-      recordGameCompletion("crack", getDayKey());
     }
+    if (isOver) recordGameResult("crack", getDayKey(), correct);
     if (isOver) trackEvent("game_completed", { game: "crack", won: correct, attempts: newGuesses.length });
     if (isOver) setGameOver(true);
 

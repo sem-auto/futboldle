@@ -107,7 +107,9 @@ export default function PerfilPage() {
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
             ["Partidas", summary.gamesPlayed],
-            ["Victorias", `${winPct}%`],
+            ["Victorias", summary.wins],
+            ["Derrotas", summary.losses],
+            ["% victorias", `${winPct}%`],
             ["Racha actual", summary.currentStreak],
             ["Racha máxima", summary.bestStreak],
             ["Top10", summary.top10Completed],
@@ -115,6 +117,10 @@ export default function PerfilPage() {
             ["Wordles", summary.wordlesCompleted],
             ["Trayectorias", summary.trayectoriasCompleted],
             ["Cracks", summary.cracksCompleted],
+            ["Equipo más completo", summary.mostCompletedClub],
+            ["Rareza más obtenida", summary.mostObtainedRarity],
+            ["Favorito", summary.favoritePlayer],
+            ["Último cromo", summary.lastUnlocked],
             ["Rareza máxima", summary.highestRarity],
             ["Jugador raro", summary.rarestPlayer],
           ].map(([label, value]) => (

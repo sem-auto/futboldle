@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayNumber, getDayKey } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
-import { recordGameCompletion } from "@/lib/profile";
+import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 
@@ -14,27 +14,51 @@ function norm(s: string) {
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 }
 
-const EXCLUDED_TRAY_PLAYER_IDS = new Set([
-  27, // Otamendi: su etapa BBVA fiable aqui es Valencia; no inventar Atletico.
-]);
+type CareerAudit = {
+  firstRelevant: string;
+  bestKnown: string;
+  lastRelevant: string;
+  source: string;
+};
 
-function hasOnlyRealClubs(clubs: string[]) {
-  return clubs.every(club => {
-    const normalized = norm(club);
-    return normalized &&
-      !normalized.includes("club ") &&
-      normalized !== "???" &&
-      normalized !== "?";
-  });
-}
+// Trayectorias auditadas con perfiles de Transfermarkt/Wikipedia equivalentes.
+// Solo se usan estos jugadores para evitar clubes inventados o pistas imposibles.
+const CAREER_AUDIT: Record<number, CareerAudit> = {
+  1: { firstRelevant: "Almería", bestKnown: "Valencia", lastRelevant: "Valencia", source: "Transfermarkt" },
+  2: { firstRelevant: "Espanyol", bestKnown: "Málaga", lastRelevant: "Málaga", source: "Transfermarkt" },
+  3: { firstRelevant: "Valencia", bestKnown: "Sevilla", lastRelevant: "Sevilla", source: "Transfermarkt" },
+  5: { firstRelevant: "Real Sociedad", bestKnown: "Barcelona", lastRelevant: "Barcelona", source: "Transfermarkt" },
+  7: { firstRelevant: "Valencia", bestKnown: "Getafe", lastRelevant: "Getafe", source: "Transfermarkt" },
+  9: { firstRelevant: "Levante", bestKnown: "Real Madrid", lastRelevant: "Real Madrid", source: "Transfermarkt" },
+  21: { firstRelevant: "Deportivo", bestKnown: "Atlético de Madrid", lastRelevant: "Atlético de Madrid", source: "Transfermarkt" },
+  22: { firstRelevant: "Deportivo", bestKnown: "Villarreal", lastRelevant: "Villarreal", source: "Transfermarkt" },
+  24: { firstRelevant: "Villarreal", bestKnown: "Atlético de Madrid", lastRelevant: "Atlético de Madrid", source: "Transfermarkt" },
+  28: { firstRelevant: "Valencia", bestKnown: "Sevilla", lastRelevant: "Sevilla", source: "Transfermarkt" },
+  32: { firstRelevant: "Valencia", bestKnown: "Barcelona", lastRelevant: "Barcelona", source: "Transfermarkt" },
+  33: { firstRelevant: "Osasuna", bestKnown: "Atlético de Madrid", lastRelevant: "Atlético de Madrid", source: "Transfermarkt" },
+  37: { firstRelevant: "Valencia", bestKnown: "Barcelona", lastRelevant: "Barcelona", source: "Transfermarkt" },
+  40: { firstRelevant: "Rayo Vallecano", bestKnown: "Sevilla", lastRelevant: "Schalke", source: "Transfermarkt" },
+  60: { firstRelevant: "Mallorca", bestKnown: "Deportivo", lastRelevant: "Las Palmas", source: "Transfermarkt" },
+  61: { firstRelevant: "Villarreal", bestKnown: "Villarreal", lastRelevant: "Arsenal", source: "Transfermarkt" },
+  63: { firstRelevant: "Betis", bestKnown: "Betis", lastRelevant: "Betis", source: "Transfermarkt" },
+  65: { firstRelevant: "Valencia", bestKnown: "Sevilla", lastRelevant: "Newell's", source: "Transfermarkt" },
+  70: { firstRelevant: "Zaragoza", bestKnown: "Valencia", lastRelevant: "Villarreal", source: "Transfermarkt" },
+  74: { firstRelevant: "Almería", bestKnown: "Valencia", lastRelevant: "Espanyol", source: "Transfermarkt" },
+  76: { firstRelevant: "Betis", bestKnown: "Athletic Club", lastRelevant: "Macarthur", source: "Transfermarkt" },
+  89: { firstRelevant: "Málaga", bestKnown: "Málaga", lastRelevant: "Las Palmas", source: "Transfermarkt" },
+  132: { firstRelevant: "Getafe", bestKnown: "Valencia", lastRelevant: "Villarreal", source: "Transfermarkt" },
+  137: { firstRelevant: "Internacional", bestKnown: "Villarreal", lastRelevant: "Santos", source: "Transfermarkt" },
+  143: { firstRelevant: "Las Palmas", bestKnown: "Betis", lastRelevant: "Las Palmas", source: "Transfermarkt" },
+  168: { firstRelevant: "Brugge", bestKnown: "Sevilla", lastRelevant: "Granada", source: "Transfermarkt" },
+  169: { firstRelevant: "Lorient", bestKnown: "Sevilla", lastRelevant: "Atlético de Madrid", source: "Transfermarkt" },
+  171: { firstRelevant: "Sporting", bestKnown: "Sporting", lastRelevant: "Granada", source: "Transfermarkt" },
+  224: { firstRelevant: "Levante", bestKnown: "Levante", lastRelevant: "Villarreal", source: "Transfermarkt" },
+  225: { firstRelevant: "Levante", bestKnown: "Sevilla", lastRelevant: "Villarreal", source: "Transfermarkt" },
+  226: { firstRelevant: "Sporting", bestKnown: "Getafe", lastRelevant: "Getafe", source: "Transfermarkt" },
+  227: { firstRelevant: "Granada", bestKnown: "Athletic Club", lastRelevant: "Athletic Club", source: "Transfermarkt" },
+};
 
-// Only players with 2+ real clubs, no placeholders and are recognisable.
-const TRAY_POOL = bbvaPlayers.filter(p =>
-  p.category === "core" &&
-  p.clubs.length >= 2 &&
-  hasOnlyRealClubs(p.clubs) &&
-  !EXCLUDED_TRAY_PLAYER_IDS.has(p.id)
-);
+const TRAY_POOL = bbvaPlayers.filter(p => CAREER_AUDIT[p.id]);
 
 function getTrayPlayer() {
   const d = new Date();
@@ -85,6 +109,17 @@ function getClues(player: Player, attempt: number) {
   ].filter(c => !(c.label === "Clubes intermedios" && !middle));
 }
 
+function getAuditedClues(player: Player, attempt: number) {
+  const career = CAREER_AUDIT[player.id];
+  return [
+    { label: "Primer club relevante", value: career.firstRelevant, shown: attempt >= 0 },
+    { label: "Club más conocido", value: career.bestKnown, shown: attempt >= 1 },
+    { label: "Último club relevante", value: career.lastRelevant, shown: attempt >= 2 },
+    { label: "Posición", value: player.position, shown: attempt >= 3 },
+    { label: "Nacionalidad", value: player.nationality, shown: attempt >= 4 },
+  ];
+}
+
 export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   const player = getTrayPlayer();
 
@@ -125,8 +160,8 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
     if (correct) {
       setWon(true);
       unlockPlayer(player.id, "Trayectoria BBVA");
-      recordGameCompletion("trayectoria", getDayKey());
     }
+    if (isOver) recordGameResult("trayectoria", getDayKey(), correct);
     if (isOver) trackEvent("game_completed", { game: "trayectoria", won: correct, attempts: newGuesses.length });
     if (isOver) setGameOver(true);
 
@@ -139,7 +174,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
     if (isOver) setTimeout(() => setShowResult(true), 350);
   }, [guesses, usedIds, attempt, player.id]);
 
-  const clues = getClues(player, attempt);
+  const clues = getAuditedClues(player, attempt);
 
   async function share() {
     const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
