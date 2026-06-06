@@ -26,6 +26,10 @@ interface DayState {
 
 function emptyRow(n:number):Row { return {letters:Array(n).fill(""),states:Array(n).fill("empty"),submitted:false}; }
 
+function emptyDayState(): DayState {
+  return {date:getDayKey(),daily:null,extras:[],current:null};
+}
+
 function evaluate(guess:string[],answer:string[]):LS[] {
   const r:LS[] = Array(answer.length).fill("wrong");
   const cnt:Record<string,number>={};
@@ -53,19 +57,54 @@ function keyState(key:string, rows:Row[]):"correct"|"partial"|"wrong"|"idle" {
   return best;
 }
 
+function isValidResult(result: unknown): result is GameResult {
+  if (!result || typeof result !== "object") return false;
+  const r = result as Partial<GameResult>;
+  return Array.isArray(r.letters) &&
+    Array.isArray(r.states) &&
+    typeof r.won === "boolean" &&
+    r.letters.every(row => Array.isArray(row)) &&
+    r.states.every(row => Array.isArray(row));
+}
+
+function sanitizeDayState(value: unknown): DayState | null {
+  if (!value || typeof value !== "object") return null;
+  const d = value as Partial<DayState>;
+  if (d.date !== getDayKey()) return null;
+  return {
+    date: d.date,
+    daily: isValidResult(d.daily) ? d.daily : null,
+    extras: Array.isArray(d.extras) ? d.extras.filter(isValidResult) : [],
+    current: null,
+  };
+}
+
 function loadDayState():DayState {
   try {
     const raw=localStorage.getItem(`fbl-day-${getDayKey()}`);
-    if(raw){ const d=JSON.parse(raw); if(d.date===getDayKey()) return d; }
-  } catch{}
-  return {date:getDayKey(),daily:null,extras:[],current:null};
+    if(raw){
+      const parsed = JSON.parse(raw);
+      const safe = sanitizeDayState(parsed);
+      if (safe) return safe;
+      localStorage.removeItem(`fbl-day-${getDayKey()}`);
+    }
+  } catch{
+    try { localStorage.removeItem(`fbl-day-${getDayKey()}`); } catch {}
+  }
+  return emptyDayState();
 }
 
 function saveDayState(ds:DayState){ try{ localStorage.setItem(`fbl-day-${getDayKey()}`,JSON.stringify(ds)); }catch{} }
 
 function rowsFromResult(result:GameResult, ansLen:number):Row[] {
   const rows = Array.from({length:MAX},()=>emptyRow(ansLen));
-  result.letters.forEach((letters,i)=>{ rows[i]={letters,states:result.states[i],submitted:true}; });
+  result.letters.slice(0, MAX).forEach((letters,i)=>{
+    rows[i]={
+      letters: Array.isArray(letters) ? letters.slice(0, ansLen) : Array(ansLen).fill(""),
+      states: Array.isArray(result.states[i]) ? result.states[i].slice(0, ansLen) : Array(ansLen).fill("wrong"),
+      submitted:true
+    };
+  });
   return rows;
 }
 
@@ -89,6 +128,7 @@ export default function WordleBBVA({onBack}:Props) {
   const [copied,    setCopied]    = useState(false);
   const [dayState,  setDayState]  = useState<DayState|null>(null);
   const [loaded,    setLoaded]    = useState(false);
+  const [compactMobile, setCompactMobile] = useState(false);
 
   function flash(msg:string){ setToast(msg); setTimeout(()=>setToast(null),1800); }
 
@@ -201,6 +241,14 @@ export default function WordleBBVA({onBack}:Props) {
     return ()=>window.removeEventListener("keydown",h);
   },[handleKey]);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setCompactMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   // ── Play extra ──
   function playExtra(){
     if(!dayState) return;
@@ -230,15 +278,6 @@ export default function WordleBBVA({onBack}:Props) {
   );
 
   const ansLen=answer.length;
-  const [compactMobile, setCompactMobile] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const update = () => setCompactMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-
   const tileW=compactMobile
     ? ansLen<=5?48:ansLen<=7?42:ansLen<=9?35:30
     : ansLen<=5?60:ansLen<=7?52:ansLen<=9?44:38;
