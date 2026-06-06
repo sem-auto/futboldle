@@ -70,7 +70,7 @@ export default function PromoBanner() {
     <div className="xl:hidden flex flex-col gap-2">
       {ADS.map((ad, i) => (
         <a key={ad.id} href={ad.url} target="_blank" rel="noopener noreferrer"
-          className="flex items-center rounded-xl overflow-hidden transition-all duration-200 max-md:max-h-[132px]"
+          className="flex items-center rounded-xl overflow-hidden transition-all duration-200 max-md:max-h-[128px] max-md:max-w-full"
           style={{
             background: "white",
             border: `1.5px solid ${i === idx ? ad.accent : "rgba(0,0,0,0.08)"}`,

@@ -88,11 +88,11 @@ function Header({ onLogoClick }: { onLogoClick: () => void }) {
 
   return (
     <header className="sticky top-0 z-20" style={{ background: "white", borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
-      <div className="max-w-4xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
+      <div className="max-w-4xl mx-auto px-3 md:px-4 h-10 md:h-12 flex items-center justify-between gap-2 md:gap-4">
         <button onClick={onLogoClick} className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center font-bebas text-[16px]"
+          <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center font-bebas text-[14px] md:text-[16px]"
             style={{ background: "#c0241c", color: "white" }}>F</div>
-          <span className="font-bebas text-[20px] leading-none tracking-wider" style={{ color: "#18181b" }}>FUTBOLDLE</span>
+          <span className="font-bebas text-[18px] md:text-[20px] leading-none tracking-wider" style={{ color: "#18181b" }}>FUTBOLDLE</span>
         </button>
 
         {/* Frase nostalgia — centro, solo desktop */}
@@ -110,13 +110,13 @@ function Header({ onLogoClick }: { onLogoClick: () => void }) {
             </div>
           )}
           {/* Día */}
-          <div className="text-[9px] font-semibold px-2 py-1 rounded-lg"
+          <div className="text-[8px] md:text-[9px] font-semibold px-1.5 md:px-2 py-0.5 md:py-1 rounded-lg"
             style={{ background: "rgba(0,0,0,0.04)", color: "#9a9a8a" }}>
             Día #{getDayNumber()}
           </div>
           {/* Social */}
           <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
-            className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors" style={{ color: "#555" }}>
+            className="w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors" style={{ color: "#555" }}>
             <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
@@ -154,7 +154,7 @@ function WordleCard({ onClick, done, won, extras }: { onClick: () => void; done:
       style={{ background: "white", boxShadow: "0 4px 16px rgba(0,0,0,0.09)", border: "1px solid rgba(0,0,0,0.07)", display: "flex", flexDirection: "column" }}>
 
       {/* Header dorado */}
-      <div className="px-4 py-3 relative overflow-hidden flex-shrink-0"
+      <div className="px-3 md:px-4 py-2.5 md:py-3 relative overflow-hidden flex-shrink-0"
         style={{ background: "linear-gradient(135deg, #c8920a 0%, #e8aa20 60%, #fac840 100%)" }}>
         <div className="absolute right-2 top-2 flex gap-1 opacity-15 pointer-events-none">
           {["B","B","V","A"].map((l,i) => (
@@ -166,11 +166,11 @@ function WordleCard({ onClick, done, won, extras }: { onClick: () => void; done:
             style={{ background: "rgba(255,255,255,0.25)", color: "white" }}>🔥 Hoy</span>
           <GamePill done={done} won={won} />
         </div>
-        <h3 className="font-bebas text-[28px] leading-none text-white">WORDLE BBVA</h3>
+        <h3 className="font-bebas text-[25px] md:text-[28px] leading-none text-white">WORDLE BBVA</h3>
         <p className="text-white/70 text-[10px] mt-0.5">Adivina el apellido del Hombre BBVA</p>
       </div>
 
-      <div className="px-4 pt-3 pb-4 flex flex-col flex-1 justify-between">
+      <div className="px-3 md:px-4 pt-2.5 md:pt-3 pb-3 md:pb-4 flex flex-col flex-1 justify-between">
         {/* Estado completado */}
         {done && (
           <div className="flex items-center gap-2 mb-2.5">
@@ -232,35 +232,35 @@ function TrayCard({ onClick, done, won }: { onClick: () => void; done: boolean; 
       className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
       style={{ background: "white", boxShadow: "0 4px 16px rgba(0,0,0,0.09)", border: "1px solid rgba(0,0,0,0.07)", display: "flex", flexDirection: "column" }}>
 
-      <div className="px-4 py-3 flex-shrink-0"
+      <div className="px-3 md:px-4 py-2.5 md:py-3 flex-shrink-0"
         style={{ background: "linear-gradient(135deg, #1e6b2e 0%, #28883c 100%)" }}>
         <div className="flex items-center gap-2 mb-2">
           <span className="text-[9px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
             style={{ background: "rgba(255,255,255,0.2)", color: "white" }}>🆕 Hoy</span>
           <GamePill done={done} won={won} />
         </div>
-        <h3 className="font-bebas text-[28px] leading-none text-white">TRAYECTORIA BBVA</h3>
+        <h3 className="font-bebas text-[25px] md:text-[28px] leading-none text-white">TRAYECTORIA BBVA</h3>
         <p className="text-white/70 text-[10px] mt-0.5">Adivina por su carrera</p>
       </div>
 
       {/* Preview: deduction clues — no placeholders */}
-      <div className="px-4 pt-3 pb-4 flex flex-col flex-1 justify-between">
-        <div className="mb-2">
+      <div className="px-3 md:px-4 pt-2.5 md:pt-3 pb-3 md:pb-4 flex flex-col flex-1 justify-between">
+        <div className="mb-1.5 md:mb-2">
           <div className="text-[7px] font-semibold uppercase tracking-[0.18em] mb-1.5" style={{ color: "#bbb" }}>
             Deduce la trayectoria
           </div>
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1 md:gap-1.5">
             {[
               { label: "Club inicial",  value: "Se revela al empezar",  shown: false },
               { label: "Club final",    value: "Falla para revelar",    shown: false },
               { label: "Posición",      value: "Falla para revelar",    shown: false },
             ].map(({label, value}, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-bold"
+                <div className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-bold"
                   style={{ background: i===0?"#1e6b2e":"#ece8e0", color: i===0?"white":"#bbb" }}>
                   {i+1}
                 </div>
-                <div className="flex-1 px-2 py-1.5 rounded-lg text-[9px] font-semibold"
+                <div className="flex-1 px-2 py-1 md:py-1.5 rounded-lg text-[9px] font-semibold"
                   style={{ background: i===0?"#f0faf2":"#f6f3ee",
                     border:`1px solid ${i===0?"rgba(30,107,46,0.18)":"rgba(0,0,0,0.06)"}`,
                     color: i===0?"#1e6b2e":"#bbb" }}>
@@ -435,7 +435,7 @@ export default function HomePage() {
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
       <Header onLogoClick={goHome} />
-      <main className="max-w-lg mx-auto px-4 py-5">
+      <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <Top10BBVA onBack={goHome} />
       </main>
     </div>
@@ -445,7 +445,7 @@ export default function HomePage() {
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
       <Header onLogoClick={goHome} />
-      <main className="max-w-lg mx-auto px-4 py-5">
+      <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <AdivinaElCrack onBack={goHome} />
       </main>
     </div>
@@ -455,7 +455,7 @@ export default function HomePage() {
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
       <Header onLogoClick={goHome} />
-      <main className="max-w-lg mx-auto px-4 py-5">
+      <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <WordleBBVA onBack={goHome} />
       </main>
     </div>
@@ -465,7 +465,7 @@ export default function HomePage() {
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
       <Header onLogoClick={goHome} />
-      <main className="max-w-lg mx-auto px-4 py-5">
+      <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <TrayectoriaBBVA onBack={goHome} />
       </main>
     </div>
@@ -476,12 +476,12 @@ export default function HomePage() {
       <SidebarAds />
       <Header onLogoClick={goHome} />
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-5 flex flex-col gap-4">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5 flex flex-col gap-3 md:gap-4 overflow-x-hidden">
 
         {/* Row 0: fecha + hoy se juega + racha */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 md:gap-2.5">
           <div className="flex-shrink-0">
-            <h2 className="font-bebas text-[24px] leading-none" style={{ color: "#18181b" }}>HOY SE JUEGA</h2>
+            <h2 className="font-bebas text-[22px] md:text-[24px] leading-none" style={{ color: "#18181b" }}>HOY SE JUEGA</h2>
             <p className="text-[9px]" style={{ color: "#9a9a8a" }}>
               {new Date().toLocaleDateString("es-ES", { weekday:"long", day:"numeric", month:"long" })} · Día #{getDayNumber()}
             </p>
@@ -500,26 +500,26 @@ export default function HomePage() {
         <DailyProgress wordleDone={wordleDone} wordleWon={wordleWon} trayDone={trayDone} trayWon={trayWon} top10Done={top10Done} top10Won={top10Won} crackDone={crackDone} crackWon={crackWon} streak={stats.streak} />
 
         {/* Frase nostalgia */}
-        <div className="text-[11px] italic text-center py-1" style={{ color: "#9a9a8a" }}>
+        <div className="text-[10px] md:text-[11px] italic text-center py-0 md:py-1" style={{ color: "#9a9a8a" }}>
           &ldquo;{BBVA_PHRASES[n]}&rdquo; · Liga BBVA Archive 2005–2016
         </div>
 
         {/* ── FILA 1: Wordle + Trayectoria (igual importancia) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3">
           <WordleCard onClick={() => setView("wordle")} done={wordleDone} won={wordleWon} extras={extras} />
           <TrayCard onClick={() => setView("trayectoria")} done={trayDone} won={trayWon} />
         </div>
 
         {/* ── FILA 2: Top 10 + Adivina el Crack ── */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5 md:gap-3">
           {/* TOP 10 BBVA */}
           <button onClick={() => setView("top10")}
             className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
             style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(26,79,160,0.20)", display: "flex", flexDirection: "column" }}>
             <div className="h-[3px]" style={{ background: "#1a4fa0" }}/>
-            <div className="px-4 py-4 flex flex-col flex-1">
+            <div className="px-3 md:px-4 py-3 md:py-4 flex flex-col flex-1">
               <div className="flex items-start justify-between mb-2">
-                <div className="text-[30px] leading-none">🏆</div>
+                <div className="text-[25px] md:text-[30px] leading-none">🏆</div>
                 <div className="flex items-center gap-1">
                   <div className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
                     style={{ background: "rgba(26,79,160,0.10)", color: "#1a4fa0" }}>Hoy</div>
@@ -527,7 +527,7 @@ export default function HomePage() {
                 </div>
               </div>
               <PodiumDeco />
-              <div className="font-bebas text-[18px] leading-none mt-2 mb-0.5" style={{ color: "#18181b" }}>TOP 10 BBVA</div>
+              <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>TOP 10 BBVA</div>
               <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Completa las listas históricas</div>
               <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#1a4fa0" }}>{top10Done ? "VER RESULTADO →" : "JUGAR →"}</div>
             </div>
@@ -537,9 +537,9 @@ export default function HomePage() {
             className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
             style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(124,58,237,0.20)", display: "flex", flexDirection: "column" }}>
             <div className="h-[3px]" style={{ background: "#7c3aed" }}/>
-            <div className="px-4 py-4 flex flex-col flex-1">
+            <div className="px-3 md:px-4 py-3 md:py-4 flex flex-col flex-1">
               <div className="flex items-start justify-between mb-2">
-                <div className="text-[30px] leading-none">🌍</div>
+                <div className="text-[25px] md:text-[30px] leading-none">🌍</div>
                 <div className="flex items-center gap-1">
                   <div className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
                     style={{ background: "rgba(124,58,237,0.10)", color: "#7c3aed" }}>Hoy</div>
@@ -547,7 +547,7 @@ export default function HomePage() {
                 </div>
               </div>
               <AttrDeco />
-              <div className="font-bebas text-[18px] leading-none mt-2 mb-0.5" style={{ color: "#18181b" }}>ADIVINA EL CRACK</div>
+              <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>ADIVINA EL CRACK</div>
               <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Pistas progresivas para adivinar</div>
               <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#7c3aed" }}>{crackDone ? "VER RESULTADO →" : "JUGAR →"}</div>
             </div>

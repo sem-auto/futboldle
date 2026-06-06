@@ -158,42 +158,42 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   );
 
   return (
-    <div className="flex flex-col gap-4 pb-10">
+    <div className="flex flex-col gap-3 md:gap-4 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-10 max-w-[100vw] overflow-x-hidden">
       <button onClick={onBack} className="self-start flex items-center gap-1.5 text-[11px] font-semibold opacity-60 hover:opacity-100 transition-opacity" style={{ color: "#3a3a3f" }}>
         ← Volver
       </button>
 
       {/* Header */}
       <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg,#1e6b2e 0%,#28883c 100%)", boxShadow: "0 4px 20px rgba(30,107,46,0.30)" }}>
-        <div className="px-5 py-4">
+        <div className="px-4 md:px-5 py-3 md:py-4">
           <div className="inline-block text-[9px] font-semibold uppercase tracking-[0.2em] px-2.5 py-1 rounded-full mb-2.5"
             style={{ background: "rgba(255,255,255,0.2)", color: "white" }}>
             Reto del día · #{getDayNumber()}
           </div>
-          <h2 className="font-bebas text-[32px] leading-none text-white mb-1">TRAYECTORIA BBVA</h2>
+          <h2 className="font-bebas text-[28px] md:text-[32px] leading-none text-white mb-1">TRAYECTORIA BBVA</h2>
           <p className="text-[11px] text-white/70">Deduce el jugador por su trayectoria · {MAX} intentos</p>
         </div>
         {/* Progress dots */}
-        <div className="px-5 pb-3 flex items-center gap-1.5">
+        <div className="px-4 md:px-5 pb-2.5 md:pb-3 flex items-center gap-1.5">
           {Array.from({ length: MAX }).map((_, i) => (
             <div key={i} className="flex-1 h-[5px] rounded-full transition-all"
               style={{ background: i < attempt ? "rgba(255,255,255,0.40)" : i === attempt && !gameOver ? "white" : "rgba(255,255,255,0.15)" }} />
           ))}
-          <span className="text-white/50 text-[9px] font-semibold ml-1">{gameOver ? "—" : `${MAX - attempt} left`}</span>
+          <span className="text-white/50 text-[9px] font-semibold ml-1">{gameOver ? "—" : `${MAX - attempt} intentos`}</span>
         </div>
       </div>
 
       {/* Clue cards — revealed progressively */}
-      <div className="grid grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 gap-1.5 md:gap-2">
         {clues.map((clue, i) => (
           <div key={i}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300"
+            className="flex items-center gap-2.5 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl transition-all duration-300"
             style={{
               background: clue.shown ? "white" : "#f4f1eb",
               border: `1px solid ${clue.shown ? "rgba(30,107,46,0.22)" : "rgba(0,0,0,0.07)"}`,
               boxShadow: clue.shown ? "0 2px 8px rgba(0,0,0,0.07)" : "none",
             }}>
-            <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold"
+            <div className="w-6 h-6 md:w-7 md:h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold"
               style={{ background: clue.shown ? "#1e6b2e" : "#e4ddd0", color: clue.shown ? "white" : "#aaa",
                 boxShadow: clue.shown ? "0 2px 6px rgba(30,107,46,0.30)" : "none" }}>
               {i + 1}
@@ -202,7 +202,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
               <div className="text-[8px] font-semibold uppercase tracking-[0.18em] mb-0.5"
                 style={{ color: clue.shown ? "#1e6b2e" : "#bbb" }}>{clue.label}</div>
               {clue.shown ? (
-                <div className="font-oswald font-semibold text-[15px] leading-none" style={{ color: "#18181b" }}>
+                <div className="font-oswald font-semibold text-[14px] md:text-[15px] leading-none" style={{ color: "#18181b" }}>
                   {clue.value}
                 </div>
               ) : (

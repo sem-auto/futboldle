@@ -230,8 +230,21 @@ export default function WordleBBVA({onBack}:Props) {
   );
 
   const ansLen=answer.length;
-  const tileW=ansLen<=5?60:ansLen<=7?52:ansLen<=9?44:38;
-  const tileFz=ansLen<=5?26:ansLen<=7?22:ansLen<=9?19:16;
+  const [compactMobile, setCompactMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setCompactMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const tileW=compactMobile
+    ? ansLen<=5?48:ansLen<=7?42:ansLen<=9?35:30
+    : ansLen<=5?60:ansLen<=7?52:ansLen<=9?44:38;
+  const tileFz=compactMobile
+    ? ansLen<=5?21:ansLen<=7?18:ansLen<=9?16:14
+    : ansLen<=5?26:ansLen<=7?22:ansLen<=9?19:16;
 
   const modeLabel = mode==="daily"
     ? `RETO DEL DÍA · #${getDayNumber()}`
@@ -241,27 +254,27 @@ export default function WordleBBVA({onBack}:Props) {
   const dailyDone = !!dayState?.daily;
 
   return (
-    <div className="flex flex-col gap-5 pb-10">
+    <div className="flex flex-col gap-3 md:gap-5 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-10 max-w-[100vw] overflow-x-hidden">
 
       {/* ── Back ── */}
-      <button onClick={onBack} className="self-start flex items-center gap-1.5 text-sm font-semibold transition-opacity opacity-60 hover:opacity-100" style={{color:"#18181b"}}>
+      <button onClick={onBack} className="self-start flex items-center gap-1.5 text-xs md:text-sm font-semibold transition-opacity opacity-60 hover:opacity-100" style={{color:"#18181b"}}>
         ← Volver
       </button>
 
       {/* ── Header ── */}
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full" style={{background:"var(--gold-dim)",border:"1px solid var(--b-gold)"}}>
+        <div className="inline-flex items-center gap-2 mb-1.5 md:mb-2 px-2.5 md:px-3 py-0.5 md:py-1 rounded-full" style={{background:"var(--gold-dim)",border:"1px solid var(--b-gold)"}}>
           <span className="text-[10px] font-oswald font-semibold uppercase tracking-[0.22em]" style={{color:"var(--gold)"}}>{modeLabel}</span>
           {mode==="daily"&&dailyDone&&(
             <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{background:"var(--ok-bg)",color:"var(--ok-txt)",border:"1px solid var(--ok-bd)"}}>Completado ✅</span>
           )}
         </div>
-        <h2 className="font-display text-4xl leading-none" style={{color:"#18181b"}}>WORDLE BBVA</h2>
-        <p className="text-[12px] mt-1.5" style={{color:"var(--txt3)"}}>Adivina el apellido · <span style={{color:"var(--gold)"}}>{ansLen} letras</span> · {MAX} intentos</p>
+        <h2 className="font-display text-[30px] md:text-4xl leading-none" style={{color:"#18181b"}}>WORDLE BBVA</h2>
+        <p className="text-[11px] md:text-[12px] mt-1 md:mt-1.5" style={{color:"var(--txt3)"}}>Adivina el apellido · <span style={{color:"var(--gold)"}}>{ansLen} letras</span> · {MAX} intentos</p>
       </div>
 
       {/* ── Pre-game prompt ── */}
-      <div className="rounded-xl px-4 py-3 text-center" style={{background:"white",border:"1px solid var(--b2)"}}>
+      <div className="rounded-xl px-3 md:px-4 py-2 md:py-3 text-center" style={{background:"white",border:"1px solid var(--b2)"}}>
         <p className="text-[13px]" style={{color:"var(--txt3)"}}>
           Adivina el apellido de un{" "}
           <span className="font-oswald font-semibold" style={{color:"var(--gold)"}}>Hombre BBVA</span>
@@ -286,9 +299,9 @@ export default function WordleBBVA({onBack}:Props) {
       )}
 
       {/* ── GRID ── */}
-      <div className="flex flex-col gap-2 items-center" style={{perspective:"400px"}}>
+      <div className="flex flex-col gap-1 md:gap-2 items-center max-w-full" style={{perspective:"400px"}}>
         {rows.map((row,ri)=>(
-          <div key={ri} className={`flex gap-2 ${shakeRow===ri?"anim-shake":""}`}>
+          <div key={ri} className={`flex gap-1 md:gap-2 ${shakeRow===ri?"anim-shake":""}`}>
             {Array.from({length:ansLen}).map((_,ci)=>{
               const letter=row.letters[ci]||"";
               const sub=row.submitted;
@@ -336,9 +349,9 @@ export default function WordleBBVA({onBack}:Props) {
 
       {/* ── KEYBOARD ── */}
       {!showResult&&(
-        <div className="flex flex-col gap-1 md:gap-1.5 items-center mt-2">
+        <div className="flex flex-col gap-0.5 md:gap-1.5 items-center mt-1.5 md:mt-2 w-full max-w-[100vw] overflow-hidden">
           {KB.map((row,ri)=>(
-            <div key={ri} className="flex gap-[3px] md:gap-[5px]">
+            <div key={ri} className="flex gap-[2px] md:gap-[5px] max-w-full">
               {row.map(key=>{
                 const ks=keyState(key,rows);
                 let bg="white", color="var(--txt3)", border="1px solid var(--b1)";
@@ -348,7 +361,7 @@ export default function WordleBBVA({onBack}:Props) {
                 const wide=key==="ENTER"||key==="⌫";
                 return (
                   <button key={key} onClick={()=>handleKey(key)}
-                    className={`h-10 md:h-[50px] rounded-lg font-oswald font-semibold transition-all active:scale-95 select-none ${wide ? "w-auto min-w-[44px] md:min-w-[52px] px-1.5 md:px-2 text-[9px] md:text-[10px]" : "w-[27px] md:w-[34px] px-0 text-[13px] md:text-[15px]"}`}
+                    className={`h-9 md:h-[50px] rounded-lg font-oswald font-semibold transition-all active:scale-95 select-none ${wide ? "w-auto min-w-[40px] md:min-w-[52px] px-1 md:px-2 text-[8.5px] md:text-[10px]" : "w-[25px] md:w-[34px] px-0 text-[12px] md:text-[15px]"}`}
                     style={{
                       letterSpacing:wide?"0.08em":"0.02em",
                       background:bg, color, border,
