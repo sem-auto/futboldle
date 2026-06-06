@@ -583,6 +583,10 @@ export default function HomePage() {
           onAlbum={() => setView("album")}
         />
 
+        <div className="text-center text-[10px]" style={{ color: "#9a9a8a" }}>
+          Tu progreso se guarda en este navegador.
+        </div>
+
         {/* Frase nostalgia */}
         <div className="text-[10px] md:text-[11px] italic text-center py-0 md:py-1" style={{ color: "#9a9a8a" }}>
           &ldquo;{BBVA_PHRASES[n]}&rdquo; · Liga BBVA Archive 2005–2016
