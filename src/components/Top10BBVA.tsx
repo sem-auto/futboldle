@@ -56,6 +56,10 @@ function difficultyLabel(kind: "FÁCIL" | "MEDIO" | "DIFÍCIL") {
   return "💀 Difícil";
 }
 
+function topCuriosity(title: string, leader: Top10Answer) {
+  return `${leader.displayName} lideró ${title.toLowerCase()} con ${leader.detail}.`;
+}
+
 export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   const challenge = getDailyTop10();
 
@@ -383,6 +387,13 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
               {challenge.answers.map(a => (
                 <span key={a.position} className="text-[16px]">{guessedAnswers.includes(norm(a.answer)) ? "🟦" : "⬛"}</span>
               ))}
+            </div>
+            <div className="rounded-xl p-3 mb-3" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
+              <div className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-1" style={{ color: "#1a4fa0" }}>Fuente</div>
+              <div className="text-[11px] font-semibold" style={{ color: "#18181b" }}>{challenge.source}</div>
+              <div className="text-[10px] mt-1" style={{ color: "#9a9a8a" }}>Periodo: {challenge.period}</div>
+              <div className="text-[10px] mt-1" style={{ color: "#9a9a8a" }}>Criterio: {challenge.criterion}</div>
+              <div className="text-[10px] mt-2" style={{ color: "#8a6200" }}><strong>Dato curioso:</strong> {topCuriosity(challenge.title, challenge.answers[0])}</div>
             </div>
             <button onClick={share} className="w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
               style={{ background: copied ? "#1e6b2e" : "#1a4fa0", color: "white" }}>
