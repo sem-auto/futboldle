@@ -254,8 +254,8 @@ function TrayCard({ onClick, done, won }: { onClick: () => void; done: boolean; 
           </div>
           <div className="flex flex-col gap-1 md:gap-1.5">
             {[
-              { label: "Club inicial",  value: "Se revela al empezar",  shown: false },
-              { label: "Club final",    value: "Falla para revelar",    shown: false },
+              { label: "Club reconocible",  value: "Se revela al empezar",  shown: false },
+              { label: "Otro club",    value: "Falla para revelar",    shown: false },
               { label: "Posición",      value: "Falla para revelar",    shown: false },
             ].map(({label, value}, i) => (
               <div key={i} className="flex items-center gap-2">
@@ -267,7 +267,7 @@ function TrayCard({ onClick, done, won }: { onClick: () => void; done: boolean; 
                   style={{ background: i===0?"#f0faf2":"#f6f3ee",
                     border:`1px solid ${i===0?"rgba(30,107,46,0.18)":"rgba(0,0,0,0.06)"}`,
                     color: i===0?"#1e6b2e":"#bbb" }}>
-                  {i===0 ? "Primer club" : label}
+                  {i===0 ? "Club reconocible" : label}
                 </div>
               </div>
             ))}
@@ -475,13 +475,14 @@ export default function HomePage() {
   const [view, setView] = useState<View>("home");
   const [albumProgress, setAlbumProgress] = useState({ unlockedCount: 0, total: 0, percent: 0 });
   const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon } = useDailyStatus();
-  const { stats } = useStats();
+  const { stats, refresh } = useStats();
   const n = getDayNumber() % BBVA_PHRASES.length;
   const goHome = () => setView("home");
 
   useEffect(() => {
     setAlbumProgress(getAlbumProgress());
-  }, [view]);
+    refresh();
+  }, [view, refresh]);
 
   if (view === "top10") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>

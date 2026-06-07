@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getDayKey } from "./daily";
 
 export interface Stats {
@@ -21,7 +21,9 @@ export function loadStats(): Stats {
   try {
     const r = localStorage.getItem(KEY);
     if (r) return { ...blank(), ...JSON.parse(r) };
-  } catch {}
+  } catch {
+    try { localStorage.removeItem(KEY); } catch {}
+  }
   return blank();
 }
 
@@ -43,6 +45,15 @@ export function recordResult(won: boolean, guesses: number) {
 
 export function useStats() {
   const [stats, setStats] = useState<Stats>(blank);
-  useEffect(() => { setStats(loadStats()); }, []);
-  return { stats, refresh: () => setStats(loadStats()) };
+  const refresh = useCallback(() => setStats(loadStats()), []);
+  useEffect(() => {
+    refresh();
+    window.addEventListener("storage", refresh);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [refresh]);
+  return { stats, refresh };
 }

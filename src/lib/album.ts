@@ -71,7 +71,7 @@ const PLAYER_CURIOSITIES: Record<string, string> = {
   SOLDADO: "Vivió en Valencia su etapa más goleadora en Primera.",
   NEGREDO: "El Tiburón explotó como goleador en el Sevilla.",
   JONAS: "Delantero brasileño de enorme rendimiento en Valencia.",
-  PIATTI: "Pasó por Almería, Valencia y Espanyol en la era BBVA.",
+  PIATTI: "Pasó por Almería y Valencia durante la era BBVA.",
   BRUNO: "Capitán y símbolo del Villarreal durante más de una década.",
   SENNA: "Campeón de Europa 2008 y leyenda del Villarreal.",
   CASILLAS: "Capitán del Real Madrid y de la España campeona de todo.",

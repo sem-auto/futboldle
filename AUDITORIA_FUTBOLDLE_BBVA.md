@@ -4,12 +4,15 @@
 
 - Nilmar: eliminada la trayectoria falsa hacia Valencia. Ahora se usa Internacional, Villarreal y Santos.
 - Benat: corregida su base para reflejar Betis y Athletic Club.
-- El modo Trayectoria ya no usa cualquier jugador de la base general. Usa un pool auditado de 32 jugadores con:
-  - Primer club relevante
-  - Club mas conocido
-  - Ultimo club relevante
+- Gameiro: confirmado sin Valencia porque su etapa valencianista empieza en 2018, fuera del periodo base.
+- Valeron: eliminado Malaga, club incorrecto para su trayectoria.
+- Barral: corregido como David Barral, con Sporting, Levante y Granada.
+- El modo Trayectoria ya no usa cualquier jugador de la base general. Usa `src/data/trayectoriaAudit.ts`, un pool auditado de 32 jugadores con:
+  - Club mas reconocible en Espana
+  - Otro club relevante
   - Posicion
   - Nacionalidad
+  - Pista corta
 - Se evita usar solo club inicial y club final para no crear pistas imposibles.
 
 ## Top10 corregidos
@@ -44,6 +47,9 @@ Se mantienen fuera de la rotacion activa los rankings acumulados o de club que n
 
 - Nilmar aparecia con Valencia como club final. Es incorrecto.
 - Benat no estaba representado con Betis, etapa clave para sus pistas.
+- Barral estaba representado como Adrian Barral y con clubes incorrectos.
+- Valeron aparecia con Malaga, club incorrecto.
+- Varios cromos mezclaban clubes posteriores al periodo base 2005-2016.
 - El perfil leia estadisticas globales, pero varios juegos solo actualizaban contadores propios.
 
 ## Estadisticas reparadas
@@ -51,6 +57,8 @@ Se mantienen fuera de la rotacion activa los rankings acumulados o de club que n
 - Wordle, Trayectoria, Top10 y Adivina el Crack registran partidas jugadas, victorias, derrotas y racha.
 - Los contadores especificos de Top10, Top20, Wordle, Trayectoria y Crack se mantienen.
 - El perfil muestra ahora victorias reales, derrotas, porcentaje, rachas y datos de coleccion.
+- Home refresca las estadisticas al volver desde un juego y lee `fbl-stats-v1`.
+- Se mantienen las claves reales: `fbl-stats-v1`, `fbl-game-counts-v1`, `fbl-day-YYYY-MM-DD` y `fbl-album-unlocked-v1`.
 
 ## Jugadores anadidos
 
@@ -74,9 +82,10 @@ Ya estaban incluidos o representados en la base:
 
 - Todos los jugadores de Top10 activos existen en la base global.
 - Todos los jugadores del pool auditado de Trayectoria existen en la base global.
+- Creada `/admin/audit` para revisar jugadores, cromos bloqueados/desbloqueados, Trayectorias, Top10, fuentes, estadisticas y localStorage.
 
 ## Pendiente
 
-- Verificacion exhaustiva linea por linea de todos los clubes de todos los jugadores de la base general contra Transfermarkt.
+- Verificacion exhaustiva linea por linea de todos los clubes secundarios de todos los jugadores de la base general contra Transfermarkt.
 - Reactivar rankings acumulados historicos solo cuando exista una fuente unica verificable para todo el periodo.
 - Fotos reales de jugadores solo deberian anadirse cuando haya una fuente local/licenciada clara.
