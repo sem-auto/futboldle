@@ -70,7 +70,7 @@ function getAuditedClues(player: Player, attempt: number) {
   const career = CAREER_AUDIT[player.id];
   return [
     { label: "Club principal", value: career.clubs[0], shown: attempt >= 0 },
-    { label: "Segundo club", value: career.clubs[1], shown: attempt >= 1 },
+    career.clubs[1] ? { label: "Segundo club", value: career.clubs[1], shown: attempt >= 1 } : null,
     career.clubs[2] ? { label: "Tercer club", value: career.clubs[2], shown: attempt >= 2 } : null,
     { label: "Posición", value: player.position, shown: attempt >= 3 },
     { label: "Nacionalidad", value: player.nationality, shown: attempt >= 4 },

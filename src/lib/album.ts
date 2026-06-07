@@ -16,11 +16,6 @@ const ICON_PLAYERS = new Set([
   "INIESTA",
   "CASILLAS",
   "VILLA",
-  "PUYOL",
-  "TORRES",
-  "FERNANDOTORRES",
-  "SILVA",
-  "DAVIDSILVA",
 ]);
 
 const LEGENDARY_PLAYERS = new Set([

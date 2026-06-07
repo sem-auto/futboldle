@@ -74,7 +74,7 @@ function getBestBbvaSeason(years: string) {
   return `${best}/${end}`;
 }
 
-function PlayerPortrait({ name, color, locked = false, size = "card" }: { name: string; color: string; locked?: boolean; size?: "card" | "modal" }) {
+function PlayerPortrait({ name, color, locked = false, size = "card", imageUrl }: { name: string; color: string; locked?: boolean; size?: "card" | "modal"; imageUrl?: string }) {
   const dimensions = size === "modal" ? "w-20 h-20" : "w-14 h-14";
   const head = size === "modal" ? "w-8 h-8" : "w-6 h-6";
   const body = size === "modal" ? "w-12 h-7" : "w-9 h-5";
@@ -83,6 +83,8 @@ function PlayerPortrait({ name, color, locked = false, size = "card" }: { name: 
       style={{ background: locked ? "#e5ded2" : "linear-gradient(135deg,#fffdf5,#efe1b8)", border: "1px solid rgba(0,0,0,0.10)", boxShadow: locked ? "none" : "inset 0 0 0 2px rgba(255,255,255,0.45)" }}>
       {locked ? (
         <span className="font-bebas text-[24px]" style={{ color: "#b8b0a4" }}>?</span>
+      ) : imageUrl ? (
+        <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
       ) : (
         <>
           <div className={`${head} rounded-full absolute top-2`} style={{ background: color, opacity: 0.82 }} />
@@ -259,6 +261,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
         {filtered.map(({ player, isUnlocked, isFavorite, unlockedAt, rarity }) => {
           const style = rarityStyle(rarity);
+          const portraitUrl = (player as { photoUrl?: string; imageUrl?: string }).photoUrl ?? (player as { photoUrl?: string; imageUrl?: string }).imageUrl;
           return (
             <div key={player.id} className={`rounded-xl overflow-hidden min-h-[190px] relative ${isUnlocked ? "album-card-unlocked anim-pop" : ""}`}
               style={cardSurface(isUnlocked, rarity)}>
@@ -281,7 +284,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
               )}
               <button onClick={() => setSelectedId(player.id)} className="w-full text-left p-3 pt-2">
                 <div className="mx-auto mb-2">
-                  <PlayerPortrait name={player.displayName} color={style.bar} locked={!isUnlocked} />
+                  <PlayerPortrait name={player.displayName} color={style.bar} locked={!isUnlocked} imageUrl={portraitUrl} />
                 </div>
                 <div className="mb-2">
                   <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: isUnlocked ? style.color : "#aaa" }}>
@@ -331,7 +334,13 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                 <button onClick={() => setSelectedId(null)} className="text-[18px]" style={{ color: "#9a9a8a" }}>×</button>
               </div>
               <div className="my-4 flex justify-center">
-                <PlayerPortrait name={selected.player.displayName} color={rarityStyle(selected.rarity).bar} locked={!selected.isUnlocked} size="modal" />
+                <PlayerPortrait
+                  name={selected.player.displayName}
+                  color={rarityStyle(selected.rarity).bar}
+                  locked={!selected.isUnlocked}
+                  size="modal"
+                  imageUrl={(selected.player as { photoUrl?: string; imageUrl?: string }).photoUrl ?? (selected.player as { photoUrl?: string; imageUrl?: string }).imageUrl}
+                />
               </div>
               <div className="grid gap-2 text-[12px]" style={{ color: "#6b6b72" }}>
                 <div><strong>Rareza:</strong> {selected.rarity}</div>

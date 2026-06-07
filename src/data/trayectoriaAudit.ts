@@ -1,5 +1,5 @@
 export type CareerAudit = {
-  clubs: [string, string] | [string, string, string] | [string, string, string, string];
+  clubs: string[];
   source: string;
   sourceUrl: string;
 };
@@ -57,13 +57,13 @@ export const CAREER_AUDIT: Record<number, CareerAudit> = {
   66: career(["Málaga", "Real Madrid", "Sevilla"]),
   67: career(["Sevilla", "Barcelona"]),
   68: career(["Villarreal", "Fiorentina", "Mallorca"]),
-  69: career(["Villarreal", "Villarreal B"]),
+  69: career(["Villarreal"]),
   70: career(["Atlético de Madrid", "Osasuna", "Athletic Club"]),
   71: career(["Atlético de Madrid", "Zaragoza"]),
   72: career(["Atlético de Madrid", "Juventus", "Chelsea"]),
   73: career(["Valencia", "Zaragoza", "Racing"]),
   74: career(["Valencia", "Real Sociedad", "Betis"]),
-  75: career(["Atlético de Madrid", "Atlético B"]),
+  75: career(["Atlético de Madrid"]),
   76: career(["Betis", "Athletic Club"]),
   77: career(["Valencia", "Getafe", "Villarreal"]),
   78: career(["Athletic Club", "Gamba Osaka"]),
@@ -73,7 +73,7 @@ export const CAREER_AUDIT: Record<number, CareerAudit> = {
   82: career(["Granada", "Porto"]),
   83: career(["Athletic Club", "Alavés"]),
   84: career(["Rayo Vallecano", "Deportivo", "Las Palmas"]),
-  85: career(["Villarreal", "Villarreal B"]),
+  85: career(["Villarreal"]),
   86: career(["Rayo Vallecano", "Swansea", "Celta de Vigo"]),
   87: career(["Valencia", "Almería", "Espanyol"]),
   88: career(["Valencia", "Deportivo", "Villarreal"]),
@@ -85,8 +85,8 @@ export const CAREER_AUDIT: Record<number, CareerAudit> = {
   94: career(["Valencia", "Getafe", "Leeds"]),
   95: career(["Real Madrid", "Getafe", "Real Sociedad"]),
   96: career(["Athletic Club", "Basconia"]),
-  97: career(["Real Sociedad", "Real Sociedad B"]),
-  98: career(["Real Sociedad", "Real Sociedad B"]),
+  97: career(["Real Sociedad"]),
+  98: career(["Real Sociedad"]),
   99: career(["Levante", "Numancia", "Real Sociedad"]),
   100: career(["Getafe", "Real Madrid", "Eibar"]),
   101: career(["Sevilla", "Arsenal", "Atlético"]),
@@ -107,7 +107,7 @@ export const CAREER_AUDIT: Record<number, CareerAudit> = {
   137: career(["Villarreal", "Internacional", "Santos"]),
   138: career(["Atlético de Madrid", "Chelsea", "Rayo Vallecano"]),
   139: career(["Valencia", "Barcelona", "Atlético"]),
-  141: career(["Real Sociedad", "Real Sociedad B"]),
+  141: career(["Real Sociedad", "Athletic Club"]),
   142: career(["Real Sociedad", "Arsenal", "Osasuna"]),
   143: career(["Betis", "Las Palmas"]),
   144: career(["Betis", "Getafe", "Granada"]),
@@ -151,7 +151,7 @@ export const CAREER_AUDIT: Record<number, CareerAudit> = {
   197: career(["Barcelona", "Al Sadd"]),
   198: career(["Barcelona", "Vissel Kobe"]),
   199: career(["Real Madrid", "Porto"]),
-  200: career(["Barcelona", "Barcelona B"]),
+  200: career(["Barcelona"]),
   205: career(["Barcelona", "Santos", "PSG"]),
   206: career(["Real Madrid", "Tottenham"]),
   207: career(["Eibar", "Atlético de Madrid", "Swansea"]),
