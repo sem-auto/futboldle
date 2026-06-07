@@ -155,7 +155,7 @@ export default function AtributosBBVA({ onBack }: { onBack: () => void }) {
       const icons = [CELL_STYLE[r.nationality].icon, CELL_STYLE[r.position].icon, CELL_STYLE[r.club].icon, CELL_STYLE[r.years].icon];
       return icons.join(" ");
     }).join("\n");
-    const txt = `Futboldle Atributos BBVA #${getDayNumber()}\n${score}\n\n${grid}\n\nhttps://futboldle.es`;
+    const txt = `⚽ Futboldle\nAtributos BBVA #${getDayNumber()}\n${score}\n\n${grid}\n\nhttps://futboldle-liard.vercel.app`;
     try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 2500); }
     catch { alert(txt); }
   }

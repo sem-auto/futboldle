@@ -46,7 +46,7 @@ function evaluate(guess:string[],answer:string[]):LS[] {
 function shareText(states:LS[][],won:boolean,label:string):string {
   const score = won?`${states.length}/${MAX}`:`X/${MAX}`;
   const e=(s:LS)=>s==="correct"?"🟩":s==="partial"?"🟨":"⬛";
-  return `Futboldle BBVA ${label}\n${score}\n\n${states.map(r=>r.map(e).join("")).join("\n")}\n\nhttps://futboldle.es`;
+  return `⚽ Futboldle\n🟩 Wordle BBVA ${label}\n${score}\n\n${states.map(r=>r.map(e).join("")).join("\n")}\n\nhttps://futboldle-liard.vercel.app`;
 }
 
 function keyState(key:string, rows:Row[]):"correct"|"partial"|"wrong"|"idle" {

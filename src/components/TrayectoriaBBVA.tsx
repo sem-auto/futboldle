@@ -135,7 +135,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
 
   async function share() {
     const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
-    const txt = `Futboldle Trayectoria #${getDayNumber()}\n${score}\n\nhttps://futboldle.es`;
+    const txt = `⚽ Futboldle\n🟩 Trayectoria BBVA #${getDayNumber()}\n${score}\n\nhttps://futboldle-liard.vercel.app`;
     try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 2500); }
     catch { alert(txt); }
   }

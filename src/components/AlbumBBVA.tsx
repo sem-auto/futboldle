@@ -338,7 +338,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                 <div><strong>Equipos:</strong> {selected.player.clubs.join(" · ")}</div>
                 <div><strong>Posición:</strong> {selected.player.position}</div>
                 <div><strong>Nacionalidad:</strong> {selected.player.nationality}</div>
-                <div><strong>A?o debut BBVA:</strong> {getBbvaDebutYear(selected.player.years)}</div>
+                <div><strong>Año debut BBVA:</strong> {getBbvaDebutYear(selected.player.years)}</div>
                 <div><strong>Mejor temporada BBVA:</strong> {getBestBbvaSeason(selected.player.years)}</div>
                 {selected.isUnlocked ? (
                   <>

@@ -34,7 +34,7 @@ export default function PerfilPage() {
 
   async function shareProfile() {
     if (!summary) return;
-    const text = `Mi colección Futboldle\n${summary.cardsUnlocked}/${summary.collectionTotal} cromos\n${trophyCount} trofeos\nRacha máxima: ${summary.bestStreak}\n\nFutboldle`;
+    const text = `Mi colección Futboldle\n${summary.cardsUnlocked}/${summary.collectionTotal} cromos\n${trophyCount} trofeos\nRacha máxima: ${summary.bestStreak}\n\nhttps://futboldle-liard.vercel.app`;
     try { await navigator.clipboard.writeText(text); } catch { alert(text); }
   }
 

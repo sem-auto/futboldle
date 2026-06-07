@@ -134,7 +134,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
   async function share() {
     const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
     const revCount = visibleHints.filter(h => h.revealed).length;
-    const txt = `Futboldle Adivina el Crack #${getDayNumber()}\n${score}\n\n🔍 ${revCount} pistas usadas\n\nhttps://futboldle.es`;
+    const txt = `⚽ Futboldle\n🟪 Adivina el Crack #${getDayNumber()}\n${score}\n\n🔍 ${revCount} pistas usadas\n\nhttps://futboldle-liard.vercel.app`;
     try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 2500); }
     catch { alert(txt); }
   }

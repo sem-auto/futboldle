@@ -21,10 +21,10 @@ const ICON_PLAYERS = new Set([
   "FERNANDOTORRES",
   "SILVA",
   "DAVIDSILVA",
-  "FALCAO",
 ]);
 
 const LEGENDARY_PLAYERS = new Set([
+  "FALCAO",
   "OZIL",
   "FABREGAS",
   "DIMARIA",
@@ -57,6 +57,11 @@ const CORE_PLAYERS = new Set([
   "ROSSI",
   "MATA",
   "JUANMATA",
+  "XABIPRIETO",
+  "BRUNOSORIANO",
+  "SERGIOGARCIA",
+  "JORGEMOLINA",
+  "RUBENCASTRO",
 ]);
 
 const PLAYER_CURIOSITIES: Record<string, string> = {

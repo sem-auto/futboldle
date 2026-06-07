@@ -40,13 +40,22 @@ const CORRECTED_PLAYERS = [
 
 const PENDING_PLAYERS: string[] = [];
 
+const CLUB_NAME_ALIASES: Record<string, string> = {
+  "Atlético": "Atlético de Madrid",
+  "Celta": "Celta de Vigo",
+  "Rayo": "Rayo Vallecano",
+  "Sporting": "Sporting de Gijón",
+  "Racing": "Racing Santander",
+  "Alavés": "Deportivo Alavés",
+};
+
 function getDuplicateAnswers() {
   const answers = bbvaPlayers.map(player => player.answer);
   return Array.from(new Set(answers.filter((answer, index) => answers.indexOf(answer) !== index)));
 }
 
 function hasBrokenEncoding(value: string) {
-  return value.includes(String.fromCharCode(63)) || /[???]/.test(value);
+  return value.includes(String.fromCharCode(63));
 }
 
 function getBrokenEncodingItems() {
@@ -69,6 +78,14 @@ function getPlayersWithoutCard() {
 
 function getPlayersWithoutAutocomplete() {
   return bbvaPlayers.filter(player => !player.answer || !player.displayName || !player.fullName).map(player => player.displayName || String(player.id));
+}
+
+function getNamingIssues() {
+  return bbvaPlayers.flatMap(player =>
+    player.clubs
+      .filter(club => CLUB_NAME_ALIASES[club])
+      .map(club => `${player.displayName}: ${club} → ${CLUB_NAME_ALIASES[club]}`)
+  );
 }
 
 function readLocalStorageSnapshot() {
@@ -128,6 +145,7 @@ export default function AdminAuditPage() {
   const brokenEncodingItems = useMemo(getBrokenEncodingItems, []);
   const playersWithoutCard = useMemo(getPlayersWithoutCard, []);
   const playersWithoutAutocomplete = useMemo(getPlayersWithoutAutocomplete, []);
+  const namingIssues = useMemo(getNamingIssues, []);
   const excludedTrajectoryIds = useMemo(() => getExcludedTrajectoryIds(bbvaPlayers.map(player => player.id)), []);
 
   function refresh() {
@@ -200,16 +218,16 @@ export default function AdminAuditPage() {
           <h2 className="font-bebas text-[24px] leading-none mb-2">RESUMEN BETA</h2>
           <div className="grid md:grid-cols-2 gap-2 text-[11px]">
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
-              <strong>Jugadores corregidos:</strong> {CORRECTED_PLAYERS.join(" ? ")}
+              <strong>Jugadores corregidos:</strong> {CORRECTED_PLAYERS.join(" · ")}
             </div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
-              <strong>Jugadores pendientes:</strong> {PENDING_PLAYERS.length ? PENDING_PLAYERS.join(" ? ") : "Ninguno"}
+              <strong>Jugadores pendientes:</strong> {PENDING_PLAYERS.length ? PENDING_PLAYERS.join(" · ") : "Ninguno"}
             </div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
-              <strong>Duplicados detectados:</strong> {duplicateAnswers.length ? duplicateAnswers.join(" ? ") : "Ninguno"}
+              <strong>Duplicados detectados:</strong> {duplicateAnswers.length ? duplicateAnswers.join(" · ") : "Ninguno"}
             </div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
-              <strong>Top10 activos con fuente:</strong> {top10Challenges.length} ? <strong>Solicitados pendientes:</strong> {pendingRequestedTops.length}
+              <strong>Top10 activos con fuente:</strong> {top10Challenges.length} · <strong>Solicitados pendientes:</strong> {pendingRequestedTops.length}
             </div>
           </div>
         </section>
@@ -220,11 +238,12 @@ export default function AdminAuditPage() {
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 activos:</strong> {top10Challenges.length}</div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 pendientes:</strong> {pendingRequestedTops.length}</div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 retirados:</strong> {removedUnverifiedTops.length}</div>
-            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Trayectorias activas:</strong> {Object.keys(CAREER_AUDIT).length} ? <strong>Excluidas:</strong> {excludedTrajectoryIds.length}</div>
-            <div className="rounded-lg p-2" style={{ background: brokenEncodingItems.length ? "#fff5f5" : "#f8f5f0" }}><strong>Jugadores con encoding roto:</strong> {brokenEncodingItems.length ? brokenEncodingItems.join(" ? ") : "Ninguno"}</div>
-            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores duplicados:</strong> {duplicateAnswers.length ? duplicateAnswers.join(" ? ") : "Ninguno"}</div>
-            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores sin cromo:</strong> {playersWithoutCard.length ? playersWithoutCard.join(" ? ") : "Ninguno"}</div>
-            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores sin autocomplete:</strong> {playersWithoutAutocomplete.length ? playersWithoutAutocomplete.join(" ? ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Trayectorias activas:</strong> {Object.keys(CAREER_AUDIT).length} · <strong>Excluidas:</strong> {excludedTrajectoryIds.length}</div>
+            <div className="rounded-lg p-2" style={{ background: brokenEncodingItems.length ? "#fff5f5" : "#f8f5f0" }}><strong>Jugadores con encoding roto:</strong> {brokenEncodingItems.length ? brokenEncodingItems.join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores duplicados:</strong> {duplicateAnswers.length ? duplicateAnswers.join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores sin cromo:</strong> {playersWithoutCard.length ? playersWithoutCard.join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores sin autocomplete:</strong> {playersWithoutAutocomplete.length ? playersWithoutAutocomplete.join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: namingIssues.length ? "#fff8e6" : "#f8f5f0" }}><strong>Jugadores con naming inconsistente:</strong> {namingIssues.length ? namingIssues.join(" · ") : "Ninguno"}</div>
           </div>
         </section>
 

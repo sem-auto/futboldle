@@ -194,8 +194,8 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
 
   async function share() {
     const score = surrendered ? `X/${challenge.answers.length}` : `${guessedAnswers.length}/${challenge.answers.length}`;
-    const grid = challenge.answers.map(a => guessedAnswers.includes(norm(a.answer)) ? "🟦" : "⬛").join("");
-    const txt = `Futboldle TOP 10 #${getDayNumber()}\n${challenge.title}\n${score}\n\n${grid}\n\nhttps://futboldle.es`;
+    const grid = challenge.answers.map(a => guessedAnswers.includes(norm(a.answer)) ? "🟩" : "⬛").join("");
+    const txt = `⚽ Futboldle\n🟨 Top10 BBVA #${getDayNumber()}\n${challenge.title}\n${score}\n\n${grid}\n\nhttps://futboldle-liard.vercel.app`;
     try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 2500); }
     catch { alert(txt); }
   }
