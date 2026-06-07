@@ -89,6 +89,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   const [query,       setQuery]       = useState("");
   const [copied,      setCopied]      = useState(false);
   const [loaded,      setLoaded]      = useState(false);
+  const [showFullCareer, setShowFullCareer] = useState(false);
 
   useEffect(() => {
     const saved = loadSaved();
@@ -132,6 +133,8 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   }, [guesses, usedIds, attempt, player.id]);
 
   const clues = getAuditedClues(player, attempt);
+  const canonicalCareer = CAREER_AUDIT[player.id]?.clubs ?? player.clubs;
+  const visibleCareer = showFullCareer ? canonicalCareer : canonicalCareer.slice(0, 2);
 
   async function share() {
     const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
@@ -247,14 +250,20 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
             <div className="text-[11px] mb-3" style={{ color: "#9a9a8a" }}>{player.fullName} · {player.nationality} · {player.position}</div>
             {/* Career chain */}
             <div className="flex flex-wrap items-center gap-1.5 mb-3">
-              {player.clubs.map((c, i) => (
+              {visibleCareer.map((c, i) => (
                 <div key={i} className="flex items-center gap-1">
                   <span className="text-[11px] font-semibold px-2 py-1 rounded-lg"
                     style={{ background: "#f0faf2", border: "1px solid rgba(30,107,46,0.18)", color: "#1e6b2e" }}>{c}</span>
-                  {i < player.clubs.length - 1 && <span className="text-[10px]" style={{ color: "#ccc" }}>→</span>}
+                  {i < visibleCareer.length - 1 && <span className="text-[10px]" style={{ color: "#ccc" }}>→</span>}
                 </div>
               ))}
             </div>
+            {canonicalCareer.length > visibleCareer.length && (
+              <button onClick={() => setShowFullCareer(true)} className="text-[10px] font-semibold px-3 py-2 rounded-lg mb-3"
+                style={{ background: "#f0faf2", color: "#1e6b2e", border: "1px solid rgba(30,107,46,0.18)" }}>
+                Ver trayectoria completa
+              </button>
+            )}
             <p className="text-[11px] italic mb-4" style={{ color: "#6b6b72" }}>"{player.hint}"</p>
             <button onClick={share} className="w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
               style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>

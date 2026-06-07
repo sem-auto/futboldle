@@ -134,7 +134,7 @@ export default function WordleBBVA({onBack}:Props) {
   const [loaded,    setLoaded]    = useState(false);
   const [compactMobile, setCompactMobile] = useState(false);
   const [wordlesCompleted, setWordlesCompleted] = useState(0);
-  const { stats } = useStats();
+  const { stats, refresh } = useStats();
 
   useEffect(() => {
     setWordlesCompleted(loadGameCounts().wordle);
@@ -203,7 +203,11 @@ export default function WordleBBVA({onBack}:Props) {
       if (w) {
         unlockPlayer(player.id, "Wordle BBVA");
       }
-      if (mode === "daily") recordGameResult("wordle", getDayKey(), w);
+      if (mode === "daily") {
+        recordGameResult("wordle", getDayKey(), w);
+        setWordlesCompleted(loadGameCounts().wordle);
+        refresh();
+      }
       trackEvent("game_completed", { game: "wordle", mode, won: w });
       const result:GameResult={
         letters: newRows.filter(r=>r.submitted).map(r=>r.letters),
@@ -222,7 +226,7 @@ export default function WordleBBVA({onBack}:Props) {
       setDayState(newDs);
       setTimeout(()=>setShowResult(true),flipDelay);
     }
-  },[rows,curRow,answer,dayState,mode,extraIdx,player.id]);
+  },[rows,curRow,answer,dayState,mode,extraIdx,player.id,refresh]);
 
   // ── Key handler ──
   const handleKey=useCallback((key:string)=>{
@@ -458,8 +462,8 @@ export default function WordleBBVA({onBack}:Props) {
               <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>{wordlesCompleted}</div>
             </div>
             <div className="rounded-lg px-2 py-1.5 text-center" style={{ background: "var(--grass-bg)", border: "1px solid var(--grass-bd)" }}>
-              <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--grass)" }}>Racha max.</div>
-              <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>{stats.bestStreak}</div>
+              <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--grass)" }}>Racha</div>
+              <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>{stats.streak}</div>
             </div>
           </div>
 
