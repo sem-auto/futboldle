@@ -8,6 +8,7 @@ import {
   getAlbumRarityProgress,
   getCollectorLevel,
   getFeaturedClubProgress,
+  getHistoricalClubShield,
   getPlayerCuriosity,
   getUnlockedPlayers,
   toggleFavoritePlayer,
@@ -209,6 +210,12 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                   style={{ background: "rgba(255,255,255,0.75)", color: isFavorite ? "#c8920a" : "#b8b0a4", border: "1px solid rgba(0,0,0,0.08)" }}>
                   ★
                 </button>
+              )}
+              {isUnlocked && (
+                <div className="absolute top-2 left-2 w-8 h-8 rounded-full flex items-center justify-center font-bebas text-[10px]"
+                  style={{ background: "#18181b", color: "white", border: "1px solid rgba(255,255,255,0.55)", boxShadow: "0 2px 8px rgba(0,0,0,0.16)" }}>
+                  {getHistoricalClubShield(player.mainClub)}
+                </div>
               )}
               <button onClick={() => setSelectedId(player.id)} className="w-full text-left p-3 pt-2">
                 <div className="mx-auto mb-2">

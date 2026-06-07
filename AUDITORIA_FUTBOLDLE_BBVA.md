@@ -4,15 +4,15 @@
 
 - Nilmar: eliminada la trayectoria falsa hacia Valencia. Ahora se usa Internacional, Villarreal y Santos.
 - Benat: corregida su base para reflejar Betis y Athletic Club.
-- Gameiro: confirmado sin Valencia porque su etapa valencianista empieza en 2018, fuera del periodo base.
+- Gameiro: actualizado para la regla beta de carrera reconocible como Sevilla, Atletico, Valencia y Lorient.
 - Valeron: eliminado Malaga, club incorrecto para su trayectoria.
 - Barral: corregido como David Barral, con Sporting, Levante y Granada.
-- El modo Trayectoria ya no usa cualquier jugador de la base general. Usa `src/data/trayectoriaAudit.ts`, un pool auditado de 32 jugadores con:
-  - Club mas reconocible en Espana
-  - Otro club relevante
+- El modo Trayectoria ya no usa cualquier jugador de la base general. Usa `src/data/trayectoriaAudit.ts`, un pool beta de 144 jugadores con:
+  - Club principal
+  - Segundo club
+  - Tercer club si existe
   - Posicion
   - Nacionalidad
-  - Pista corta
 - Se evita usar solo club inicial y club final para no crear pistas imposibles.
 
 ## Top10 corregidos
@@ -42,6 +42,10 @@ Se mantienen fuera de la rotacion activa los rankings acumulados o de club que n
 - Mas partidos Atletico era BBVA
 - Mas partidos Sevilla era BBVA
 - Mas partidos Villarreal era BBVA
+
+## Tops solicitados pendientes
+
+Se anadio una cola interna `pendingRequestedTops` para los Top10 de beta que faltan por auditar manualmente. No se activan hasta tener fuente, temporada, estadistica exacta y ranking completo.
 
 ## Datos erroneos encontrados
 
@@ -83,6 +87,9 @@ Ya estaban incluidos o representados en la base:
 - Todos los jugadores de Top10 activos existen en la base global.
 - Todos los jugadores del pool auditado de Trayectoria existen en la base global.
 - Creada `/admin/audit` para revisar jugadores, cromos bloqueados/desbloqueados, Trayectorias, Top10, fuentes, estadisticas y localStorage.
+- La auditoria muestra tambien Top10 pendientes solicitados y trayectorias excluidas.
+- Eliminados duplicados innecesarios de Agirretxe, Carlos Vela, Ibai Gomez y Nolito.
+- Validacion beta: 214 jugadores, 144 trayectorias auditadas, 0 jugadores Top10 huerfanos, 0 displayNames duplicados.
 
 ## Pendiente
 

@@ -38,6 +38,38 @@ export const removedUnverifiedTops = [
   "Más partidos Villarreal era BBVA",
 ];
 
+export const pendingRequestedTops = [
+  "Top goleadores 08/09",
+  "Top goleadores 09/10",
+  "Top goleadores 10/11",
+  "Top goleadores 11/12",
+  "Top goleadores 12/13",
+  "Top goleadores 13/14",
+  "Top goleadores 14/15",
+  "Top asistencias 08/09",
+  "Top asistencias 09/10",
+  "Top asistencias 10/11",
+  "Top asistencias 11/12",
+  "Top asistencias 13/14",
+  "Top asistencias 14/15",
+  "Top porterías 10/11",
+  "Top porterías 11/12",
+  "Top porterías 12/13",
+  "Top porterías 13/14",
+  "Top porterías 14/15",
+  "Máximos goleadores era BBVA",
+  "Máximos asistentes era BBVA",
+  "Más partidos era BBVA",
+  "Más partidos Valencia era BBVA",
+  "Más partidos Sevilla era BBVA",
+  "Más partidos Atlético era BBVA",
+  "Más partidos Villarreal era BBVA",
+  "Más partidos Athletic era BBVA",
+  "Más porterías a cero era BBVA",
+  "Más goles españoles era BBVA",
+  "Más asistencias españolas era BBVA",
+];
+
 export const top10Challenges: Top10Challenge[] = [
   {
     // Fuente consultada: StatBunker, La Liga 15/16 Top goal scorers.

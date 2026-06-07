@@ -68,12 +68,13 @@ function getClues(player: Player, attempt: number) {
 
 function getAuditedClues(player: Player, attempt: number) {
   const career = CAREER_AUDIT[player.id];
+  const thirdClub = career.clubs[2] ?? "Sin tercer club clave";
   return [
-    { label: "Club más reconocible", value: career.spanishClub, shown: attempt >= 0 },
-    { label: "Otro club relevante", value: career.extraClub ? `${career.otherClub} / ${career.extraClub}` : career.otherClub, shown: attempt >= 1 },
-    { label: "Posición", value: player.position, shown: attempt >= 2 },
-    { label: "Nacionalidad", value: player.nationality, shown: attempt >= 3 },
-    { label: "Pista corta", value: career.shortClue, shown: attempt >= 4 },
+    { label: "Club principal", value: career.clubs[0], shown: attempt >= 0 },
+    { label: "Segundo club", value: career.clubs[1], shown: attempt >= 1 },
+    { label: "Tercer club", value: thirdClub, shown: attempt >= 2 },
+    { label: "Posición", value: player.position, shown: attempt >= 3 },
+    { label: "Nacionalidad", value: player.nationality, shown: attempt >= 4 },
   ];
 }
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { CAREER_AUDIT, PROJECT_PERIOD, getExcludedTrajectoryIds } from "@/data/trayectoriaAudit";
-import { removedUnverifiedTops, top10Challenges } from "@/data/top10Challenges";
+import { pendingRequestedTops, removedUnverifiedTops, top10Challenges } from "@/data/top10Challenges";
 import { getAlbumEntries, getAlbumProgress, getTrophyShowcase } from "@/lib/album";
 import { loadGameCounts } from "@/lib/profile";
 import { loadStats } from "@/lib/useStats";
@@ -41,12 +41,12 @@ function getAuditErrors() {
   const errors: string[] = [];
   const playerIds = new Set(bbvaPlayers.map(player => player.id));
   const playerAnswers = new Set(bbvaPlayers.map(player => player.answer));
-  const duplicateAnswers = bbvaPlayers
-    .map(player => player.answer)
-    .filter((answer, index, list) => list.indexOf(answer) !== index);
+  const duplicateNames = bbvaPlayers
+    .map(player => player.displayName)
+    .filter((name, index, list) => list.indexOf(name) !== index);
 
-  if (duplicateAnswers.length) {
-    errors.push(`Respuestas duplicadas en base global: ${Array.from(new Set(duplicateAnswers)).join(", ")}`);
+  if (duplicateNames.length) {
+    errors.push(`Jugadores duplicados en base global: ${Array.from(new Set(duplicateNames)).join(", ")}`);
   }
 
   for (const player of bbvaPlayers) {
@@ -183,8 +183,8 @@ export default function AdminAuditPage() {
                   return (
                     <tr key={id} style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
                       <td className="py-1.5 pr-2 font-semibold">{player?.displayName ?? id}</td>
-                      <td className="py-1.5 pr-2">{audit.spanishClub}</td>
-                      <td className="py-1.5 pr-2">{audit.otherClub}{audit.extraClub ? ` / ${audit.extraClub}` : ""}</td>
+                      <td className="py-1.5 pr-2">{audit.clubs[0]}</td>
+                      <td className="py-1.5 pr-2">{audit.clubs.slice(1).join(" / ")}</td>
                       <td className="py-1.5 pr-2">{audit.source}</td>
                     </tr>
                   );
@@ -207,6 +207,8 @@ export default function AdminAuditPage() {
             </div>
             <h3 className="font-bebas text-[18px] leading-none mt-3 mb-1">Pendientes / retirados</h3>
             <div className="text-[10px]" style={{ color: "#9a9a8a" }}>{removedUnverifiedTops.join(" · ")}</div>
+            <h3 className="font-bebas text-[18px] leading-none mt-3 mb-1">Solicitados para auditar</h3>
+            <div className="text-[10px]" style={{ color: "#9a9a8a" }}>{pendingRequestedTops.join(" · ")}</div>
           </div>
         </section>
 
