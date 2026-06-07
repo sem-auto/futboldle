@@ -15,17 +15,23 @@ type Props = {
 
 function scorePlayer(player: BBVAPlayer, query: string) {
   const q = normalize(query);
-  const nameFields = [
-    normalize(player.displayName),
-    normalize(player.fullName),
-    ...player.fullName.split(/\s+/).map(normalize),
-    ...player.displayName.split(/\s+/).map(normalize),
-  ].filter(Boolean);
-  const aliasFields = [normalize(player.answer)].filter(Boolean);
+  if (!q) return 99;
 
-  if (nameFields.some(f => f === q || f.startsWith(q))) return 0;
-  if (nameFields.some(f => f.includes(q))) return 1;
-  if (aliasFields.some(f => f === q || f.startsWith(q) || f.includes(q))) return 2;
+  const displayName = normalize(player.displayName);
+  const fullName = normalize(player.fullName);
+  const displayWords = player.displayName.split(/\s+/).map(normalize).filter(Boolean);
+  const fullWords = player.fullName.split(/\s+/).map(normalize).filter(Boolean);
+  const aliases = [normalize(player.answer)].filter(Boolean);
+  const directStarts = [displayName, ...aliases].filter(field => field.startsWith(q));
+  const displayStarts = displayWords.filter(word => word.startsWith(q));
+  const fullStarts = [fullName, ...fullWords].filter(field => field.startsWith(q));
+  const shortest = (fields: string[]) => Math.min(...fields.map(field => field.length)) / 1000;
+
+  if (directStarts.length) return shortest(directStarts);
+  if (displayStarts.length) return 1 + shortest(displayStarts);
+  if (fullStarts.length) return 2 + shortest(fullStarts);
+  if (displayName.includes(q) || fullName.includes(q)) return 3 + Math.min(displayName.length, fullName.length) / 1000;
+  if (aliases.some(alias => alias.includes(q))) return 4 + shortest(aliases.filter(alias => alias.includes(q)));
   return 99;
 }
 
@@ -36,7 +42,11 @@ function getSuggestions(players: BBVAPlayer[], query: string, usedIds: number[])
     .filter(player => !used.has(player.id))
     .map(player => ({ player, score: scorePlayer(player, query) }))
     .filter(item => item.score < 99)
-    .sort((a, b) => a.score - b.score || a.player.displayName.localeCompare(b.player.displayName, "es"))
+    .sort((a, b) =>
+      a.score - b.score ||
+      normalize(a.player.displayName).length - normalize(b.player.displayName).length ||
+      a.player.displayName.localeCompare(b.player.displayName, "es")
+    )
     .slice(0, 10)
     .map(item => item.player);
 }
