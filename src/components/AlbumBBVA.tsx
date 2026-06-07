@@ -44,6 +44,23 @@ function rarityStyle(rarity: AlbumRarity) {
   return { label: "CULTO", stars: "★", bar: "#7c3aed", bg: "#f5f0ff", color: "#6d28d9" };
 }
 
+function cardSurface(isUnlocked: boolean, rarity: AlbumRarity) {
+  const style = rarityStyle(rarity);
+  if (!isUnlocked) {
+    return {
+      background: "#f3efe8",
+      border: "1px solid rgba(0,0,0,0.08)",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+    };
+  }
+  const glow = rarity === "ICONO" ? "rgba(24,24,27,0.20)" : rarity === "LEGENDARIO" ? "rgba(200,146,10,0.28)" : `${style.bar}20`;
+  return {
+    background: `linear-gradient(145deg, ${style.bg} 0%, #fffdf7 48%, ${style.bg} 100%)`,
+    border: `2px solid ${style.bar}`,
+    boxShadow: `0 8px 18px rgba(0,0,0,0.11), inset 0 0 0 3px rgba(255,255,255,0.55), 0 0 18px ${glow}`,
+  };
+}
+
 function PlayerPortrait({ name, color, locked = false, size = "card" }: { name: string; color: string; locked?: boolean; size?: "card" | "modal" }) {
   const dimensions = size === "modal" ? "w-20 h-20" : "w-14 h-14";
   const head = size === "modal" ? "w-8 h-8" : "w-6 h-6";
@@ -203,7 +220,11 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
           const style = rarityStyle(rarity);
           return (
             <div key={player.id} className={`rounded-xl overflow-hidden min-h-[190px] relative ${isUnlocked ? "album-card-unlocked anim-pop" : ""}`}
-              style={{ background: isUnlocked ? style.bg : "#f3efe8", border: `1px solid ${isUnlocked ? "rgba(0,0,0,0.10)" : "rgba(0,0,0,0.08)"}`, boxShadow: isUnlocked ? "0 4px 14px rgba(0,0,0,0.08)" : "0 2px 8px rgba(0,0,0,0.04)" }}>
+              style={cardSurface(isUnlocked, rarity)}>
+              {isUnlocked && (
+                <div className="pointer-events-none absolute inset-0 z-0"
+                  style={{ background: "linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 62%)", mixBlendMode: "screen" }} />
+              )}
               <div className="h-[5px]" style={{ background: isUnlocked ? style.bar : "#ddd7ca" }} />
               {isUnlocked && (
                 <button onClick={() => toggleFavorite(player.id)} className="absolute top-2 right-2 w-7 h-7 rounded-full text-[13px]"

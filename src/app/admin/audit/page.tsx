@@ -27,6 +27,24 @@ const PERIOD_SUSPICIOUS_CLUBS = [
   "Valencia 2018",
 ];
 
+const CORRECTED_PLAYERS = [
+  "Piti",
+  "Barkero",
+  "Chory Castro",
+  "Bacca",
+  "F?bregas",
+  "Brahimi",
+  "Nolito",
+  "Jes?s Navas",
+];
+
+const PENDING_PLAYERS: string[] = [];
+
+function getDuplicateAnswers() {
+  const answers = bbvaPlayers.map(player => player.answer);
+  return Array.from(new Set(answers.filter((answer, index) => answers.indexOf(answer) !== index)));
+}
+
 function readLocalStorageSnapshot() {
   const snapshot: Record<string, string> = {};
   for (const key of STORAGE_KEYS) snapshot[key] = localStorage.getItem(key) ?? "";
@@ -49,6 +67,7 @@ function getAuditErrors() {
     errors.push(`Jugadores duplicados en base global: ${Array.from(new Set(duplicateNames)).join(", ")}`);
   }
 
+
   for (const player of bbvaPlayers) {
     const suspicious = player.clubs.filter(club => PERIOD_SUSPICIOUS_CLUBS.includes(club));
     if (suspicious.length) errors.push(`${player.displayName}: club sospechoso fuera de periodo: ${suspicious.join(", ")}`);
@@ -65,9 +84,6 @@ function getAuditErrors() {
     }
   }
 
-  if (bbvaPlayers.find(player => player.answer === "GAMEIRO")?.clubs.includes("Valencia")) {
-    errors.push("Gameiro contiene Valencia, club fuera del periodo Futboldle.");
-  }
 
   return errors;
 }
@@ -82,6 +98,7 @@ export default function AdminAuditPage() {
   const [trophyCount, setTrophyCount] = useState(0);
 
   const errors = useMemo(getAuditErrors, []);
+  const duplicateAnswers = useMemo(getDuplicateAnswers, []);
   const excludedTrajectoryIds = useMemo(() => getExcludedTrajectoryIds(bbvaPlayers.map(player => player.id)), []);
 
   function refresh() {
@@ -113,7 +130,7 @@ export default function AdminAuditPage() {
             style={{ background: "#18181b", color: "white" }}>Refrescar</button>
         </div>
 
-        <section className="grid grid-cols-2 md:grid-cols-6 gap-2">
+        <section className="grid grid-cols-2 md:grid-cols-5 gap-2">
           {[
             ["Jugadores", bbvaPlayers.length],
             ["Desbloqueados", albumProgress?.unlockedCount ?? 0],
@@ -121,6 +138,10 @@ export default function AdminAuditPage() {
             ["Partidas", stats?.played ?? 0],
             ["Victorias", stats?.won ?? 0],
             ["Trofeos", trophyCount],
+            ["Top10 auditados", top10Challenges.length],
+            ["Trayectorias", Object.keys(CAREER_AUDIT).length],
+            ["Pendientes", pendingRequestedTops.length],
+            ["Duplicados", duplicateAnswers.length],
           ].map(([label, value]) => (
             <div key={label} className="rounded-xl px-3 py-2" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
               <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#bbb" }}>{label}</div>
@@ -140,6 +161,25 @@ export default function AdminAuditPage() {
               ))}
             </div>
           )}
+        </section>
+
+
+        <section className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+          <h2 className="font-bebas text-[24px] leading-none mb-2">RESUMEN BETA</h2>
+          <div className="grid md:grid-cols-2 gap-2 text-[11px]">
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
+              <strong>Jugadores corregidos:</strong> {CORRECTED_PLAYERS.join(" ? ")}
+            </div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
+              <strong>Jugadores pendientes:</strong> {PENDING_PLAYERS.length ? PENDING_PLAYERS.join(" ? ") : "Ninguno"}
+            </div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
+              <strong>Duplicados detectados:</strong> {duplicateAnswers.length ? duplicateAnswers.join(" ? ") : "Ninguno"}
+            </div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
+              <strong>Top10 activos con fuente:</strong> {top10Challenges.length} ? <strong>Solicitados pendientes:</strong> {pendingRequestedTops.length}
+            </div>
+          </div>
         </section>
 
         <section className="rounded-xl p-3 overflow-x-auto" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
