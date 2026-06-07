@@ -68,14 +68,13 @@ function getClues(player: Player, attempt: number) {
 
 function getAuditedClues(player: Player, attempt: number) {
   const career = CAREER_AUDIT[player.id];
-  const thirdClub = career.clubs[2] ?? "Sin tercer club clave";
   return [
     { label: "Club principal", value: career.clubs[0], shown: attempt >= 0 },
     { label: "Segundo club", value: career.clubs[1], shown: attempt >= 1 },
-    { label: "Tercer club", value: thirdClub, shown: attempt >= 2 },
+    career.clubs[2] ? { label: "Tercer club", value: career.clubs[2], shown: attempt >= 2 } : null,
     { label: "Posición", value: player.position, shown: attempt >= 3 },
     { label: "Nacionalidad", value: player.nationality, shown: attempt >= 4 },
-  ];
+  ].filter((clue): clue is { label: string; value: string; shown: boolean } => clue !== null);
 }
 
 export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {

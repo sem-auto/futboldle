@@ -8,6 +8,7 @@ import {
   getAlbumRarityProgress,
   getCollectorLevel,
   getFeaturedClubProgress,
+  getClubProgress,
   getHistoricalClubShield,
   getPlayerCuriosity,
   getUnlockedPlayers,
@@ -61,6 +62,18 @@ function cardSurface(isUnlocked: boolean, rarity: AlbumRarity) {
   };
 }
 
+function getBbvaDebutYear(years: string) {
+  return years.match(/\d{4}/)?.[0] ?? "Era BBVA";
+}
+
+function getBestBbvaSeason(years: string) {
+  const yearsFound = years.match(/\d{4}/g) ?? [];
+  const best = yearsFound[yearsFound.length - 1] ?? yearsFound[0];
+  if (!best) return "Era BBVA";
+  const end = String((Number(best) + 1) % 100).padStart(2, "0");
+  return `${best}/${end}`;
+}
+
 function PlayerPortrait({ name, color, locked = false, size = "card" }: { name: string; color: string; locked?: boolean; size?: "card" | "modal" }) {
   const dimensions = size === "modal" ? "w-20 h-20" : "w-14 h-14";
   const head = size === "modal" ? "w-8 h-8" : "w-6 h-6";
@@ -88,6 +101,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [club, setClub] = useState("Todos");
   const [position, setPosition] = useState("Todas");
+  const [showAllCollections, setShowAllCollections] = useState(false);
 
   useEffect(() => setUnlocked(getUnlockedPlayers()), [version]);
 
@@ -104,6 +118,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
   const collectorLevel = getCollectorLevel(albumProgress.unlockedCount);
   const rarityProgress = getAlbumRarityProgress();
   const clubProgress = getFeaturedClubProgress(["Valencia", "Atlético de Madrid", "Sevilla", "Barcelona", "Villarreal"]);
+  const allClubProgress = clubs.filter(item => item !== "Todos").map(getClubProgress).filter(item => item.total > 0);
   const objectives = getAlbumObjectives();
   const entries = getAlbumEntries();
   const filtered = entries.filter(entry => {
@@ -197,6 +212,32 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
           ))}
         </div>
       </div>
+
+      <div className="flex justify-end -mt-2">
+        <button onClick={() => setShowAllCollections(value => !value)} className="text-[10px] font-semibold px-3 py-2 rounded-xl" style={{ background: "#fffbf5", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>
+          {showAllCollections ? "Ocultar colecciones" : "Ver todas las colecciones"}
+        </button>
+      </div>
+
+      {showAllCollections && (
+        <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+          <div className="font-bebas text-[22px] leading-none mb-2" style={{ color: "#18181b" }}>TODAS LAS COLECCIONES</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[70vh] overflow-y-auto pr-1">
+            {allClubProgress.map(item => (
+              <button key={item.club} onClick={() => setClub(item.club)} className="text-left rounded-lg px-3 py-2" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bebas" style={{ background: "#18181b", color: "white" }}>{clubBadge(item.club)}</span>
+                  <span className="font-oswald font-semibold text-[12px] flex-1" style={{ color: "#18181b" }}>{item.club}</span>
+                  <span className="text-[10px] font-semibold" style={{ color: "#9a9a8a" }}>{item.unlocked}/{item.total} ? {item.percent}%</span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#ece8e0" }}>
+                  <div className="h-full rounded-full" style={{ width: `${item.percent}%`, background: "#c8920a" }} />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
         <div className="font-bebas text-[20px] leading-none mb-2" style={{ color: "#18181b" }}>OBJETIVOS</div>
@@ -297,6 +338,8 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                 <div><strong>Equipos:</strong> {selected.player.clubs.join(" · ")}</div>
                 <div><strong>Posición:</strong> {selected.player.position}</div>
                 <div><strong>Nacionalidad:</strong> {selected.player.nationality}</div>
+                <div><strong>A?o debut BBVA:</strong> {getBbvaDebutYear(selected.player.years)}</div>
+                <div><strong>Mejor temporada BBVA:</strong> {getBestBbvaSeason(selected.player.years)}</div>
                 {selected.isUnlocked ? (
                   <>
                     <div><strong>Desbloqueado mediante:</strong> {selected.source ?? "Futboldle"}</div>

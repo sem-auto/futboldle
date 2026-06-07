@@ -167,11 +167,11 @@ export const CAREER_AUDIT: Record<number, CareerAudit> = {
   255: career(["Real Madrid", "Real Sociedad", "Liverpool"]),
   256: career(["Racing", "Real Madrid", "Deportivo"]),
   257: career(["Betis", "Toulouse"]),
-  258: career(["M?laga", "Benfica"]),
+  258: career(["Málaga", "Benfica"]),
   259: career(["Real Madrid", "Ajax", "Hamburgo"]),
-  260: career(["Atl?tico de Madrid", "Chelsea", "Real Madrid"]),
+  260: career(["Atlético de Madrid", "Chelsea", "Real Madrid"]),
   261: career(["Barcelona", "Manchester United"]),
-  262: career(["Almer?a", "Sevilla", "Celta de Vigo"]),
+  262: career(["Almería", "Sevilla", "Celta de Vigo"]),
   263: career(["Levante", "Osasuna", "Espanyol"]),
 };
 

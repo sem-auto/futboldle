@@ -427,6 +427,11 @@ function TodayStrip({ wordleDone, trayDone, onWordle, onTray }: {
 }
 
 /* ════════════════════════════════════════════ */
+function dailyShareSquare(done: boolean, won: boolean) {
+  if (!done) return "\u2b1c";
+  return won ? "\ud83d\udfe9" : "\ud83d\udfe5";
+}
+
 function ProfileCompact({ played, won, streak, albumProgress, onAlbum }: {
   played: number;
   won: number;
@@ -483,6 +488,26 @@ export default function HomePage() {
     setAlbumProgress(getAlbumProgress());
     refresh();
   }, [view, refresh]);
+
+  async function shareDailyResult() {
+    const lines = [
+      "\u26bd Futboldle",
+      "",
+      dailyShareSquare(wordleDone, wordleWon) + " Wordle BBVA",
+      dailyShareSquare(trayDone, trayWon) + " Trayectoria BBVA",
+      dailyShareSquare(top10Done, top10Won) + " Top10 BBVA",
+      dailyShareSquare(crackDone, crackWon) + " Adivina el Crack",
+      "",
+      "\ud83c\udfb4 " + albumProgress.unlockedCount + "/" + albumProgress.total + " cromos",
+      "\ud83d\udd25 Racha: " + stats.streak,
+      "",
+      "https://futboldle-liard.vercel.app",
+    ];
+    const text = lines.join("\\n");
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      await navigator.clipboard.writeText(text);
+    }
+  }
 
   if (view === "top10") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
@@ -567,6 +592,10 @@ export default function HomePage() {
 
         {/* Barra de progreso diaria */}
         <DailyProgress wordleDone={wordleDone} wordleWon={wordleWon} trayDone={trayDone} trayWon={trayWon} top10Done={top10Done} top10Won={top10Won} crackDone={crackDone} crackWon={crackWon} streak={stats.streak} />
+
+        <button onClick={shareDailyResult} className="self-center text-[10px] font-semibold px-3 py-1.5 rounded-lg" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)", color: "#6b6b72" }}>
+          Compartir resultado
+        </button>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
           {["Retos diarios Liga BBVA 2005-2016", "Desbloquea cromos", "Completa trofeos", "Construye tu colección"].map(item => (

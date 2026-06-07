@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDailyTop10, top10Challenges } from "@/data/top10Challenges";
-import type { Top10Answer } from "@/data/top10Challenges";
+import type { Top10Answer, Top10Challenge } from "@/data/top10Challenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameCompletion, recordGameResult } from "@/lib/profile";
@@ -54,6 +54,10 @@ function difficultyLabel(kind: "FÁCIL" | "MEDIO" | "DIFÍCIL") {
   if (kind === "FÁCIL") return "🎯 Fácil";
   if (kind === "MEDIO") return "🔥 Medio";
   return "💀 Difícil";
+}
+
+function sourceLabel(challenge: Top10Challenge) {
+  return challenge.sourceName ?? challenge.source.split("\u00b7")[0].trim();
 }
 
 function topCuriosity(title: string, leader: Top10Answer) {
@@ -244,7 +248,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
           <p className="text-white/80 text-[10px] font-semibold uppercase tracking-[0.14em] mb-1">{challenge.topType}</p>
           <p className="text-white/70 text-[11px] mb-1">{challenge.subtitle}</p>
           <p className="text-white/90 text-[12px] font-semibold">{challenge.consigna}</p>
-          <p className="text-white/55 text-[10px] mt-2">{challenge.source}</p>
+          <p className="text-white/55 text-[10px] mt-2">Fuente: {sourceLabel(challenge)}</p>
         </div>
         <div className="px-5 pb-3">
           <div className="flex items-center justify-between mb-1">
@@ -391,7 +395,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
             </div>
             <div className="rounded-xl p-3 mb-3" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
               <div className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-1" style={{ color: "#1a4fa0" }}>Fuente</div>
-              <div className="text-[11px] font-semibold" style={{ color: "#18181b" }}>{challenge.source}</div>
+              <div className="text-[11px] font-semibold" style={{ color: "#18181b" }}>{sourceLabel(challenge)}</div>
               <div className="text-[10px] mt-1" style={{ color: "#9a9a8a" }}>Periodo: {challenge.period}</div>
               <div className="text-[10px] mt-1" style={{ color: "#9a9a8a" }}>Criterio: {challenge.criterion}</div>
               <div className="text-[10px] mt-2" style={{ color: "#8a6200" }}><strong>Dato curioso:</strong> {topCuriosity(challenge.title, challenge.answers[0])}</div>

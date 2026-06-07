@@ -32,10 +32,10 @@ const CORRECTED_PLAYERS = [
   "Barkero",
   "Chory Castro",
   "Bacca",
-  "F?bregas",
+  "Fàbregas",
   "Brahimi",
   "Nolito",
-  "Jes?s Navas",
+  "Jesús Navas",
 ];
 
 const PENDING_PLAYERS: string[] = [];
@@ -43,6 +43,32 @@ const PENDING_PLAYERS: string[] = [];
 function getDuplicateAnswers() {
   const answers = bbvaPlayers.map(player => player.answer);
   return Array.from(new Set(answers.filter((answer, index) => answers.indexOf(answer) !== index)));
+}
+
+function hasBrokenEncoding(value: string) {
+  return value.includes(String.fromCharCode(63)) || /[???]/.test(value);
+}
+
+function getBrokenEncodingItems() {
+  const items: string[] = [];
+  for (const player of bbvaPlayers) {
+    const values = [player.fullName, player.displayName, player.mainClub, player.nationality, player.position, player.hint, ...player.clubs];
+    if (values.some(hasBrokenEncoding)) items.push(`Jugador ${player.id}: ${player.displayName}`);
+  }
+  for (const challenge of top10Challenges) {
+    const values = [challenge.title, challenge.subtitle, challenge.period, challenge.criterion, challenge.source, challenge.consigna, ...challenge.answers.flatMap(answer => [answer.displayName, answer.detail, answer.hintNationality, answer.hintPosition, answer.hintClub, answer.hintInitial])];
+    if (values.some(hasBrokenEncoding)) items.push(`Top10: ${challenge.title}`);
+  }
+  return items;
+}
+
+function getPlayersWithoutCard() {
+  const albumIds = new Set(getAlbumEntries().map(entry => entry.player.id));
+  return bbvaPlayers.filter(player => !albumIds.has(player.id)).map(player => player.displayName);
+}
+
+function getPlayersWithoutAutocomplete() {
+  return bbvaPlayers.filter(player => !player.answer || !player.displayName || !player.fullName).map(player => player.displayName || String(player.id));
 }
 
 function readLocalStorageSnapshot() {
@@ -99,6 +125,9 @@ export default function AdminAuditPage() {
 
   const errors = useMemo(getAuditErrors, []);
   const duplicateAnswers = useMemo(getDuplicateAnswers, []);
+  const brokenEncodingItems = useMemo(getBrokenEncodingItems, []);
+  const playersWithoutCard = useMemo(getPlayersWithoutCard, []);
+  const playersWithoutAutocomplete = useMemo(getPlayersWithoutAutocomplete, []);
   const excludedTrajectoryIds = useMemo(() => getExcludedTrajectoryIds(bbvaPlayers.map(player => player.id)), []);
 
   function refresh() {
@@ -142,6 +171,9 @@ export default function AdminAuditPage() {
             ["Trayectorias", Object.keys(CAREER_AUDIT).length],
             ["Pendientes", pendingRequestedTops.length],
             ["Duplicados", duplicateAnswers.length],
+            ["Encoding roto", brokenEncodingItems.length],
+            ["Sin cromo", playersWithoutCard.length],
+            ["Sin autocomplete", playersWithoutAutocomplete.length],
           ].map(([label, value]) => (
             <div key={label} className="rounded-xl px-3 py-2" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
               <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#bbb" }}>{label}</div>
@@ -179,6 +211,20 @@ export default function AdminAuditPage() {
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
               <strong>Top10 activos con fuente:</strong> {top10Challenges.length} ? <strong>Solicitados pendientes:</strong> {pendingRequestedTops.length}
             </div>
+          </div>
+        </section>
+
+        <section className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+          <h2 className="font-bebas text-[24px] leading-none mb-2">CALIDAD DE DATOS</h2>
+          <div className="grid md:grid-cols-2 gap-2 text-[11px]">
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 activos:</strong> {top10Challenges.length}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 pendientes:</strong> {pendingRequestedTops.length}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 retirados:</strong> {removedUnverifiedTops.length}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Trayectorias activas:</strong> {Object.keys(CAREER_AUDIT).length} ? <strong>Excluidas:</strong> {excludedTrajectoryIds.length}</div>
+            <div className="rounded-lg p-2" style={{ background: brokenEncodingItems.length ? "#fff5f5" : "#f8f5f0" }}><strong>Jugadores con encoding roto:</strong> {brokenEncodingItems.length ? brokenEncodingItems.join(" ? ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores duplicados:</strong> {duplicateAnswers.length ? duplicateAnswers.join(" ? ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores sin cromo:</strong> {playersWithoutCard.length ? playersWithoutCard.join(" ? ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores sin autocomplete:</strong> {playersWithoutAutocomplete.length ? playersWithoutAutocomplete.join(" ? ") : "Ninguno"}</div>
           </div>
         </section>
 
