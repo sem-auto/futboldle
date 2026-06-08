@@ -5324,8 +5324,53 @@ export const top10Challenges: Top10Challenge[] = [
   }
 ];
 
-export function getDailyTop10(): Top10Challenge {
-  const d = new Date();
-  const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-  return top10Challenges[seed % top10Challenges.length];
+export type Top10Family =
+  | "FIFA"
+  | "Goleadores temporada"
+  | "Asistencias temporada"
+  | "Porterías temporada"
+  | "Acumulados BBVA"
+  | "Clubes"
+  | "Nacionalidades"
+  | "Sin Barça/Madrid";
+
+export function getTop10Family(challenge: Top10Challenge): Top10Family {
+  const text = `${challenge.id} ${challenge.title} ${challenge.category}`.toLowerCase();
+  if (text.includes("fifa")) return "FIFA";
+  if (text.includes("sin-barca-madrid") || text.includes("sin barça/madrid")) return "Sin Barça/Madrid";
+  if (challenge.category === "CLUBES" && text.includes("partidos")) return "Clubes";
+  if (text.includes("español") || text.includes("extranjer")) return "Nacionalidades";
+  if (challenge.category === "PORTEROS" || text.includes("porterías")) return text.includes("20") ? "Porterías temporada" : "Acumulados BBVA";
+  if (challenge.category === "GOLEADORES") return /\d{4}-\d{2}|20\d{2}-\d{2}|\d{2}\/\d{2}/.test(challenge.id) ? "Goleadores temporada" : "Acumulados BBVA";
+  if (challenge.category === "ASISTENCIAS") return /\d{4}-\d{2}|20\d{2}-\d{2}|\d{2}\/\d{2}/.test(challenge.id) ? "Asistencias temporada" : "Acumulados BBVA";
+  return "Acumulados BBVA";
+}
+
+function getDayNumberForTop10(date = new Date()): number {
+  const start = new Date("2025-01-01").getTime();
+  const today = new Date(date);
+  today.setHours(0, 0, 0, 0);
+  return Math.floor((today.getTime() - start) / 86400000) + 1;
+}
+
+function pickTop10ForDay(dayNumber: number, previous?: Top10Challenge): Top10Challenge {
+  const total = top10Challenges.length;
+  const baseIndex = Math.abs(dayNumber * 37 + 11) % total;
+  const previousFamily = previous ? getTop10Family(previous) : null;
+
+  for (let offset = 0; offset < total; offset++) {
+    const candidate = top10Challenges[(baseIndex + offset) % total];
+    if (!previousFamily || getTop10Family(candidate) !== previousFamily) return candidate;
+  }
+
+  return top10Challenges[baseIndex];
+}
+
+export function getDailyTop10(date = new Date()): Top10Challenge {
+  const targetDay = getDayNumberForTop10(date);
+  let selected = pickTop10ForDay(1);
+  for (let day = 2; day <= targetDay; day++) {
+    selected = pickTop10ForDay(day, selected);
+  }
+  return selected;
 }
