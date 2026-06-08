@@ -1,3 +1,5 @@
+import { bbvaPlayers } from "./bbvaPlayers";
+
 export type Top10Category = "GOLEADORES" | "ASISTENCIAS" | "PORTEROS" | "CLUBES";
 
 export interface Top10Answer {
@@ -11,6 +13,7 @@ export interface Top10Answer {
   hintPosition: string;
   hintClub: string;
   hintInitial: string;
+  verifiedGoalkeeperOffensive?: boolean;
 }
 
 export interface Top10Challenge {
@@ -34,6 +37,7 @@ export interface Top10Challenge {
 }
 
 export const removedUnverifiedTops = [
+  "Máximos asistentes sin Barça/Madrid 2005/06-2015/16",
   "Máximos goleadores BBVA 2005/06-2015/16 acumulado",
   "Máximos goleadores españoles BBVA acumulado",
   "Más partidos Valencia era BBVA",
@@ -2017,10 +2021,10 @@ export const top10Challenges: Top10Challenge[] = [
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Goles acumulados en LaLiga según StatBunker",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://betl.statbunker.com/alltimestats?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Máximos goleadores BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · goles",
     "consigna": "Completa el Top10 histórico de goleadores de LaLiga.",
@@ -2155,10 +2159,10 @@ export const top10Challenges: Top10Challenge[] = [
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Goles acumulados por jugadores españoles",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://betl.statbunker.com/alltimestats?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Máximos goleadores españoles BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · españoles",
     "consigna": "Completa el Top10 de goleadores españoles.",
@@ -2293,10 +2297,10 @@ export const top10Challenges: Top10Challenge[] = [
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Goles acumulados por jugadores extranjeros",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://betl.statbunker.com/alltimestats?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Máximos goleadores extranjeros BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · extranjeros",
     "consigna": "Completa el Top10 de goleadores extranjeros.",
@@ -2431,10 +2435,10 @@ export const top10Challenges: Top10Challenge[] = [
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Goles acumulados excluyendo jugadores asociados a Barça o Real Madrid en el reto",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://betl.statbunker.com/alltimestats?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Máximos goleadores sin Barça/Madrid 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · sin gigantes",
     "consigna": "Completa el Top10 de goleadores sin Barça ni Madrid.",
@@ -2569,10 +2573,10 @@ export const top10Challenges: Top10Challenge[] = [
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Asistencias acumuladas en LaLiga según StatBunker",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://bbs.statbunker.com/alltimestats/AllTimeCompetitionMostAssists?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Máximos asistentes BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · asistencias",
     "consigna": "Completa el Top10 histórico de asistentes.",
@@ -2707,10 +2711,10 @@ export const top10Challenges: Top10Challenge[] = [
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Asistencias de jugadores españoles",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://bbs.statbunker.com/alltimestats/AllTimeCompetitionMostAssists?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Máximos asistentes españoles BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · españoles",
     "consigna": "Completa el Top10 de asistentes españoles.",
@@ -2839,154 +2843,16 @@ export const top10Challenges: Top10Challenge[] = [
     ]
   },
   {
-    "id": "statbunker-laliga-historico-sin-barca-madrid-asistencias",
-    "kind": "DIFÍCIL",
-    "category": "ASISTENCIAS",
-    "topType": "TOP HISTÓRICO VERIFICADO",
-    "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
-    "criterion": "Asistencias excluyendo jugadores asociados a Barça o Real Madrid en el reto",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
-    "sourceName": "StatBunker",
-    "sourceUrl": "https://bbs.statbunker.com/alltimestats/AllTimeCompetitionMostAssists?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
-    "title": "Máximos asistentes sin Barça/Madrid 2005/06-2015/16",
-    "subtitle": "2005/06-2015/16 · sin gigantes",
-    "consigna": "Completa el Top10 de asistentes sin Barça ni Madrid.",
-    "emoji": "🏟️",
-    "answers": [
-      {
-        "position": 1,
-        "answer": "KOKE",
-        "displayName": "Koke",
-        "detail": "88 asistencias",
-        "value": 88,
-        "label": "88 asistencias",
-        "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Atlético de Madrid",
-        "hintInitial": "K___"
-      },
-      {
-        "position": 2,
-        "answer": "PAREJO",
-        "displayName": "Parejo",
-        "detail": "74 asistencias",
-        "value": 74,
-        "label": "74 asistencias",
-        "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Valencia",
-        "hintInitial": "D___ P_____"
-      },
-      {
-        "position": 3,
-        "answer": "ASPAS",
-        "displayName": "Aspas",
-        "detail": "68 asistencias",
-        "value": 68,
-        "label": "68 asistencias",
-        "hintNationality": "España",
-        "hintPosition": "Delantero",
-        "hintClub": "Celta de Vigo",
-        "hintInitial": "I___ A____"
-      },
-      {
-        "position": 4,
-        "answer": "NAVAS",
-        "displayName": "Keylor Navas",
-        "detail": "58 asistencias",
-        "value": 58,
-        "label": "58 asistencias",
-        "hintNationality": "Costa Rica",
-        "hintPosition": "Extremo / Centrocampista",
-        "hintClub": "Sevilla",
-        "hintInitial": "J____ N____"
-      },
-      {
-        "position": 5,
-        "answer": "SUSAETA",
-        "displayName": "Susaeta",
-        "detail": "51 asistencias",
-        "value": 51,
-        "label": "51 asistencias",
-        "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Athletic Club",
-        "hintInitial": "M_____ S______"
-      },
-      {
-        "position": 6,
-        "answer": "JOAQUIN",
-        "displayName": "Joaquín",
-        "detail": "48 asistencias",
-        "value": 48,
-        "label": "48 asistencias",
-        "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Betis",
-        "hintInitial": "J______ S_______"
-      },
-      {
-        "position": 7,
-        "answer": "LEON",
-        "displayName": "Pedro León",
-        "detail": "44 asistencias",
-        "value": 44,
-        "label": "44 asistencias",
-        "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Getafe",
-        "hintInitial": "P____ L___"
-      },
-      {
-        "position": 8,
-        "answer": "GARCIA",
-        "displayName": "Raúl García",
-        "detail": "44 asistencias",
-        "value": 44,
-        "label": "44 asistencias",
-        "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Atlético de Madrid",
-        "hintInitial": "R___ G_____"
-      },
-      {
-        "position": 9,
-        "answer": "CANALES",
-        "displayName": "Canales",
-        "detail": "44 asistencias",
-        "value": 44,
-        "label": "44 asistencias",
-        "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Betis",
-        "hintInitial": "S_____ C______"
-      },
-      {
-        "position": 10,
-        "answer": "CASTRO",
-        "displayName": "Chory Castro",
-        "detail": "43 asistencias",
-        "value": 43,
-        "label": "43 asistencias",
-        "hintNationality": "Uruguay",
-        "hintPosition": "Delantero",
-        "hintClub": "Real Sociedad",
-        "hintInitial": "C____ C_____"
-      }
-    ]
-  },
-  {
     "id": "statbunker-laliga-historico-partidos",
     "kind": "MEDIO",
     "category": "CLUBES",
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Partidos acumulados en LaLiga",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://m.statbunker.com/alltimestats/AllTimeAppearances?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Más partidos BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · apariciones",
     "consigna": "Completa el Top10 histórico de partidos.",
@@ -3121,10 +2987,10 @@ export const top10Challenges: Top10Challenge[] = [
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Partidos de jugadores españoles",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://m.statbunker.com/alltimestats/AllTimeAppearances?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Más partidos españoles BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · españoles",
     "consigna": "Completa el Top10 español de partidos.",
@@ -3259,10 +3125,10 @@ export const top10Challenges: Top10Challenge[] = [
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
     "criterion": "Penaltis marcados en LaLiga según StatBunker",
-    "source": "StatBunker ? LaLiga 2005/06-2015/16",
+    "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://m.statbunker.com/alltimestats/AllTimePenalties?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker ? datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
     "title": "Más penaltis marcados BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · penaltis",
     "consigna": "Completa el Top10 de especialistas desde el punto de penalti.",
@@ -5324,6 +5190,21 @@ export const top10Challenges: Top10Challenge[] = [
   }
 ];
 
+export type Top10ValidationIssueType =
+  | "goalkeeper_offensive_metric"
+  | "non_goalkeeper_keeper_metric"
+  | "missing_player"
+  | "broken_encoding";
+
+export interface Top10ValidationIssue {
+  type: Top10ValidationIssueType;
+  challengeId: string;
+  title: string;
+  answer?: string;
+  displayName?: string;
+  message: string;
+}
+
 export type Top10Family =
   | "FIFA"
   | "Goleadores temporada"
@@ -5333,6 +5214,124 @@ export type Top10Family =
   | "Clubes"
   | "Nacionalidades"
   | "Sin Barça/Madrid";
+
+function normalizeTop10Text(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9]/gi, "").toUpperCase();
+}
+
+function hasBrokenEncoding(value: string) {
+  return /[A-Za-z\u00c0-\u024f]\?[A-Za-z\u00c0-\u024f]/.test(value);
+}
+
+function resolveTop10Player(answer: Top10Answer) {
+  const display = normalizeTop10Text(answer.displayName);
+  const normalizedAnswer = normalizeTop10Text(answer.answer);
+
+  return bbvaPlayers.find(player => normalizeTop10Text(player.displayName) === display) ??
+    bbvaPlayers.find(player => normalizeTop10Text(player.fullName) === display) ??
+    bbvaPlayers.find(player => normalizeTop10Text(player.answer) === normalizedAnswer);
+}
+
+function isGoalkeeper(position: string) {
+  return position.toLowerCase().includes("portero");
+}
+
+function isOffensiveMetric(challenge: Top10Challenge) {
+  const text = `${challenge.category} ${challenge.title} ${challenge.criterion}`.toLowerCase();
+  return challenge.category === "GOLEADORES" ||
+    challenge.category === "ASISTENCIAS" ||
+    text.includes("gol") ||
+    text.includes("asist") ||
+    text.includes("penalti");
+}
+
+export function validateTop10Challenge(challenge: Top10Challenge): Top10ValidationIssue[] {
+  const issues: Top10ValidationIssue[] = [];
+  const challengeTextFields = [
+    challenge.title,
+    challenge.subtitle,
+    challenge.period,
+    challenge.criterion,
+    challenge.source,
+    challenge.sourceNote,
+  ];
+
+  if (challengeTextFields.some(hasBrokenEncoding)) {
+    issues.push({
+      type: "broken_encoding",
+      challengeId: challenge.id,
+      title: challenge.title,
+      message: "El Top10 tiene texto con encoding roto.",
+    });
+  }
+
+  for (const answer of challenge.answers) {
+    const answerTextFields = [
+      answer.displayName,
+      answer.detail,
+      answer.label ?? "",
+      answer.hintNationality,
+      answer.hintPosition,
+      answer.hintClub,
+      answer.hintInitial,
+    ];
+
+    if (answerTextFields.some(hasBrokenEncoding)) {
+      issues.push({
+        type: "broken_encoding",
+        challengeId: challenge.id,
+        title: challenge.title,
+        answer: answer.answer,
+        displayName: answer.displayName,
+        message: `El jugador ${answer.displayName} tiene texto con encoding roto.`,
+      });
+      continue;
+    }
+
+    const player = resolveTop10Player(answer);
+    if (!player) {
+      issues.push({
+        type: "missing_player",
+        challengeId: challenge.id,
+        title: challenge.title,
+        answer: answer.answer,
+        displayName: answer.displayName,
+        message: `${answer.displayName} no existe en la base global de jugadores.`,
+      });
+      continue;
+    }
+
+    if (challenge.category === "PORTEROS" && !isGoalkeeper(player.position)) {
+      issues.push({
+        type: "non_goalkeeper_keeper_metric",
+        challengeId: challenge.id,
+        title: challenge.title,
+        answer: answer.answer,
+        displayName: answer.displayName,
+        message: `${answer.displayName} no es portero y aparece en un ranking de porteros.`,
+      });
+    }
+
+    if (isOffensiveMetric(challenge) && isGoalkeeper(player.position) && !answer.verifiedGoalkeeperOffensive) {
+      issues.push({
+        type: "goalkeeper_offensive_metric",
+        challengeId: challenge.id,
+        title: challenge.title,
+        answer: answer.answer,
+        displayName: answer.displayName,
+        message: `${answer.displayName} es portero y aparece en una métrica ofensiva.`,
+      });
+    }
+  }
+
+  return issues;
+}
+
+export function getTop10ValidationIssues() {
+  return top10Challenges.flatMap(validateTop10Challenge);
+}
+
+export const activeTop10Challenges = top10Challenges.filter(challenge => validateTop10Challenge(challenge).length === 0);
 
 export function getTop10Family(challenge: Top10Challenge): Top10Family {
   const text = `${challenge.id} ${challenge.title} ${challenge.category}`.toLowerCase();
@@ -5354,16 +5353,17 @@ function getDayNumberForTop10(date = new Date()): number {
 }
 
 function pickTop10ForDay(dayNumber: number, previous?: Top10Challenge): Top10Challenge {
-  const total = top10Challenges.length;
+  const publishableTop10Challenges = activeTop10Challenges.length ? activeTop10Challenges : top10Challenges;
+  const total = publishableTop10Challenges.length;
   const baseIndex = Math.abs(dayNumber * 37 + 11) % total;
   const previousFamily = previous ? getTop10Family(previous) : null;
 
   for (let offset = 0; offset < total; offset++) {
-    const candidate = top10Challenges[(baseIndex + offset) % total];
+    const candidate = publishableTop10Challenges[(baseIndex + offset) % total];
     if (!previousFamily || getTop10Family(candidate) !== previousFamily) return candidate;
   }
 
-  return top10Challenges[baseIndex];
+  return publishableTop10Challenges[baseIndex];
 }
 
 export function getDailyTop10(date = new Date()): Top10Challenge {

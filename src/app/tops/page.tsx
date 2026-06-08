@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getDailyTop10, top10Challenges } from "@/data/top10Challenges";
+import { activeTop10Challenges, getDailyTop10 } from "@/data/top10Challenges";
 import type { Top10Category } from "@/data/top10Challenges";
 
 const FILTERS: Array<"TODOS" | Top10Category> = ["TODOS", "GOLEADORES", "ASISTENCIAS", "PORTEROS", "CLUBES"];
@@ -19,7 +19,7 @@ export default function TopsPage() {
     } catch {}
   }, []);
 
-  const visible = filter === "TODOS" ? top10Challenges : top10Challenges.filter(top => top.category === filter);
+  const visible = filter === "TODOS" ? activeTop10Challenges : activeTop10Challenges.filter(top => top.category === filter);
 
   function statusFor(id: string) {
     if (completed.includes(id)) return { label: "✅ Completado", color: "#1e6b2e", bg: "#f0faf2" };

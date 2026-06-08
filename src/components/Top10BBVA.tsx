@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
-import { getDailyTop10, top10Challenges } from "@/data/top10Challenges";
+import { activeTop10Challenges, getDailyTop10 } from "@/data/top10Challenges";
 import type { Top10Answer, Top10Challenge } from "@/data/top10Challenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
@@ -221,7 +221,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
         <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
           <div className="font-bebas text-[22px] leading-none mb-2" style={{ color: "#18181b" }}>TOPS HISTÓRICOS</div>
           <div className="flex flex-col gap-1">
-            {top10Challenges.map(top => {
+            {activeTop10Challenges.map(top => {
               const completed = completedTops.includes(top.id);
               const active = top.id === challenge.id;
               return (

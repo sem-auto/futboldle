@@ -181,7 +181,7 @@ export const bbvaPlayers: BBVAPlayer[] = [
   { id: 173,answer: "TORRES",    fullName: "Fernando Torres",     displayName: "Torres",         clubs: ["Atlético","Liverpool","Chelsea","AC Milan"], mainClub: "Atlético de Madrid",nationality: "España",       position: "Delantero",     years: "2001-2016", hint: "El Niño. En Liverpool fue el mejor 9 del mundo. Antes fue el ídolo del Atleti.",   category: "core" },
   { id: 174,answer: "RONDON",    fullName: "Salomón Rondón",      displayName: "Rondón",         clubs: ["Las Palmas","Málaga"],                      mainClub:"Málaga",             nationality: "Venezuela",    position: "Delantero",     years: "2009-2012", hint: "El venezolano físico que pasó por Málaga antes de recorrer Europa.",               category: "core" },
   { id: 175,answer: "VIETTO",    fullName: "Luciano Vietto",      displayName: "Vietto",         clubs: ["Villarreal","Atlético","Sevilla"],           mainClub: "Villarreal",        nationality: "Argentina",    position: "Delantero",     years: "2013-2017", hint: "Joven prometedor del Villarreal. Goles y mucha expectativa.",                       category: "core" },
-  { id: 176,answer: "MORENO",    fullName: "Gerard Moreno",       displayName: "Gerard Moreno",  clubs: ["Espanyol","Villarreal"],                    mainClub: "Villarreal",        nationality: "España",       position: "Delantero",     years: "2013-2023", hint: "El del penalti en Europa League. Tardó en explotar pero fue brutal.",               category: "core" },
+  { id: 176,answer: "GERARDMORENO",    fullName: "Gerard Moreno",       displayName: "Gerard Moreno",  clubs: ["Espanyol","Villarreal"],                    mainClub: "Villarreal",        nationality: "España",       position: "Delantero",     years: "2013-2023", hint: "El del penalti en Europa League. Tardó en explotar pero fue brutal.",               category: "core" },
   { id: 177,answer: "DEL MORAL", fullName: "Manu del Moral",      displayName: "Manu del Moral", clubs: ["Huelva","Levante","Getafe"],                 mainClub: "Levante",           nationality: "España",       position: "Delantero",     years: "2011-2015", hint: "Delantero del Levante de los años buenos.",                                          category: "core" },
   { id: 178,answer: "CASTRO",    fullName: "Chory Castro",        displayName: "Chory Castro",   clubs: ["Mallorca","Real Sociedad","Málaga"],         mainClub: "Real Sociedad",     nationality: "Uruguay",      position: "Delantero",     years: "2009-2016", hint: "El uruguayo que dejó mucha zurda entre Mallorca y la Real.",                         category: "core" },
   { id: 179,answer: "KONE",      fullName: "Lacina Koné",         displayName: "Koné",           clubs: ["Levante","Osasuna","Hannover"],              mainClub: "Levante",           nationality: "Costa de Marfil",position:"Delantero",     years: "2013-2015", hint: "El delantero de Costa de Marfil que pasó por el Levante.",                         category: "core" },
@@ -270,24 +270,99 @@ export const bbvaPlayers: BBVAPlayer[] = [
   { id: 307,answer: "NAVARRO",  fullName: "Fernando Navarro",     displayName: "Fernando Navarro", clubs: ["Sevilla","Barcelona"],                    mainClub: "Sevilla",           nationality: "España",       position: "Defensa",       years: "2008-2015", hint: "Lateral izquierdo muy fiable del Sevilla europeo.",                               category: "low" },
   { id: 308,answer: "FAZIO",    fullName: "Federico Fazio",       displayName: "Fazio",          clubs: ["Sevilla","Roma","Tottenham"],              mainClub: "Sevilla",           nationality: "Argentina",    position: "Defensa",       years: "2007-2014", hint: "Central argentino de gran presencia en Nervión.",                                  category: "low" },
   { id: 309,answer: "OCAMPOS",  fullName: "Lucas Ocampos",        displayName: "Ocampos",        clubs: ["Sevilla","Monaco","Milan"],                mainClub: "Sevilla",           nationality: "Argentina",    position: "Delantero",     years: "2019-2022", hint: "Extremo argentino de enorme impacto en Sevilla.",                                  category: "low" },
-
-  { id: 310,answer: "GERARDMORENO", fullName: "Gerard Moreno", displayName: "Gerard Moreno", clubs: ["Villarreal","Espanyol"], mainClub: "Villarreal", nationality: "España", position: "Delantero", years: "2012-2024", hint: "Goleador zurdo de enorme peso en el Villarreal moderno.", category: "low" },
   { id: 311,answer: "DIAKHABY", fullName: "Mouctar Diakhaby", displayName: "Diakhaby", clubs: ["Valencia","Lyon"], mainClub: "Valencia", nationality: "Guinea", position: "Defensa", years: "2018-2024", hint: "Central físico del Valencia posterior a la era BBVA.", category: "low" },
   { id: 312,answer: "GUDELJ", fullName: "Nemanja Gudelj", displayName: "Gudelj", clubs: ["Sevilla","Ajax"], mainClub: "Sevilla", nationality: "Serbia", position: "Centrocampista", years: "2019-2024", hint: "Mediocentro de oficio en el Sevilla reciente.", category: "low" },
   { id: 313,answer: "OLIVERTORRES", fullName: "Óliver Torres", displayName: "Óliver Torres", clubs: ["Atlético de Madrid","Villarreal","Sevilla"], mainClub: "Sevilla", nationality: "España", position: "Centrocampista", years: "2012-2024", hint: "Talento fino formado en el Atlético y asentado en Sevilla.", category: "low" },
   { id: 314,answer: "JAUMECOSTA", fullName: "Jaume Costa", displayName: "Jaume Costa", clubs: ["Villarreal","Valencia"], mainClub: "Villarreal", nationality: "España", position: "Defensa", years: "2012-2022", hint: "Lateral competitivo y muy reconocible del Villarreal.", category: "low" },
   { id: 315,answer: "DEMARCOS", fullName: "Óscar de Marcos", displayName: "De Marcos", clubs: ["Athletic Club"], mainClub: "Athletic Club", nationality: "España", position: "Defensa", years: "2009-2024", hint: "Uno de los grandes hombres de club del Athletic moderno.", category: "low" },
   { id: 316,answer: "MARCELO", fullName: "Marcelo Vieira", displayName: "Marcelo", clubs: ["Real Madrid"], mainClub: "Real Madrid", nationality: "Brasil", position: "Defensa", years: "2007-2022", hint: "Lateral izquierdo legendario del Real Madrid.", category: "low" },
+
+  // Jugadores añadidos por Tops de clubes auditados
+  { id: 317,answer: "ADRIANO", fullName: "Adriano Correia", displayName: "Adriano", clubs: ["Sevilla","Barcelona"], mainClub: "Sevilla", nationality: "Brasil", position: "Defensa", years: "2004-2016", hint: "Lateral brasileño de ida y vuelta, clave entre Sevilla y Barcelona.", category: "core" },
+  { id: 318,answer: "AGUERO", fullName: "Sergio Agüero", displayName: "Agüero", clubs: ["Atlético de Madrid","Manchester City"], mainClub: "Atlético de Madrid", nationality: "Argentina", position: "Delantero", years: "2006-2011", hint: "El Kun explotó en el Atlético antes de hacer historia en Inglaterra.", category: "core" },
+  { id: 319,answer: "GURPEGI", fullName: "Carlos Gurpegui", displayName: "Gurpegui", clubs: ["Athletic Club"], mainClub: "Athletic Club", nationality: "España", position: "Centrocampista / Defensa", years: "2002-2016", hint: "Hombre de club del Athletic, garra y muchos partidos en San Mamés.", category: "core" },
+  { id: 320,answer: "SANJOSE", fullName: "Mikel San José", displayName: "San José", clubs: ["Athletic Club","Liverpool"], mainClub: "Athletic Club", nationality: "España", position: "Defensa", years: "2009-2016", hint: "Central del Athletic con llegada y golpeo desde lejos.", category: "core" },
+  { id: 321,answer: "JAVIMARTINEZ", fullName: "Javi Martínez", displayName: "Javi Martínez", clubs: ["Athletic Club","Bayern"], mainClub: "Athletic Club", nationality: "España", position: "Centrocampista", years: "2006-2012", hint: "Mediocentro poderoso del Athletic antes de conquistar Múnich.", category: "core" },
+  { id: 322,answer: "ITURRASPE", fullName: "Ander Iturraspe", displayName: "Iturraspe", clubs: ["Athletic Club"], mainClub: "Athletic Club", nationality: "España", position: "Centrocampista", years: "2008-2016", hint: "Pivote de Lezama, muy reconocible en el Athletic de Bielsa y Valverde.", category: "core" },
+  { id: 323,answer: "JUANITO", fullName: "Juan Gutiérrez Moreno", displayName: "Juanito", clubs: ["Betis","Atlético de Madrid"], mainClub: "Betis", nationality: "España", position: "Defensa", years: "2001-2010", hint: "Central del Betis campeón de Copa y de la selección española.", category: "core" },
+  { id: 324,answer: "ARZU", fullName: "Arturo García Muñoz", displayName: "Arzu", clubs: ["Betis"], mainClub: "Betis", nationality: "España", position: "Centrocampista", years: "2000-2011", hint: "Mediocentro de la casa verdiblanca durante muchos años.", category: "core" },
+  { id: 325,answer: "MELLI", fullName: "Juan Alberto Andreu", displayName: "Melli", clubs: ["Betis","Tenerife"], mainClub: "Betis", nationality: "España", position: "Defensa", years: "2001-2010", hint: "Central rápido y muy de aquel Betis de mediados de los 2000.", category: "low" },
+  { id: 326,answer: "CANAS", fullName: "José Alberto Cañas", displayName: "Cañas", clubs: ["Betis","Espanyol","Swansea"], mainClub: "Betis", nationality: "España", position: "Centrocampista", years: "2010-2016", hint: "Pivote intenso que salió de Betis y también pasó por Espanyol.", category: "low" },
+  { id: 327,answer: "VADILLO", fullName: "Álvaro Vadillo", displayName: "Vadillo", clubs: ["Betis","Huesca"], mainClub: "Betis", nationality: "España", position: "Extremo", years: "2011-2016", hint: "Promesa de banda del Betis que apareció muy joven en Primera.", category: "low" },
+  { id: 328,answer: "LUISGARCIA", fullName: "Luis García Fernández", displayName: "Luis García", clubs: ["Espanyol","Zaragoza","Atlético de Madrid"], mainClub: "Espanyol", nationality: "España", position: "Delantero", years: "2005-2016", hint: "Delantero trabajador y goleador, muy recordado en el Espanyol.", category: "core" },
+  { id: 329,answer: "JAVILOPEZ", fullName: "Javi López", displayName: "Javi López", clubs: ["Espanyol"], mainClub: "Espanyol", nationality: "España", position: "Defensa", years: "2010-2016", hint: "Lateral y capitán silencioso del Espanyol durante años.", category: "low" },
+  { id: 330,answer: "CHICA", fullName: "Javi Chica", displayName: "Chica", clubs: ["Espanyol","Betis"], mainClub: "Espanyol", nationality: "España", position: "Defensa", years: "2005-2015", hint: "Lateral intenso, criado en el Espanyol y recordado también en el Betis.", category: "low" },
+  { id: 331,answer: "CALLEJON", fullName: "José Callejón", displayName: "Callejón", clubs: ["Espanyol","Real Madrid","Napoli"], mainClub: "Espanyol", nationality: "España", position: "Delantero", years: "2008-2013", hint: "Extremo granadino que se hizo mayor en Cornellà antes de volver al Madrid.", category: "core" },
 ];
 
-/** Core players only — used for daily + extra picks */
+/** Core players only — used for collection odds and fallback pools */
 export const corePlayers = bbvaPlayers.filter(p => p.category === "core");
+
+const WORDLE_DAILY_RECOGNIZABLE_ANSWERS = new Set([
+  "VILLA",
+  "SILVA",
+  "MATA",
+  "CAZORLA",
+  "JOAQUIN",
+  "VALERON",
+  "CANI",
+  "DUDA",
+  "CAMACHO",
+  "APONO",
+  "SOLDADO",
+  "NEGREDO",
+  "ADURIZ",
+  "FALCAO",
+  "FORLAN",
+  "KANOUTE",
+  "JONAS",
+  "PIATTI",
+  "PAREJO",
+  "BANEGA",
+  "RAKITIC",
+  "BENAT",
+  "ISCO",
+  "ROSSI",
+  "NILMAR",
+  "TAMUDO",
+  "MUNITIS",
+  "PANDIANI",
+  "BARKERO",
+]);
+
+const WORDLE_DAILY_RECOGNIZABLE_NAMES = new Set([
+  "Jesús Navas",
+  "Rubén Castro",
+  "Diego Costa",
+]);
+
+const WORDLE_DAILY_EXCLUDED_ANSWERS = new Set([
+  "DIAKHABY",
+  "OCAMPOS",
+  "OYARZABAL",
+  "SOLER",
+  "OLIVERTORRES",
+  "GUDELJ",
+  "GUEDES",
+  "JAUMECOSTA",
+  "PAULISTA",
+]);
+
+export const dailyWordlePlayers = bbvaPlayers.filter(player =>
+  !WORDLE_DAILY_EXCLUDED_ANSWERS.has(player.answer) &&
+  (WORDLE_DAILY_RECOGNIZABLE_ANSWERS.has(player.answer) || WORDLE_DAILY_RECOGNIZABLE_NAMES.has(player.displayName))
+);
+
+export function getWordleMainHardPlayers(): BBVAPlayer[] {
+  return dailyWordlePlayers.filter(player => WORDLE_DAILY_EXCLUDED_ANSWERS.has(player.answer));
+}
 
 /** Deterministic daily player (same for all users) */
 export function getPlayerOfDay(): BBVAPlayer {
   const d = new Date();
   const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-  return corePlayers[seed % corePlayers.length];
+  const pool = dailyWordlePlayers.length ? dailyWordlePlayers : corePlayers;
+  return pool[seed % pool.length];
 }
 
 /**
@@ -300,8 +375,8 @@ export function getExtraPlayer(extraIndex: number): BBVAPlayer {
   const dateSeed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
   const dailyId = getPlayerOfDay().id;
 
-  // Build pool excluding daily
-  const pool = corePlayers.filter(p => p.id !== dailyId);
+  // Extras can use the broader base; the daily main Wordle stays nostalgic and recognizable.
+  const pool = bbvaPlayers.filter(p => p.id !== dailyId);
   const seed = dateSeed * 100 + extraIndex;
 
   // Offset by prior extras to avoid repetition

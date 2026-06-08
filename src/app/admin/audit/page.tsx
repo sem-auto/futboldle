@@ -2,9 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { bbvaPlayers } from "@/data/bbvaPlayers";
+import { bbvaPlayers, dailyWordlePlayers, getWordleMainHardPlayers } from "@/data/bbvaPlayers";
 import { CAREER_AUDIT, PROJECT_PERIOD, getExcludedTrajectoryIds } from "@/data/trayectoriaAudit";
-import { pendingRequestedTops, removedUnverifiedTops, top10Challenges } from "@/data/top10Challenges";
+import {
+  activeTop10Challenges,
+  getTop10ValidationIssues,
+  pendingRequestedTops,
+  removedUnverifiedTops,
+  top10Challenges,
+} from "@/data/top10Challenges";
 import { getAlbumEntries, getAlbumProgress, getTrophyShowcase } from "@/lib/album";
 import { loadGameCounts } from "@/lib/profile";
 import { loadStats } from "@/lib/useStats";
@@ -49,13 +55,20 @@ const CLUB_NAME_ALIASES: Record<string, string> = {
   "Alavés": "Deportivo Alavés",
 };
 
-function getDuplicateAnswers() {
-  const answers = bbvaPlayers.map(player => player.answer);
-  return Array.from(new Set(answers.filter((answer, index) => answers.indexOf(answer) !== index)));
+function normalizeAuditText(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9]/gi, "").toUpperCase();
+}
+
+function getDuplicatePlayers() {
+  const names = bbvaPlayers.map(player => normalizeAuditText(player.displayName));
+  const duplicateKeys = new Set(names.filter((name, index) => names.indexOf(name) !== index));
+  return bbvaPlayers
+    .filter(player => duplicateKeys.has(normalizeAuditText(player.displayName)))
+    .map(player => `${player.displayName} (#${player.id})`);
 }
 
 function hasBrokenEncoding(value: string) {
-  return value.includes(String.fromCharCode(63));
+  return /[A-Za-z\u00c0-\u024f]\?[A-Za-z\u00c0-\u024f]/.test(value);
 }
 
 function getBrokenEncodingItems() {
@@ -101,7 +114,6 @@ function readLocalStorageSnapshot() {
 function getAuditErrors() {
   const errors: string[] = [];
   const playerIds = new Set(bbvaPlayers.map(player => player.id));
-  const playerAnswers = new Set(bbvaPlayers.map(player => player.answer));
   const duplicateNames = bbvaPlayers
     .map(player => player.displayName)
     .filter((name, index, list) => list.indexOf(name) !== index);
@@ -122,11 +134,8 @@ function getAuditErrors() {
 
   for (const challenge of top10Challenges) {
     if (!challenge.source || !challenge.sourceUrl) errors.push(`${challenge.title}: falta fuente o URL.`);
-    for (const answer of challenge.answers) {
-      if (!playerAnswers.has(answer.answer)) errors.push(`${challenge.title}: ${answer.displayName} no existe en la base global.`);
-    }
   }
-
+  for (const issue of getTop10ValidationIssues()) errors.push(issue.message);
 
   return errors;
 }
@@ -141,12 +150,17 @@ export default function AdminAuditPage() {
   const [trophyCount, setTrophyCount] = useState(0);
 
   const errors = useMemo(getAuditErrors, []);
-  const duplicateAnswers = useMemo(getDuplicateAnswers, []);
+  const duplicatePlayers = useMemo(getDuplicatePlayers, []);
   const brokenEncodingItems = useMemo(getBrokenEncodingItems, []);
   const playersWithoutCard = useMemo(getPlayersWithoutCard, []);
   const playersWithoutAutocomplete = useMemo(getPlayersWithoutAutocomplete, []);
   const namingIssues = useMemo(getNamingIssues, []);
   const excludedTrajectoryIds = useMemo(() => getExcludedTrajectoryIds(bbvaPlayers.map(player => player.id)), []);
+  const top10ValidationIssues = useMemo(getTop10ValidationIssues, []);
+  const goalkeeperOffensiveIssues = top10ValidationIssues.filter(issue => issue.type === "goalkeeper_offensive_metric");
+  const missingPlayerIssues = top10ValidationIssues.filter(issue => issue.type === "missing_player");
+  const top10EncodingIssues = top10ValidationIssues.filter(issue => issue.type === "broken_encoding");
+  const wordleMainHardPlayers = useMemo(getWordleMainHardPlayers, []);
 
   function refresh() {
     setStats(loadStats());
@@ -185,13 +199,15 @@ export default function AdminAuditPage() {
             ["Partidas", stats?.played ?? 0],
             ["Victorias", stats?.won ?? 0],
             ["Trofeos", trophyCount],
+            ["Top10 activos", activeTop10Challenges.length],
             ["Top10 auditados", top10Challenges.length],
             ["Trayectorias", Object.keys(CAREER_AUDIT).length],
             ["Pendientes", pendingRequestedTops.length],
-            ["Duplicados", duplicateAnswers.length],
+            ["Duplicados", duplicatePlayers.length],
             ["Encoding roto", brokenEncodingItems.length],
             ["Sin cromo", playersWithoutCard.length],
             ["Sin autocomplete", playersWithoutAutocomplete.length],
+            ["Wordle diario", dailyWordlePlayers.length],
           ].map(([label, value]) => (
             <div key={label} className="rounded-xl px-3 py-2" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
               <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#bbb" }}>{label}</div>
@@ -224,10 +240,10 @@ export default function AdminAuditPage() {
               <strong>Jugadores pendientes:</strong> {PENDING_PLAYERS.length ? PENDING_PLAYERS.join(" · ") : "Ninguno"}
             </div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
-              <strong>Duplicados detectados:</strong> {duplicateAnswers.length ? duplicateAnswers.join(" · ") : "Ninguno"}
+              <strong>Duplicados detectados:</strong> {duplicatePlayers.length ? duplicatePlayers.join(" · ") : "Ninguno"}
             </div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}>
-              <strong>Top10 activos con fuente:</strong> {top10Challenges.length} · <strong>Solicitados pendientes:</strong> {pendingRequestedTops.length}
+              <strong>Top10 activos con fuente:</strong> {activeTop10Challenges.length} · <strong>Solicitados pendientes:</strong> {pendingRequestedTops.length}
             </div>
           </div>
         </section>
@@ -235,14 +251,19 @@ export default function AdminAuditPage() {
         <section className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
           <h2 className="font-bebas text-[24px] leading-none mb-2">CALIDAD DE DATOS</h2>
           <div className="grid md:grid-cols-2 gap-2 text-[11px]">
-            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 activos:</strong> {top10Challenges.length}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 activos:</strong> {activeTop10Challenges.length}</div>
+            <div className="rounded-lg p-2" style={{ background: top10ValidationIssues.length ? "#fff5f5" : "#f8f5f0" }}><strong>Top10 bloqueados por validación:</strong> {top10ValidationIssues.length ? top10ValidationIssues.map(issue => `${issue.title}: ${issue.displayName ?? issue.type}`).join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: goalkeeperOffensiveIssues.length ? "#fff5f5" : "#f8f5f0" }}><strong>Top10 con portero en métrica ofensiva:</strong> {goalkeeperOffensiveIssues.length ? goalkeeperOffensiveIssues.map(issue => `${issue.title}: ${issue.displayName}`).join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: missingPlayerIssues.length ? "#fff5f5" : "#f8f5f0" }}><strong>Top10 con jugador inexistente:</strong> {missingPlayerIssues.length ? missingPlayerIssues.map(issue => `${issue.title}: ${issue.displayName}`).join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: top10EncodingIssues.length ? "#fff5f5" : "#f8f5f0" }}><strong>Top10 con encoding roto:</strong> {top10EncodingIssues.length ? top10EncodingIssues.map(issue => `${issue.title}: ${issue.displayName ?? "texto"}`).join(" · ") : "Ninguno"}</div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 pendientes:</strong> {pendingRequestedTops.length}</div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Top10 retirados:</strong> {removedUnverifiedTops.length}</div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Trayectorias activas:</strong> {Object.keys(CAREER_AUDIT).length} · <strong>Excluidas:</strong> {excludedTrajectoryIds.length}</div>
             <div className="rounded-lg p-2" style={{ background: brokenEncodingItems.length ? "#fff5f5" : "#f8f5f0" }}><strong>Jugadores con encoding roto:</strong> {brokenEncodingItems.length ? brokenEncodingItems.join(" · ") : "Ninguno"}</div>
-            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores duplicados:</strong> {duplicateAnswers.length ? duplicateAnswers.join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores duplicados:</strong> {duplicatePlayers.length ? duplicatePlayers.join(" · ") : "Ninguno"}</div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores sin cromo:</strong> {playersWithoutCard.length ? playersWithoutCard.join(" · ") : "Ninguno"}</div>
             <div className="rounded-lg p-2" style={{ background: "#f8f5f0" }}><strong>Jugadores sin autocomplete:</strong> {playersWithoutAutocomplete.length ? playersWithoutAutocomplete.join(" · ") : "Ninguno"}</div>
+            <div className="rounded-lg p-2" style={{ background: wordleMainHardPlayers.length ? "#fff8e6" : "#f8f5f0" }}><strong>Jugadores difíciles en Wordle principal:</strong> {wordleMainHardPlayers.length ? wordleMainHardPlayers.map(player => player.displayName).join(" · ") : "Ninguno"}</div>
             <div className="rounded-lg p-2" style={{ background: namingIssues.length ? "#fff8e6" : "#f8f5f0" }}><strong>Jugadores con naming inconsistente:</strong> {namingIssues.length ? namingIssues.join(" · ") : "Ninguno"}</div>
           </div>
         </section>
