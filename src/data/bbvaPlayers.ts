@@ -293,6 +293,8 @@ export const bbvaPlayers: BBVAPlayer[] = [
   { id: 329,answer: "JAVILOPEZ", fullName: "Javi López", displayName: "Javi López", clubs: ["Espanyol"], mainClub: "Espanyol", nationality: "España", position: "Defensa", years: "2010-2016", hint: "Lateral y capitán silencioso del Espanyol durante años.", category: "low" },
   { id: 330,answer: "CHICA", fullName: "Javi Chica", displayName: "Chica", clubs: ["Espanyol","Betis"], mainClub: "Espanyol", nationality: "España", position: "Defensa", years: "2005-2015", hint: "Lateral intenso, criado en el Espanyol y recordado también en el Betis.", category: "low" },
   { id: 331,answer: "CALLEJON", fullName: "José Callejón", displayName: "Callejón", clubs: ["Espanyol","Real Madrid","Napoli"], mainClub: "Espanyol", nationality: "España", position: "Delantero", years: "2008-2013", hint: "Extremo granadino que se hizo mayor en Cornellà antes de volver al Madrid.", category: "core" },
+  { id: 332,answer: "ANDRESFERNANDEZ", fullName: "Andrés Fernández", displayName: "Andrés Fernández", clubs: ["Osasuna","Villarreal","Granada"], mainClub: "Osasuna", nationality: "España", position: "Portero", years: "2011-2016", hint: "Portero de reflejos, muy reconocible en Osasuna y Villarreal.", category: "core" },
+  { id: 333,answer: "ORELLANA", fullName: "Fabián Orellana", displayName: "Orellana", clubs: ["Granada","Celta de Vigo","Valencia"], mainClub: "Celta de Vigo", nationality: "Chile", position: "Centrocampista", years: "2012-2017", hint: "Mediapunta chileno con mucha fantasía en Balaídos.", category: "core" },
 ];
 
 /** Core players only — used for collection odds and fallback pools */
