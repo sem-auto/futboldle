@@ -133,13 +133,24 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
     if (exactAlias) handleGuess(exactAlias.displayName, exactAlias.answer);
   }
 
-  function submitPlayer(player: typeof bbvaPlayers[0]) {
-    const challengeAnswer = challenge.answers.find(item =>
-      norm(item.answer) === norm(player.answer) ||
+function submitPlayer(player: typeof bbvaPlayers[0]) {
+    const exactName = challenge.answers.find(item =>
       norm(item.displayName) === norm(player.displayName) ||
       norm(item.displayName) === norm(player.fullName)
     );
-    handleGuess(challengeAnswer?.displayName ?? player.displayName, challengeAnswer?.answer ?? player.answer);
+    if (exactName) {
+      handleGuess(exactName.displayName, exactName.answer);
+      return;
+    }
+
+    const sameAnswerPlayers = bbvaPlayers.filter(item => norm(item.answer) === norm(player.answer));
+    const answerMatch = challenge.answers.find(item => norm(item.answer) === norm(player.answer));
+    if (answerMatch && sameAnswerPlayers.length <= 1) {
+      handleGuess(answerMatch.displayName, answerMatch.answer);
+      return;
+    }
+
+    handleGuess(player.displayName, `${player.answer}${player.id}`);
   }
 
   function handleHint() {
