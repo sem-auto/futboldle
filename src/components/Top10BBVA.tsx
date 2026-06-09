@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { activeTop10Challenges, getDailyTop10 } from "@/data/top10Challenges";
@@ -8,6 +8,7 @@ import { unlockPlayer } from "@/lib/album";
 import { recordGameCompletion, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
+import { shareResult } from "@/lib/share";
 
 function norm(s: string) {
   return s.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, "");
@@ -206,9 +207,8 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
   async function share() {
     const score = surrendered ? `X/${challenge.answers.length}` : `${guessedAnswers.length}/${challenge.answers.length}`;
     const grid = challenge.answers.map(a => guessedAnswers.includes(norm(a.answer)) ? "🟩" : "⬛").join("");
-    const txt = `⚽ Futboldle\n🟨 Top10 BBVA #${getDayNumber()}\n${challenge.title}\n${score}\n\n${grid}\n\nhttps://futboldle-liard.vercel.app`;
-    try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 2500); }
-    catch { alert(txt); }
+    const txt = `⚽ Futboldle\n🟨 Top10 BBVA #${getDayNumber()}\n${challenge.title}\n${score}\n\n${grid}\n\nhttps://futboldle.es`;
+    shareResult(txt, () => { setCopied(true); setTimeout(() => setCopied(false), 2500); });
   }
 
   if (!loaded) return (

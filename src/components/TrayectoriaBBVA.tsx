@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayNumber, getDayKey } from "@/lib/daily";
@@ -6,6 +6,7 @@ import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
+import { shareResult } from "@/lib/share";
 import { CAREER_AUDIT } from "@/data/trayectoriaAudit";
 
 const MAX = 5;
@@ -77,6 +78,24 @@ function getAuditedClues(player: Player, attempt: number) {
   ].filter((clue): clue is { label: string; value: string; shown: boolean } => clue !== null);
 }
 
+function getAuditedCluesV2(player: Player, attempt: number) {
+  const career = CAREER_AUDIT[player.id];
+  const clubs = career.clubs.filter(Boolean);
+  const clubClues = clubs.slice(0, 4).map((club, index) => ({
+    label: index === 0 ? "Club principal" : index === 1 ? "Segundo club" : index === 2 ? "Tercer club" : "Cuarto club",
+    value: club,
+    shown: attempt >= index,
+  }));
+  const nextIndex = clubClues.length;
+  const detailClues = clubs.length >= 4
+    ? [{ label: "Posición / nacionalidad", value: `${player.position} · ${player.nationality}`, shown: attempt >= 4 }]
+    : [
+        { label: "Posición", value: player.position, shown: attempt >= nextIndex },
+        { label: "Nacionalidad", value: player.nationality, shown: attempt >= nextIndex + 1 },
+      ];
+  return [...clubClues, ...detailClues].slice(0, MAX);
+}
+
 export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   const player = getTrayPlayer();
 
@@ -89,7 +108,6 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   const [query,       setQuery]       = useState("");
   const [copied,      setCopied]      = useState(false);
   const [loaded,      setLoaded]      = useState(false);
-  const [showFullCareer, setShowFullCareer] = useState(false);
 
   useEffect(() => {
     const saved = loadSaved();
@@ -132,15 +150,14 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
     if (isOver) setTimeout(() => setShowResult(true), 350);
   }, [guesses, usedIds, attempt, player.id]);
 
-  const clues = getAuditedClues(player, attempt);
+  const clues = getAuditedCluesV2(player, attempt);
   const canonicalCareer = CAREER_AUDIT[player.id]?.clubs ?? player.clubs;
-  const visibleCareer = showFullCareer ? canonicalCareer : canonicalCareer.slice(0, 2);
+  const visibleCareer = canonicalCareer;
 
   async function share() {
     const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
-    const txt = `⚽ Futboldle\n🟩 Trayectoria BBVA #${getDayNumber()}\n${score}\n\nhttps://futboldle-liard.vercel.app`;
-    try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 2500); }
-    catch { alert(txt); }
+    const txt = `⚽ Futboldle\n🟩 Trayectoria BBVA #${getDayNumber()}\n${score}\n\nhttps://futboldle.es`;
+    shareResult(txt, () => { setCopied(true); setTimeout(() => setCopied(false), 2500); });
   }
 
   if (!loaded) return (
@@ -258,12 +275,6 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
                 </div>
               ))}
             </div>
-            {canonicalCareer.length > visibleCareer.length && (
-              <button onClick={() => setShowFullCareer(true)} className="text-[10px] font-semibold px-3 py-2 rounded-lg mb-3"
-                style={{ background: "#f0faf2", color: "#1e6b2e", border: "1px solid rgba(30,107,46,0.18)" }}>
-                Ver trayectoria completa
-              </button>
-            )}
             <p className="text-[11px] italic mb-4" style={{ color: "#6b6b72" }}>"{player.hint}"</p>
             <button onClick={share} className="w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
               style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>

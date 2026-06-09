@@ -1,12 +1,12 @@
 import { getAlbumEntries, getCollectionProfileStats } from "./album";
 import { loadStats } from "./useStats";
 
-type GameKey = "wordle" | "trayectoria" | "top10" | "top20" | "crack";
+type GameKey = "wordle" | "trayectoria" | "top10" | "top20" | "crack" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
 const GAME_COUNTS_KEY = "fbl-game-counts-v1";
 const STATS_KEY = "fbl-stats-v1";
 
 function blankCounts() {
-  return { wordle: 0, trayectoria: 0, top10: 0, top20: 0, crack: 0 };
+  return { wordle: 0, trayectoria: 0, top10: 0, top20: 0, crack: 0, jugoAqui: 0, fichaje: 0, clubOculto: 0, once: 0, quienFalta: 0 };
 }
 
 export function loadGameCounts() {

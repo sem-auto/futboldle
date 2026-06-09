@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getHistoricalClubShield, getTrophyShowcase } from "@/lib/album";
 import { trackEvent } from "@/lib/analytics";
+import { shareResult } from "@/lib/share";
 
 type Trophy = ReturnType<typeof getTrophyShowcase>[number];
 
@@ -28,8 +29,8 @@ export default function VitrinaPage() {
   }, [trophies]);
 
   async function shareTrophy(trophy: Trophy) {
-    const text = `🏆 ${trophy.label}\nFutboldle`;
-    try { await navigator.clipboard.writeText(text); } catch { alert(text); }
+    const text = `🏆 ${trophy.label}\nFutboldle\n\nhttps://futboldle.es`;
+    shareResult(text);
   }
 
   return (

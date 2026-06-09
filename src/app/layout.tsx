@@ -2,17 +2,20 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Suspense } from "react";
 import GoogleAnalyticsPageView from "@/components/GoogleAnalyticsPageView";
+import ShareSheetHost from "@/components/ShareSheetHost";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = "G-Q4DBT40EYL";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://futboldle.es"),
   title: "Futboldle — Minijuegos diarios para enfermos de la Liga BBVA",
   description: "Wordle BBVA y más. La nostalgia de la Liga BBVA 2005-2016. Hombres BBVA.",
   keywords: "futboldle, wordle futbol, liga bbva, hombres bbva, adivina futbolista, laliga nostalgia",
   openGraph: {
     title: "Futboldle ⚽",
     description: "Minijuegos diarios para enfermos de la Liga BBVA.",
+    url: "https://futboldle.es",
     type: "website",
   },
 };
@@ -44,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GoogleAnalyticsPageView />
         </Suspense>
         {children}
+        <ShareSheetHost />
       </body>
     </html>
   );

@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getFavoritePlayers, getTrophyShowcase } from "@/lib/album";
 import { getProfileSummary } from "@/lib/profile";
 import { importProgressBackup, stringifyProgressBackup } from "@/lib/progressBackup";
+import { shareResult } from "@/lib/share";
 
 type Summary = ReturnType<typeof getProfileSummary>;
 
@@ -34,8 +35,8 @@ export default function PerfilPage() {
 
   async function shareProfile() {
     if (!summary) return;
-    const text = `Mi colección Futboldle\n${summary.cardsUnlocked}/${summary.collectionTotal} cromos\n${trophyCount} trofeos\nRacha máxima: ${summary.bestStreak}\n\nhttps://futboldle-liard.vercel.app`;
-    try { await navigator.clipboard.writeText(text); } catch { alert(text); }
+    const text = `Mi colección Futboldle\n${summary.cardsUnlocked}/${summary.collectionTotal} cromos\n${trophyCount} trofeos\nRacha máxima: ${summary.bestStreak}\n\nhttps://futboldle.es`;
+    shareResult(text);
   }
 
   async function exportProgress() {

@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayKey, getDayNumber } from "@/lib/daily";
+import { shareResult } from "@/lib/share";
 
 const MAX = 8;
 const DARK_RED = "#9b1c1c";
@@ -155,9 +156,8 @@ export default function AtributosBBVA({ onBack }: { onBack: () => void }) {
       const icons = [CELL_STYLE[r.nationality].icon, CELL_STYLE[r.position].icon, CELL_STYLE[r.club].icon, CELL_STYLE[r.years].icon];
       return icons.join(" ");
     }).join("\n");
-    const txt = `⚽ Futboldle\nAtributos BBVA #${getDayNumber()}\n${score}\n\n${grid}\n\nhttps://futboldle-liard.vercel.app`;
-    try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 2500); }
-    catch { alert(txt); }
+    const txt = `⚽ Futboldle\nAtributos BBVA #${getDayNumber()}\n${score}\n\n${grid}\n\nhttps://futboldle.es`;
+    shareResult(txt, () => { setCopied(true); setTimeout(() => setCopied(false), 2500); });
   }
 
   if (!loaded) return (

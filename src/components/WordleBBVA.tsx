@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 import { BBVAPlayer, getPlayerOfDay, getExtraPlayer } from "@/data/bbvaPlayers";
 import { normalize } from "@/lib/normalize";
@@ -7,6 +7,7 @@ import { unlockPlayer } from "@/lib/album";
 import { loadGameCounts, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import { useStats } from "@/lib/useStats";
+import { shareResult } from "@/lib/share";
 
 const MAX = 6;
 const KB  = [
@@ -46,7 +47,7 @@ function evaluate(guess:string[],answer:string[]):LS[] {
 function shareText(states:LS[][],won:boolean,label:string):string {
   const score = won?`${states.length}/${MAX}`:`X/${MAX}`;
   const e=(s:LS)=>s==="correct"?"🟩":s==="partial"?"🟨":"⬛";
-  return `⚽ Futboldle\n🟩 Wordle BBVA ${label}\n${score}\n\n${states.map(r=>r.map(e).join("")).join("\n")}\n\nhttps://futboldle-liard.vercel.app`;
+  return `⚽ Futboldle\n🟩 Wordle BBVA ${label}\n${score}\n\n${states.map(r=>r.map(e).join("")).join("\n")}\n\nhttps://futboldle.es`;
 }
 
 function keyState(key:string, rows:Row[]):"correct"|"partial"|"wrong"|"idle" {
@@ -124,7 +125,6 @@ export default function WordleBBVA({onBack}:Props) {
   const [curRow,    setCurRow]    = useState(0);
   const [gameOver,  setGameOver]  = useState(false);
   const [won,       setWon]       = useState(false);
-  const [showHint,  setShowHint]  = useState(false);
   const [showResult,setShowResult]= useState(false);
   const [revealed,  setRevealed]  = useState<boolean[]>(Array(MAX).fill(false));
   const [shakeRow,  setShakeRow]  = useState<number|null>(null);
@@ -154,12 +154,11 @@ export default function WordleBBVA({onBack}:Props) {
       setWon(w); setGameOver(over);
       existingResult.letters.forEach((_,i)=>{ rev[i]=true; });
       setRevealed(rev);
-      setShowHint(true);
       setTimeout(()=>setShowResult(true),300);
     } else {
       setRows(Array.from({length:MAX},()=>emptyRow(ans.length)));
       setCurRow(0); setGameOver(false); setWon(false);
-      setShowHint(false); setShowResult(false);
+      setShowResult(false);
       setRevealed(Array(MAX).fill(false));
     }
   }
@@ -196,8 +195,6 @@ export default function WordleBBVA({onBack}:Props) {
     const next=curRow+1;
     const over=w||next>=MAX;
     setCurRow(next);
-    if(next>=3&&!w) setShowHint(true);
-
     if(over){
       setWon(w); setGameOver(true);
       if (w) {
@@ -287,8 +284,7 @@ export default function WordleBBVA({onBack}:Props) {
       : `Extra #${extraIdx}`;
     const submitted=rows.filter(r=>r.submitted);
     const text=shareText(submitted.map(r=>r.states),won,label);
-    try{ await navigator.clipboard.writeText(text); setCopied(true); setTimeout(()=>setCopied(false),2500); }
-    catch{ alert(text); }
+    shareResult(text, () => { setCopied(true); setTimeout(()=>setCopied(false),2500); });
   }
 
   if(!loaded) return (
@@ -339,15 +335,6 @@ export default function WordleBBVA({onBack}:Props) {
           <span className="font-oswald font-semibold" style={{color:"var(--gold)"}}>Hombre BBVA</span>
         </p>
       </div>
-
-      {/* ── Post-3 hint ── */}
-      {showHint&&!gameOver&&(
-        <div className="rounded-xl px-4 py-3 anim-in" style={{background:"white",border:"1px solid var(--b-gold)"}}>
-          <div className="text-[9px] font-oswald font-semibold uppercase tracking-[0.22em] mb-1.5" style={{color:"var(--gold)"}}>💡 Pista</div>
-          <p className="text-[13px] font-semibold mb-0.5" style={{color:"#18181b"}}>{player.mainClub} · {player.position}</p>
-          <p className="text-[12px] italic leading-relaxed" style={{color:"var(--txt3)"}}>&ldquo;{player.hint}&rdquo;</p>
-        </div>
-      )}
 
       {/* ── Toast ── */}
       {toast&&(

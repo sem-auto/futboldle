@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayKey, getDayNumber } from "@/lib/daily";
@@ -6,6 +6,7 @@ import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
+import { shareResult } from "@/lib/share";
 
 const MAX = 5;
 const STORE_KEY = () => `fbl-crack-${getDayKey()}`;
@@ -130,13 +131,13 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
     ...h,
     revealed: h.revealed || (gameOver && i <= 4),
   }));
+  const revealedCount = visibleHints.filter(h => h.revealed).length;
 
   async function share() {
     const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
     const revCount = visibleHints.filter(h => h.revealed).length;
-    const txt = `⚽ Futboldle\n🟪 Adivina el Crack #${getDayNumber()}\n${score}\n\n🔍 ${revCount} pistas usadas\n\nhttps://futboldle-liard.vercel.app`;
-    try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 2500); }
-    catch { alert(txt); }
+    const txt = `⚽ Futboldle\n🟪 Cromo oculto #${getDayNumber()}\n${score}\n\n🔍 ${revCount} pistas usadas\n\nhttps://futboldle.es`;
+    shareResult(txt, () => { setCopied(true); setTimeout(() => setCopied(false), 2500); });
   }
 
   if (!loaded) return (
@@ -163,8 +164,8 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
             style={{ background: "rgba(255,255,255,0.2)", color: "white" }}>
             Reto del día · #{getDayNumber()}
           </div>
-          <h2 className="font-bebas text-[32px] leading-none text-white mb-1 break-words">ADIVINA EL CRACK</h2>
-          <p className="text-[11px] text-white/70">Las pistas se revelan con cada fallo · {MAX} intentos</p>
+          <h2 className="font-bebas text-[32px] leading-none text-white mb-1 break-words">CROMO OCULTO</h2>
+          <p className="text-[11px] text-white/70">Revela el cromo con cada fallo · {MAX} intentos</p>
         </div>
         {/* Attempt bar */}
         <div className="px-5 pb-3 flex items-center gap-1.5">
@@ -173,6 +174,44 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
               style={{ background: i < attempt ? "rgba(255,255,255,0.40)" : i === attempt && !gameOver ? "white" : "rgba(255,255,255,0.15)" }} />
           ))}
           <span className="text-white/50 text-[9px] font-semibold ml-1">{gameOver ? "—" : `${MAX - attempt} intentos`}</span>
+        </div>
+      </div>
+
+      {/* Cromo visual */}
+      <div className="rounded-2xl p-3 flex items-center gap-3"
+        style={{ background: "linear-gradient(135deg,#18181b 0%,#2b2142 100%)", border: `1px solid ${PURPLE_BD}`, boxShadow: "0 6px 22px rgba(0,0,0,0.10)" }}>
+        <div className="relative w-24 h-32 rounded-xl flex-shrink-0 overflow-hidden"
+          style={{ background: gameOver ? "linear-gradient(145deg,#fff8e6,#f4e1a8)" : "linear-gradient(145deg,#2a2140,#111)", border: "2px solid rgba(250,200,64,0.70)" }}>
+          <div className="absolute inset-x-0 top-0 h-8" style={{ background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent)" }} />
+          <div className="h-full flex flex-col items-center justify-center text-center px-2">
+            <div className="text-[8px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: gameOver ? "#7c3aed" : "#fac840" }}>
+              Cromo oculto
+            </div>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
+              style={{ background: gameOver ? "#7c3aed" : "rgba(255,255,255,0.10)", color: "white", border: "1px solid rgba(255,255,255,0.25)" }}>
+              <span className="font-bebas text-[24px]">{gameOver ? player.displayName.slice(0, 1).toUpperCase() : "?"}</span>
+            </div>
+            <div className="font-bebas text-[18px] leading-none break-words" style={{ color: gameOver ? "#18181b" : "white" }}>
+              {gameOver ? player.displayName.toUpperCase() : "?????"}
+            </div>
+          </div>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[8px] font-semibold uppercase tracking-[0.18em] mb-1" style={{ color: "#fac840" }}>
+            Panini BBVA
+          </div>
+          <div className="font-bebas text-[24px] leading-none text-white">
+            {gameOver ? "Cromo revelado" : "Descubre el jugador"}
+          </div>
+          <p className="text-[11px] mt-1 leading-snug" style={{ color: "rgba(255,255,255,0.72)" }}>
+            Cada fallo abre una pista. La gracia está en encontrar ese punto de memoria BBVA antes de verlo claro.
+          </p>
+          <div className="mt-3 flex gap-1">
+            {Array.from({ length: MAX }).map((_, i) => (
+              <div key={i} className="h-1.5 flex-1 rounded-full"
+                style={{ background: i < revealedCount ? "#fac840" : "rgba(255,255,255,0.16)" }} />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -247,7 +286,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
       {showResult && (
         <div className="anim-in rounded-2xl overflow-hidden" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
           <div className="px-5 py-4" style={{ background: won ? "linear-gradient(135deg,#5b21b6,#7c3aed)" : "linear-gradient(135deg,#b81c14,#d42018)" }}>
-            <div className="font-bebas text-[30px] leading-none text-white mb-0.5">{won ? "¡CRACK TOTAL!" : "ERA..."}</div>
+            <div className="font-bebas text-[30px] leading-none text-white mb-0.5">{won ? "¡CROMO REVELADO!" : "ERA..."}</div>
             <p className="text-white/70 text-[12px]">{won ? `En ${guesses.length}/${MAX} intentos` : "No has podido con él"}</p>
           </div>
           <div className="p-4" style={{ background: "white" }}>
