@@ -99,8 +99,12 @@ function Header({ onLogoClick }: { onLogoClick: () => void }) {
     <header className="sticky top-0 z-20" style={{ background: "white", borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
       <div className="max-w-4xl mx-auto px-3 md:px-4 h-10 md:h-12 flex items-center justify-between gap-2 md:gap-4">
         <button onClick={onLogoClick} className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center font-bebas text-[14px] md:text-[16px]"
-            style={{ background: "#c0241c", color: "white" }}>F</div>
+          <img
+            src="/brand-logo.png"
+            alt="Futboldle"
+            className="w-7 h-7 md:w-8 md:h-8 rounded-lg object-cover flex-shrink-0"
+            style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.12)" }}
+          />
           <span className="font-bebas text-[18px] md:text-[20px] leading-none tracking-wider" style={{ color: "#18181b" }}>FUTBOLDLE</span>
         </button>
 
