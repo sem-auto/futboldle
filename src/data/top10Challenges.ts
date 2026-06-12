@@ -113,15 +113,15 @@ export const top10Challenges: Top10Challenge[] = [
     "category": "GOLEADORES",
     "topType": "TOP HISTÓRICO VERIFICADO",
     "period": "2005/06-2015/16 · era BBVA 2005/06-2015/16",
-    "criterion": "Goles marcados en LaLiga 2015/16",
-    "source": "StatBunker · La Liga 15/16 Top goal scorers",
+    "criterion": "Goles acumulados entre 2005/06 y 2015/16 excluyendo los goles marcados con Barcelona y Real Madrid",
+    "source": "Auditoría manual beta · acumulado por clubes del periodo",
     "sourceName": "StatBunker",
-    "sourceUrl": "https://www.statbunker.com/competitions/TopGoalScorers?comp_id=518",
-    "sourceNote": "Fuente consultada: StatBunker · La Liga 15/16 Top goal scorers.",
+    "sourceUrl": "https://www.statbunker.com/competitions/FantasyFootballPlayersStats?comp_id=518",
+    "sourceNote": "Ranking corregido para Futboldle el 2026-06-12. Excluye goles con Barcelona y Real Madrid; no usa totales históricos completos.",
     "top20Unlockable": true,
-    "title": "Top goleadores LaLiga 15/16 2005/06-2015/16",
-    "subtitle": "2015/16 · goles en Liga",
-    "consigna": "Completa el Top10 oficial de goleadores de LaLiga 2015/16.",
+    "title": "Máximos goleadores sin Barça/Madrid 2005/06-2015/16",
+    "subtitle": "2005/06-2015/16 · sin Barça/Madrid auditado",
+    "consigna": "Completa el Top10 de goleadores sin contar goles con Barça ni Madrid.",
     "emoji": "⚽",
     "answers": [
       {
@@ -2308,31 +2308,31 @@ export const top10Challenges: Top10Challenge[] = [
     "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://betl.statbunker.com/alltimestats?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Corregido manualmente el 2026-06-12 para usar solo goles del periodo 2005/06-2015/16; no usa totales históricos completos.",
     "title": "Máximos goleadores extranjeros BBVA 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · extranjeros",
     "consigna": "Completa el Top10 de goleadores extranjeros.",
-    "emoji": "🏟️",
+    "emoji": "🌍",
     "answers": [
       {
         "position": 1,
         "answer": "MESSI",
         "displayName": "Messi",
-        "detail": "453 goles",
-        "value": 453,
-        "label": "453 goles",
+        "detail": "311 goles",
+        "value": 311,
+        "label": "311 goles",
         "hintNationality": "Argentina",
         "hintPosition": "Delantero",
         "hintClub": "Barcelona",
-        "hintInitial": "L_____ M____"
+        "hintInitial": "M____"
       },
       {
         "position": 2,
         "answer": "RONALDO",
         "displayName": "Cristiano Ronaldo",
-        "detail": "311 goles",
-        "value": 311,
-        "label": "311 goles",
+        "detail": "260 goles",
+        "value": 260,
+        "label": "260 goles",
         "hintNationality": "Portugal",
         "hintPosition": "Delantero",
         "hintClub": "Real Madrid",
@@ -2342,97 +2342,97 @@ export const top10Challenges: Top10Challenge[] = [
         "position": 3,
         "answer": "BENZEMA",
         "displayName": "Benzema",
-        "detail": "238 goles",
-        "value": 238,
-        "label": "238 goles",
+        "detail": "111 goles",
+        "value": 111,
+        "label": "111 goles",
         "hintNationality": "Francia",
         "hintPosition": "Delantero",
         "hintClub": "Real Madrid",
-        "hintInitial": "K____ B______"
+        "hintInitial": "B______"
       },
       {
         "position": 4,
-        "answer": "GRIEZMANN",
-        "displayName": "Griezmann",
-        "detail": "203 goles",
-        "value": 203,
-        "label": "203 goles",
-        "hintNationality": "Francia",
+        "answer": "HIGUAIN",
+        "displayName": "Higuaín",
+        "detail": "107 goles",
+        "value": 107,
+        "label": "107 goles",
+        "hintNationality": "Argentina",
         "hintPosition": "Delantero",
-        "hintClub": "Atlético de Madrid",
-        "hintInitial": "A_______ G________"
+        "hintClub": "Real Madrid",
+        "hintInitial": "H______"
       },
       {
         "position": 5,
+        "answer": "ETOO",
+        "displayName": "Eto'o",
+        "detail": "94 goles",
+        "value": 94,
+        "label": "94 goles",
+        "hintNationality": "Camerún",
+        "hintPosition": "Delantero",
+        "hintClub": "Barcelona",
+        "hintInitial": "E___"
+      },
+      {
+        "position": 6,
+        "answer": "GRIEZMANN",
+        "displayName": "Griezmann",
+        "detail": "90 goles",
+        "value": 90,
+        "label": "90 goles",
+        "hintNationality": "Francia",
+        "hintPosition": "Delantero",
+        "hintClub": "Atlético de Madrid",
+        "hintInitial": "G________"
+      },
+      {
+        "position": 7,
         "answer": "SUAREZ",
         "displayName": "Luis Suárez",
-        "detail": "178 goles",
-        "value": 178,
-        "label": "178 goles",
+        "detail": "56 goles",
+        "value": 56,
+        "label": "56 goles",
         "hintNationality": "Uruguay",
         "hintPosition": "Delantero",
         "hintClub": "Barcelona",
         "hintInitial": "L___ S_____"
       },
       {
-        "position": 6,
-        "answer": "STUANI",
-        "displayName": "Stuani",
-        "detail": "106 goles",
-        "value": 106,
-        "label": "106 goles",
-        "hintNationality": "Uruguay",
-        "hintPosition": "Delantero",
-        "hintClub": "Espanyol",
-        "hintInitial": "C________ S_____"
-      },
-      {
-        "position": 7,
-        "answer": "HIGUAIN",
-        "displayName": "Higuaín",
-        "detail": "105 goles",
-        "value": 105,
-        "label": "105 goles",
-        "hintNationality": "Argentina",
-        "hintPosition": "Delantero",
-        "hintClub": "Real Madrid",
-        "hintInitial": "G______ H______"
-      },
-      {
         "position": 8,
-        "answer": "BALE",
-        "displayName": "Gareth Bale",
-        "detail": "81 goles",
-        "value": 81,
-        "label": "81 goles",
-        "hintNationality": "Gales",
-        "hintPosition": "Delantero",
-        "hintClub": "Real Madrid",
-        "hintInitial": "G_____ B___"
-      },
-      {
-        "position": 9,
-        "answer": "GAMEIRO",
-        "displayName": "Gameiro",
-        "detail": "74 goles",
-        "value": 74,
-        "label": "74 goles",
-        "hintNationality": "Francia",
-        "hintPosition": "Delantero",
-        "hintClub": "Sevilla",
-        "hintInitial": "K____ G______"
-      },
-      {
-        "position": 10,
         "answer": "FORLAN",
         "displayName": "Forlán",
-        "detail": "74 goles",
-        "value": 74,
-        "label": "74 goles",
+        "detail": "54 goles",
+        "value": 54,
+        "label": "54 goles",
         "hintNationality": "Uruguay",
         "hintPosition": "Delantero",
         "hintClub": "Atlético de Madrid",
-        "hintInitial": "D____ F_____"
+        "hintInitial": "F_____"
+      },
+      {
+        "position": 9,
+        "answer": "KANOUTE",
+        "displayName": "Kanouté",
+        "detail": "52 goles",
+        "value": 52,
+        "label": "52 goles",
+        "hintNationality": "Mal?",
+        "hintPosition": "Delantero",
+        "hintClub": "Sevilla",
+        "hintInitial": "K_____"
+      },
+      {
+        "position": 10,
+        "answer": "VELA",
+        "displayName": "Carlos Vela",
+        "detail": "51 goles",
+        "value": 51,
+        "label": "51 goles",
+        "hintNationality": "México",
+        "hintPosition": "Delantero",
+        "hintClub": "Real Sociedad",
+        "hintInitial": "C_____ V___"
       }
     ]
   },
@@ -2446,7 +2446,7 @@ export const top10Challenges: Top10Challenge[] = [
     "source": "StatBunker - LaLiga 2005/06-2015/16",
     "sourceName": "StatBunker",
     "sourceUrl": "https://betl.statbunker.com/alltimestats?comp_code=LL",
-    "sourceNote": "Fuente consultada: StatBunker - datos limitados a la era BBVA 2005/06-2015/16.",
+    "sourceNote": "Corregido manualmente el 2026-06-12 para excluir goles con Barcelona y Real Madrid y usar solo 2005/06-2015/16.",
     "title": "Máximos goleadores sin Barça/Madrid 2005/06-2015/16",
     "subtitle": "2005/06-2015/16 · sin gigantes",
     "consigna": "Completa el Top10 de goleadores sin Barça ni Madrid.",
@@ -2454,35 +2454,35 @@ export const top10Challenges: Top10Challenge[] = [
     "answers": [
       {
         "position": 1,
-        "answer": "ASPAS",
-        "displayName": "Aspas",
-        "detail": "163 goles",
-        "value": 163,
-        "label": "163 goles",
+        "answer": "VILLA",
+        "displayName": "Villa",
+        "detail": "145 goles",
+        "value": 145,
+        "label": "145 goles",
         "hintNationality": "España",
         "hintPosition": "Delantero",
-        "hintClub": "Celta de Vigo",
-        "hintInitial": "I___ A____"
+        "hintClub": "Valencia",
+        "hintInitial": "V____"
       },
       {
         "position": 2,
         "answer": "ADURIZ",
         "displayName": "Aduriz",
-        "detail": "142 goles",
-        "value": 142,
-        "label": "142 goles",
+        "detail": "125 goles",
+        "value": 125,
+        "label": "125 goles",
         "hintNationality": "España",
         "hintPosition": "Delantero",
         "hintClub": "Athletic Club",
-        "hintInitial": "A____ A_____"
+        "hintInitial": "A_____"
       },
       {
         "position": 3,
         "answer": "NEGREDO",
         "displayName": "Negredo",
-        "detail": "127 goles",
-        "value": 127,
-        "label": "127 goles",
+        "detail": "112 goles",
+        "value": 112,
+        "label": "112 goles",
         "hintNationality": "España",
         "hintPosition": "Delantero",
         "hintClub": "Sevilla",
@@ -2490,87 +2490,87 @@ export const top10Challenges: Top10Challenge[] = [
       },
       {
         "position": 4,
-        "answer": "GERARDMORENO",
-        "displayName": "Gerard Moreno",
-        "detail": "123 goles",
-        "value": 123,
-        "label": "123 goles",
-        "hintNationality": "España",
-        "hintPosition": "Delantero",
-        "hintClub": "Villarreal",
-        "hintInitial": "G_____ M_____"
-      },
-      {
-        "position": 5,
         "answer": "SOLDADO",
         "displayName": "Soldado",
-        "detail": "116 goles",
-        "value": 116,
-        "label": "116 goles",
-        "hintNationality": "España",
-        "hintPosition": "Delantero",
-        "hintClub": "Valencia",
-        "hintInitial": "R_______ S______"
-      },
-      {
-        "position": 6,
-        "answer": "STUANI",
-        "displayName": "Stuani",
         "detail": "106 goles",
         "value": 106,
         "label": "106 goles",
+        "hintNationality": "España",
+        "hintPosition": "Delantero",
+        "hintClub": "Valencia",
+        "hintInitial": "S______"
+      },
+      {
+        "position": 5,
+        "answer": "FORLAN",
+        "displayName": "Forlán",
+        "detail": "94 goles",
+        "value": 94,
+        "label": "94 goles",
         "hintNationality": "Uruguay",
         "hintPosition": "Delantero",
-        "hintClub": "Espanyol",
-        "hintInitial": "C________ S_____"
+        "hintClub": "Atlético de Madrid",
+        "hintInitial": "F_____"
+      },
+      {
+        "position": 6,
+        "answer": "KANOUTE",
+        "displayName": "Kanouté",
+        "detail": "89 goles",
+        "value": 89,
+        "label": "89 goles",
+        "hintNationality": "Mal?",
+        "hintPosition": "Delantero",
+        "hintClub": "Sevilla",
+        "hintInitial": "K_____"
       },
       {
         "position": 7,
-        "answer": "GARCIA",
-        "displayName": "Raúl García",
-        "detail": "101 goles",
-        "value": 101,
-        "label": "101 goles",
+        "answer": "RUBENCASTRO",
+        "displayName": "Rubén Castro",
+        "detail": "77 goles",
+        "value": 77,
+        "label": "77 goles",
         "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Atlético de Madrid",
-        "hintInitial": "R___ G_____"
+        "hintPosition": "Delantero",
+        "hintClub": "Betis",
+        "hintInitial": "R____ C_____"
       },
       {
         "position": 8,
-        "answer": "OYARZABAL",
-        "displayName": "Oyarzabal",
-        "detail": "87 goles",
-        "value": 87,
-        "label": "87 goles",
-        "hintNationality": "España",
+        "answer": "LUISFABIANO",
+        "displayName": "Luis Fabiano",
+        "detail": "72 goles",
+        "value": 72,
+        "label": "72 goles",
+        "hintNationality": "Brasil",
         "hintPosition": "Delantero",
-        "hintClub": "Real Sociedad",
-        "hintInitial": "M____ O________"
+        "hintClub": "Sevilla",
+        "hintInitial": "L___ F_______"
       },
       {
         "position": 9,
-        "answer": "LLORENTE",
-        "displayName": "Llorente",
-        "detail": "80 goles",
-        "value": 80,
-        "label": "80 goles",
-        "hintNationality": "España",
+        "answer": "GRIEZMANN",
+        "displayName": "Griezmann",
+        "detail": "71 goles",
+        "value": 71,
+        "label": "71 goles",
+        "hintNationality": "Francia",
         "hintPosition": "Delantero",
-        "hintClub": "Athletic Club",
-        "hintInitial": "F_______ L_______"
+        "hintClub": "Atlético de Madrid",
+        "hintInitial": "G________"
       },
       {
         "position": 10,
-        "answer": "PAREJO",
-        "displayName": "Parejo",
-        "detail": "75 goles",
-        "value": 75,
-        "label": "75 goles",
-        "hintNationality": "España",
-        "hintPosition": "Centrocampista",
-        "hintClub": "Valencia",
-        "hintInitial": "D___ P_____"
+        "answer": "ROSSI",
+        "displayName": "Rossi",
+        "detail": "70 goles",
+        "value": 70,
+        "label": "70 goles",
+        "hintNationality": "Italia",
+        "hintPosition": "Delantero",
+        "hintClub": "Villarreal",
+        "hintInitial": "R____"
       }
     ]
   },
@@ -5473,11 +5473,15 @@ export function validateTop10Challenge(challenge: Top10Challenge): Top10Validati
   return issues;
 }
 
+const retiredTop10Ids = new Set([
+  "statbunker-laliga-historico-asistencias",
+]);
+
 export function getTop10ValidationIssues() {
   return top10Challenges.flatMap(validateTop10Challenge);
 }
 
-export const activeTop10Challenges = top10Challenges.filter(challenge => validateTop10Challenge(challenge).length === 0);
+export const activeTop10Challenges = top10Challenges.filter(challenge => !retiredTop10Ids.has(challenge.id) && validateTop10Challenge(challenge).length === 0);
 
 export function getTop10Family(challenge: Top10Challenge): Top10Family {
   const text = `${challenge.id} ${challenge.title} ${challenge.category}`.toLowerCase();

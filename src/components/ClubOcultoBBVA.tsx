@@ -34,6 +34,26 @@ function fold(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
 }
 
+function getClubSuggestions(query: string) {
+  const q = fold(query);
+  if (q.length < 2) return [];
+  const clubs = Array.from(new Set([
+    ...CASES.map(item => item.club),
+    ...bbvaPlayers.flatMap(player => player.clubs),
+  ]));
+  return clubs
+    .map(club => {
+      const normalized = fold(club);
+      const words = club.split(/\s+/).map(fold);
+      const score = normalized.startsWith(q) ? 0 : words.some(word => word.startsWith(q)) ? 1 : normalized.includes(q) ? 2 : 99;
+      return { club, score };
+    })
+    .filter(item => item.score < 99)
+    .sort((a, b) => a.score - b.score || a.club.length - b.club.length || a.club.localeCompare(b.club, "es"))
+    .slice(0, 8)
+    .map(item => item.club);
+}
+
 function getCase() {
   return CASES[(getDayNumber() * 5 + 2) % CASES.length];
 }
@@ -52,6 +72,7 @@ export default function ClubOcultoBBVA({ onBack }: { onBack: () => void }) {
   const [won, setWon] = useState(false);
   const [copied, setCopied] = useState(false);
   const shownClues = done ? item.clues : item.clues.slice(0, Math.min(item.clues.length, 2 + guesses.length));
+  const suggestions = getClubSuggestions(query);
 
   useEffect(() => {
     try {
@@ -112,9 +133,27 @@ export default function ClubOcultoBBVA({ onBack }: { onBack: () => void }) {
 
           {!done ? (
             <div className="flex flex-col gap-2">
-              <input value={query} onChange={event => setQuery(event.target.value)} onKeyDown={event => { if (event.key === "Enter") submit(); }}
-                placeholder="Escribe el club" className="w-full px-4 py-3 rounded-xl outline-none text-[14px]"
-                style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.10)", color: "#18181b" }} />
+              <div className="relative">
+                <input value={query} onChange={event => setQuery(event.target.value)} onKeyDown={event => {
+                  if (event.key !== "Enter") return;
+                  if (suggestions.length > 0) setQuery(suggestions[0]);
+                  else submit();
+                }}
+                  placeholder="Escribe el club" className="w-full px-4 py-3 rounded-xl outline-none text-[14px]"
+                  style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.10)", color: "#18181b" }} />
+                {suggestions.length > 0 && (
+                  <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-72 overflow-y-auto"
+                    style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
+                    {suggestions.map(club => (
+                      <button key={club} onMouseDown={() => setQuery(club)}
+                        className="w-full px-4 py-2.5 text-left border-b last:border-0 font-oswald font-semibold text-[13px]"
+                        style={{ borderColor: "rgba(0,0,0,0.06)", color: "#18181b" }}>
+                        {club}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button onClick={submit} className="font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl" style={{ background: "#1a4fa0", color: "white" }}>Probar</button>
               <div className="text-center text-[10px]" style={{ color: "#9a9a8a" }}>{MAX - guesses.length} intentos</div>
             </div>

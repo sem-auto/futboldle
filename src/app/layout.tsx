@@ -9,9 +9,39 @@ const GA_MEASUREMENT_ID = "G-Q4DBT40EYL";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://futboldle.es"),
-  title: "Futboldle — Minijuegos diarios para enfermos de la Liga BBVA",
-  description: "Wordle BBVA y más. La nostalgia de la Liga BBVA 2005-2016. Hombres BBVA.",
-  keywords: "futboldle, wordle futbol, liga bbva, hombres bbva, adivina futbolista, laliga nostalgia",
+  title: "Futboldle ⚽",
+  description: "Minijuegos diarios para enfermos de la Liga BBVA.",
+  keywords: [
+    "Futboldle",
+    "minijuegos de fútbol",
+    "minijuegos de futbol",
+    "minijuegos Liga Española",
+    "wordle fútbol",
+    "wordle futbol",
+    "Liga BBVA",
+    "Hombres BBVA",
+    "juego fútbol antiguo",
+    "juego futbol antiguo",
+    "fútbol retro",
+    "futbol retro",
+    "fútbol nostalgia",
+    "LaLiga nostalgia",
+    "adivina futbolista",
+  ],
+  alternates: {
+    canonical: "https://futboldle.es",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -26,18 +56,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
+        url: "https://futboldle.es/icon.png",
+        width: 512,
+        height: 512,
         alt: "Futboldle",
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Futboldle ⚽",
     description: "Minijuegos diarios para enfermos de la Liga BBVA.",
-    images: ["/og-image.png"],
+    images: ["https://futboldle.es/icon.png"],
   },
 };
 

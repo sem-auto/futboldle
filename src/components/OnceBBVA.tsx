@@ -111,6 +111,15 @@ function allOpenNames(slots: Slot[], filled: FilledSlot[]) {
   ));
 }
 
+function allSearchableNames(slots: Slot[], filled: FilledSlot[], misses: string[]) {
+  const usedNames = new Set([...filled.map(item => fold(item.playerName)), ...misses.map(fold)]);
+  return Array.from(new Set([
+    ...slots.flatMap(slot => slot.accepted),
+    ...bbvaPlayers.map(player => player.displayName),
+    ...bbvaPlayers.map(player => player.fullName),
+  ])).filter(name => !usedNames.has(fold(name)));
+}
+
 function getSuggestions(query: string, names: string[]) {
   const q = fold(query);
   if (q.length < 2) return [];
@@ -157,7 +166,8 @@ export default function OnceBBVA({ onBack }: { onBack: () => void }) {
   const [copied, setCopied] = useState(false);
   const rows = roleRows(xi.slots);
   const openNames = allOpenNames(xi.slots, filled);
-  const suggestions = getSuggestions(query, openNames);
+  const searchableNames = allSearchableNames(xi.slots, filled, misses);
+  const suggestions = getSuggestions(query, searchableNames);
 
   useEffect(() => {
     try {
@@ -214,7 +224,7 @@ export default function OnceBBVA({ onBack }: { onBack: () => void }) {
       const nextMisses = [...misses, clean];
       setMisses(nextMisses);
       persist(filled, nextMisses, false, false);
-      flash(`${clean} no entra en este once`);
+      flash(`${clean} no encaja en ningún hueco`);
       return;
     }
     const slots = openMatchingSlots(xi.slots, filled, match);
@@ -251,7 +261,7 @@ export default function OnceBBVA({ onBack }: { onBack: () => void }) {
         <div className="p-4 flex flex-col gap-3">
           <div className="rounded-xl px-3 py-2" style={{ background: "#fff8f7", border: "1px solid rgba(184,28,20,0.14)" }}>
             <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#b81c14" }}>Objetivo</div>
-            <p className="text-[11px] mt-0.5" style={{ color: "#6b6b72" }}>Cada casilla tiene equipo y posición. Escribe cualquier jugador del once y se colocará donde corresponda.</p>
+            <p className="text-[11px] mt-0.5" style={{ color: "#6b6b72" }}>Cada casilla tiene equipo y posición. Puedes probar cualquier jugador; si encaja, se colocará donde corresponda.</p>
           </div>
 
           <div className="rounded-2xl px-2.5 py-4" style={{ background: "linear-gradient(180deg,#d8f0dc,#b6dfbe)", border: "1px solid rgba(30,107,46,0.18)" }}>
