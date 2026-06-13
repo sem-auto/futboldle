@@ -134,8 +134,8 @@ export default function PerfilPage() {
 
         <section className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
           <div className="font-bebas text-[22px] leading-none mb-2" style={{ color: "#18181b" }}>COLECCIÓN</div>
-          <div className="grid grid-cols-4 gap-2">
-            {(["ICONO", "LEGENDARIO", "CORE", "CULTO"] as const).map(rarity => (
+          <div className="grid grid-cols-5 gap-2">
+            {(["COMUN", "ESPECIAL", "ELITE", "LEYENDA", "SECRETO"] as const).map(rarity => (
               <div key={rarity} className="rounded-lg px-2 py-1.5" style={{ background: "#f8f5f0" }}>
                 <div className="text-[8px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#9a9a8a" }}>{rarity}</div>
                 <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>

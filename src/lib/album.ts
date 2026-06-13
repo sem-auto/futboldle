@@ -5,7 +5,7 @@ import { normalize } from "./normalize";
 const ALBUM_KEY = "fbl-album-unlocked-v1";
 const ALBUM_META_KEY = "fbl-album-meta-v1";
 const FAVORITES_KEY = "fbl-album-favorites-v1";
-export type AlbumRarity = "ICONO" | "LEGENDARIO" | "CORE" | "CULTO";
+export type AlbumRarity = "COMUN" | "ESPECIAL" | "ELITE" | "LEYENDA" | "SECRETO";
 
 const ICON_PLAYERS = new Set([
   "MESSI",
@@ -182,19 +182,20 @@ export function getAlbumProgress() {
 
 export function getPlayerRarity(player: (typeof bbvaPlayers)[number]): AlbumRarity {
   const keys = playerKeys(player);
-  if (keys.some(key => ICON_PLAYERS.has(key))) return "ICONO";
-  if (keys.some(key => LEGENDARY_PLAYERS.has(key))) return "LEGENDARIO";
-  if (keys.some(key => CORE_PLAYERS.has(key))) return "CORE";
-  return "CULTO";
+  if (keys.some(key => ICON_PLAYERS.has(key))) return "SECRETO";
+  if (keys.some(key => LEGENDARY_PLAYERS.has(key))) return "LEYENDA";
+  if (keys.some(key => CORE_PLAYERS.has(key))) return "ELITE";
+  return player.category === "core" ? "ESPECIAL" : "COMUN";
 }
 
 export function getAlbumRarityProgress() {
   const unlockedSet = new Set(getUnlockedPlayers());
   const empty = {
-    ICONO: { unlocked: 0, total: 0 },
-    LEGENDARIO: { unlocked: 0, total: 0 },
-    CORE: { unlocked: 0, total: 0 },
-    CULTO: { unlocked: 0, total: 0 },
+    COMUN: { unlocked: 0, total: 0 },
+    ESPECIAL: { unlocked: 0, total: 0 },
+    ELITE: { unlocked: 0, total: 0 },
+    LEYENDA: { unlocked: 0, total: 0 },
+    SECRETO: { unlocked: 0, total: 0 },
   };
 
   return bbvaPlayers.reduce((acc, player) => {
@@ -206,7 +207,7 @@ export function getAlbumRarityProgress() {
 }
 
 export function compareAlbumPlayers(a: (typeof bbvaPlayers)[number], b: (typeof bbvaPlayers)[number]) {
-  const rank: Record<AlbumRarity, number> = { ICONO: 0, LEGENDARIO: 1, CORE: 2, CULTO: 3 };
+  const rank: Record<AlbumRarity, number> = { SECRETO: 0, LEYENDA: 1, ELITE: 2, ESPECIAL: 3, COMUN: 4 };
   return rank[getPlayerRarity(a)] - rank[getPlayerRarity(b)] ||
     a.displayName.localeCompare(b.displayName, "es");
 }
@@ -267,18 +268,18 @@ export function getAlbumObjectives() {
       percent: item.percent,
     })),
     {
-      id: "iconos",
-      label: "Completa los Iconos",
-      current: rarity.ICONO.unlocked,
-      target: rarity.ICONO.total,
-      percent: rarity.ICONO.total ? Math.round((rarity.ICONO.unlocked / rarity.ICONO.total) * 100) : 0,
+      id: "secretos",
+      label: "Completa los Secretos",
+      current: rarity.SECRETO.unlocked,
+      target: rarity.SECRETO.total,
+      percent: rarity.SECRETO.total ? Math.round((rarity.SECRETO.unlocked / rarity.SECRETO.total) * 100) : 0,
     },
     {
-      id: "legendarios",
-      label: "Completa los Legendarios",
-      current: rarity.LEGENDARIO.unlocked,
-      target: rarity.LEGENDARIO.total,
-      percent: rarity.LEGENDARIO.total ? Math.round((rarity.LEGENDARIO.unlocked / rarity.LEGENDARIO.total) * 100) : 0,
+      id: "leyendas",
+      label: "Completa las Leyendas",
+      current: rarity.LEYENDA.unlocked,
+      target: rarity.LEYENDA.total,
+      percent: rarity.LEYENDA.total ? Math.round((rarity.LEYENDA.unlocked / rarity.LEYENDA.total) * 100) : 0,
     },
     {
       id: "50-cromos",
@@ -335,11 +336,11 @@ export const TROPHY_DEFINITIONS = [
     label: `Coleccionista ${club.replace("Atlético de Madrid", "Atlético").replace("Athletic Club", "Athletic")}`,
     club,
   })),
-  { id: "legendary-50", category: "LEYENDAS", label: "50% legendarios" },
-  { id: "legendary-all", category: "LEYENDAS", label: "Todos los legendarios" },
-  { id: "icon-first", category: "ICONOS", label: "Primer icono" },
-  { id: "icon-5", category: "ICONOS", label: "5 iconos" },
-  { id: "icon-all", category: "ICONOS", label: "Todos los iconos" },
+  { id: "legendary-50", category: "LEYENDAS", label: "50% Leyendas" },
+  { id: "legendary-all", category: "LEYENDAS", label: "Todas las Leyendas" },
+  { id: "icon-first", category: "SECRETOS", label: "Primer Secreto" },
+  { id: "icon-5", category: "SECRETOS", label: "5 Secretos" },
+  { id: "icon-all", category: "SECRETOS", label: "Todos los Secretos" },
   { id: "collection-25", category: "COLECCIÓN", label: "25 cromos" },
   { id: "collection-50", category: "COLECCIÓN", label: "50 cromos" },
   { id: "collection-100", category: "COLECCIÓN", label: "100 cromos" },
@@ -403,11 +404,11 @@ export function syncTrophies() {
         if (clubProgress.total > 0 && clubProgress.unlocked === clubProgress.total) earned.add(trophy.id);
       }
     }
-    if (rarity.LEGENDARIO.total > 0 && rarity.LEGENDARIO.unlocked / rarity.LEGENDARIO.total >= 0.5) earned.add("legendary-50");
-    if (rarity.LEGENDARIO.total > 0 && rarity.LEGENDARIO.unlocked === rarity.LEGENDARIO.total) earned.add("legendary-all");
-    if (rarity.ICONO.unlocked >= 1) earned.add("icon-first");
-    if (rarity.ICONO.unlocked >= 5) earned.add("icon-5");
-    if (rarity.ICONO.total > 0 && rarity.ICONO.unlocked === rarity.ICONO.total) earned.add("icon-all");
+    if (rarity.LEYENDA.total > 0 && rarity.LEYENDA.unlocked / rarity.LEYENDA.total >= 0.5) earned.add("legendary-50");
+    if (rarity.LEYENDA.total > 0 && rarity.LEYENDA.unlocked === rarity.LEYENDA.total) earned.add("legendary-all");
+    if (rarity.SECRETO.unlocked >= 1) earned.add("icon-first");
+    if (rarity.SECRETO.unlocked >= 5) earned.add("icon-5");
+    if (rarity.SECRETO.total > 0 && rarity.SECRETO.unlocked === rarity.SECRETO.total) earned.add("icon-all");
     if (progress.unlockedCount >= 25) earned.add("collection-25");
     if (progress.unlockedCount >= 50) earned.add("collection-50");
     if (progress.unlockedCount >= 100) earned.add("collection-100");

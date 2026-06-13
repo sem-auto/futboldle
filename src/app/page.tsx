@@ -468,14 +468,17 @@ function dailyShareSquare(done: boolean, won: boolean) {
   return won ? "\ud83d\udfe9" : "\ud83d\udfe5";
 }
 
-function ProfileCompact({ played, won, streak, albumProgress, onAlbum }: {
+function ProfileCompact({ played, won, streak, bestStreak, albumProgress, onAlbum }: {
   played: number;
   won: number;
   streak: number;
+  bestStreak: number;
   albumProgress: { unlockedCount: number; total: number; percent: number };
   onAlbum: () => void;
 }) {
   const winPct = played > 0 ? Math.round((won / played) * 100) : 0;
+  const nextMilestone = [7, 30, 50, 100].find(day => streak < day) ?? 100;
+  const streakProgress = Math.min(100, Math.round((streak / nextMilestone) * 100));
 
   return (
     <div className="grid grid-cols-4 gap-2 rounded-xl px-3 py-2"
@@ -493,7 +496,7 @@ function ProfileCompact({ played, won, streak, albumProgress, onAlbum }: {
       <div>
         <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Racha</div>
         <div className="font-bebas text-[18px] leading-none" style={{ color: "#c8920a" }}>{streak}</div>
-        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>actual</div>
+        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>mejor {bestStreak}</div>
       </div>
       <button onClick={onAlbum} className="text-left rounded-lg px-2 py-1 transition-colors"
         style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.20)" }}>
@@ -507,6 +510,15 @@ function ProfileCompact({ played, won, streak, albumProgress, onAlbum }: {
         <a href="/perfil" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Perfil</a>
         <a href="/tops" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Tops</a>
         <a href="/vitrina" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Vitrina</a>
+      </div>
+      <div className="col-span-4 rounded-lg px-2 py-1.5" style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.16)" }}>
+        <div className="flex items-center justify-between text-[9px] font-semibold mb-1" style={{ color: "#8a6200" }}>
+          <span>Próximo hito de racha</span>
+          <span>{streak}/{nextMilestone} días</span>
+        </div>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#efe4c9" }}>
+          <div className="h-full rounded-full" style={{ width: `${streakProgress}%`, background: "#c8920a" }} />
+        </div>
       </div>
     </div>
   );
@@ -791,6 +803,7 @@ export default function HomePage() {
             played={stats.played}
             won={stats.won}
             streak={stats.streak}
+            bestStreak={stats.bestStreak}
             albumProgress={albumProgress}
             onAlbum={() => setView("album")}
           />

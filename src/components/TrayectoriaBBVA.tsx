@@ -8,6 +8,7 @@ import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { shareResult } from "@/lib/share";
 import { CAREER_AUDIT } from "@/data/trayectoriaAudit";
+import { getCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX = 5;
 const STORE_KEY = () => `fbl-tray-v2-${getDayKey()}`;
@@ -61,7 +62,7 @@ function getClues(player: Player, attempt: number) {
   return [
     { label: "Club inicial",          value: first,               shown: attempt >= 0 },
     { label: "Club final",            value: last,                shown: attempt >= 1 },
-    { label: "Clubes intermedios",    value: middle ?? "—",       shown: attempt >= 2 && !!middle },
+    { label: "Clubes intermedios",    value: middle ?? "—",      shown: attempt >= 2 && !!middle },
     { label: "Posición",              value: player.position,     shown: attempt >= 3 },
     { label: "Nacionalidad",          value: player.nationality,  shown: attempt >= 4 },
   ].filter(c => !(c.label === "Clubes intermedios" && !middle));
@@ -153,6 +154,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   const clues = getAuditedCluesV2(player, attempt);
   const canonicalCareer = CAREER_AUDIT[player.id]?.clubs ?? player.clubs;
   const visibleCareer = canonicalCareer;
+  const community = getCommunityDifficulty("trayectoria", `${getDayKey()}-${player.id}`);
 
   async function share() {
     const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
@@ -189,6 +191,21 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
               style={{ background: i < attempt ? "rgba(255,255,255,0.40)" : i === attempt && !gameOver ? "white" : "rgba(255,255,255,0.15)" }} />
           ))}
           <span className="text-white/50 text-[9px] font-semibold ml-1">{gameOver ? "—" : `${MAX - attempt} intentos`}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-1.5 rounded-xl px-3 py-2" style={{ background: "white", border: "1px solid rgba(30,107,46,0.14)" }}>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Dificultad</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{community.label}</div>
+        </div>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Aciertan</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#1e6b2e" }}>{community.completion}%</div>
+        </div>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Media</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#c8920a" }}>{community.attempts} intentos</div>
         </div>
       </div>
 

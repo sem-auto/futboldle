@@ -9,6 +9,7 @@ import { recordGameCompletion, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { shareResult } from "@/lib/share";
+import { getCommunityDifficulty } from "@/lib/communityStats";
 
 function norm(s: string) {
   return s.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, "");
@@ -191,6 +192,7 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
   const wrongCount = allGuesses.length - guessedAnswers.length;
   const pct = Math.round((guessedAnswers.length / challenge.answers.length) * 100);
   const done = finished;
+  const community = getCommunityDifficulty("top10", challenge.id);
   const wrongFlashPlayer = wrongFlash ? bbvaPlayers.find(p => norm(p.displayName) === norm(wrongFlash) || norm(p.fullName) === norm(wrongFlash)) : null;
 
   // Which hints are visible for "current unsolved item"
@@ -260,6 +262,16 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
           <p className="text-white/70 text-[11px] mb-1">{challenge.subtitle}</p>
           <p className="text-white/90 text-[12px] font-semibold">{challenge.consigna}</p>
           <p className="text-white/55 text-[10px] mt-2">Fuente: {sourceLabel(challenge)}</p>
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            <div className="rounded-lg px-2 py-1.5" style={{ background: "rgba(255,255,255,0.14)" }}>
+              <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-white/60">Dificultad</div>
+              <div className="font-oswald font-semibold text-[12px] text-white">{community.label}</div>
+            </div>
+            <div className="rounded-lg px-2 py-1.5" style={{ background: "rgba(255,255,255,0.14)" }}>
+              <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-white/60">Lo completan</div>
+              <div className="font-oswald font-semibold text-[12px] text-white">Solo el {community.completion}%</div>
+            </div>
+          </div>
         </div>
         <div className="px-5 pb-3">
           <div className="flex items-center justify-between mb-1">

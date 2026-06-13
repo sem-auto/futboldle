@@ -39,10 +39,11 @@ function clubBadge(clubName: string) {
 }
 
 function rarityStyle(rarity: AlbumRarity) {
-  if (rarity === "ICONO") return { label: "ICONO", stars: "★★★★", bar: "#18181b", bg: "#fff8e6", color: "#111" };
-  if (rarity === "LEGENDARIO") return { label: "LEGENDARIO", stars: "★★★", bar: "#c8920a", bg: "#fffbf0", color: "#8a6200" };
-  if (rarity === "CORE") return { label: "CORE", stars: "★★", bar: "#1e6b2e", bg: "#f0faf2", color: "#1e6b2e" };
-  return { label: "CULTO", stars: "★", bar: "#7c3aed", bg: "#f5f0ff", color: "#6d28d9" };
+  if (rarity === "SECRETO") return { label: "SECRETO", stars: "★★★★★", bar: "#18181b", bg: "#fff8e6", color: "#111" };
+  if (rarity === "LEYENDA") return { label: "LEYENDA", stars: "★★★★", bar: "#c8920a", bg: "#fffbf0", color: "#8a6200" };
+  if (rarity === "ELITE") return { label: "ÉLITE", stars: "★★★", bar: "#1e6b2e", bg: "#f0faf2", color: "#1e6b2e" };
+  if (rarity === "ESPECIAL") return { label: "ESPECIAL", stars: "★★", bar: "#1a4fa0", bg: "#eff4ff", color: "#1a4fa0" };
+  return { label: "COMÚN", stars: "★", bar: "#7c3aed", bg: "#f5f0ff", color: "#6d28d9" };
 }
 
 function cardSurface(isUnlocked: boolean, rarity: AlbumRarity) {
@@ -54,7 +55,7 @@ function cardSurface(isUnlocked: boolean, rarity: AlbumRarity) {
       boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
     };
   }
-  const glow = rarity === "ICONO" ? "rgba(24,24,27,0.20)" : rarity === "LEGENDARIO" ? "rgba(200,146,10,0.28)" : `${style.bar}20`;
+  const glow = rarity === "SECRETO" ? "rgba(24,24,27,0.20)" : rarity === "LEYENDA" ? "rgba(200,146,10,0.28)" : `${style.bar}20`;
   return {
     background: `linear-gradient(145deg, ${style.bg} 0%, #fffdf7 48%, ${style.bg} 100%)`,
     border: `2px solid ${style.bar}`,
@@ -119,6 +120,8 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
   const albumProgress = getAlbumProgress();
   const collectorLevel = getCollectorLevel(albumProgress.unlockedCount);
   const rarityProgress = getAlbumRarityProgress();
+  const remainingCards = Math.max(0, albumProgress.total - albumProgress.unlockedCount);
+  const cardsToNextReward = Math.max(0, collectorLevel.nextTarget - albumProgress.unlockedCount);
   const clubProgress = getFeaturedClubProgress(["Valencia", "Atlético de Madrid", "Sevilla", "Barcelona", "Villarreal"]);
   const allClubProgress = clubs.filter(item => item !== "Todos").map(getClubProgress).filter(item => item.total > 0);
   const objectives = getAlbumObjectives();
@@ -150,8 +153,11 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
           <p className="text-white/80 text-[12px] mt-1">
             {albumProgress.unlockedCount} / {albumProgress.total} jugadores desbloqueados · {albumProgress.percent}%
           </p>
-          <div className="grid grid-cols-4 gap-2 mt-3">
-            {(["ICONO", "LEGENDARIO", "CORE", "CULTO"] as const).map(rarity => (
+          <p className="text-white/85 text-[11px] mt-1">
+            Te faltan {remainingCards} cromos para completar la colección.
+          </p>
+          <div className="grid grid-cols-5 gap-1.5 mt-3">
+            {(["COMUN", "ESPECIAL", "ELITE", "LEYENDA", "SECRETO"] as const).map(rarity => (
               <div key={rarity} className="rounded-lg px-2 py-1.5" style={{ background: "rgba(255,255,255,0.16)" }}>
                 <div className="text-[8px] font-semibold uppercase tracking-[0.12em] text-white/75">{rarity}</div>
                 <div className="font-bebas text-[17px] leading-none text-white">
@@ -167,6 +173,9 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
             </div>
             <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.22)" }}>
               <div className="h-full rounded-full" style={{ width: `${collectorLevel.percent}%`, background: "white" }} />
+            </div>
+            <div className="text-[10px] text-white/85 mt-1">
+              {cardsToNextReward <= 1 ? "Te falta 1 cromo para desbloquear una recompensa." : `Te faltan ${cardsToNextReward} cromos para desbloquear una recompensa.`}
             </div>
           </div>
         </div>
@@ -230,7 +239,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bebas" style={{ background: "#18181b", color: "white" }}>{clubBadge(item.club)}</span>
                   <span className="font-oswald font-semibold text-[12px] flex-1" style={{ color: "#18181b" }}>{item.club}</span>
-                  <span className="text-[10px] font-semibold" style={{ color: "#9a9a8a" }}>{item.unlocked}/{item.total} ? {item.percent}%</span>
+                  <span className="text-[10px] font-semibold" style={{ color: "#9a9a8a" }}>{item.unlocked}/{item.total} · {item.percent}%</span>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#ece8e0" }}>
                   <div className="h-full rounded-full" style={{ width: `${item.percent}%`, background: "#c8920a" }} />
@@ -310,7 +319,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                   </>
                 ) : (
                   <div className="flex flex-col gap-1 text-[11px] font-semibold" style={{ color: "#9a9a8a" }}>
-                    <span>Pista mínima: {player.position}</span>
+                    <span>?????</span>
                   </div>
                 )}
               </button>

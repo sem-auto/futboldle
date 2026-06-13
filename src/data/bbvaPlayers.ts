@@ -337,6 +337,16 @@ const WORDLE_DAILY_RECOGNIZABLE_NAMES = new Set([
   "Jesús Navas",
   "Rubén Castro",
   "Diego Costa",
+  "David Villa",
+  "David Silva",
+  "Juan Mata",
+  "Santi Cazorla",
+  "Joaquín",
+  "Valerón",
+  "Aritz Aduriz",
+  "Falcao",
+  "Diego Forlán",
+  "Frédéric Kanouté",
 ]);
 
 const WORDLE_DAILY_EXCLUDED_ANSWERS = new Set([

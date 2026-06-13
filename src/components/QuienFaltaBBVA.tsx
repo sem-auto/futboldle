@@ -109,7 +109,7 @@ export default function QuienFaltaBBVA({ onBack }: { onBack: () => void }) {
             {item.names.map(name => (
               <div key={name} className="rounded-xl px-3 py-3 text-center font-oswald font-semibold text-[13px]" style={{ background: "#f6f2ff", border: "1px solid rgba(124,58,237,0.14)", color: "#7c3aed" }}>{name}</div>
             ))}
-            <div className="rounded-xl px-3 py-3 text-center font-oswald font-semibold text-[13px]" style={{ background: "#f8f5f0", border: "1px dashed rgba(0,0,0,0.18)", color: "#9a9a8a" }}>????</div>
+            <div className="rounded-xl px-3 py-3 text-center font-oswald font-semibold text-[13px]" style={{ background: "#f8f5f0", border: "1px dashed rgba(0,0,0,0.18)", color: "#9a9a8a" }}>?</div>
           </div>
 
           {!done ? (

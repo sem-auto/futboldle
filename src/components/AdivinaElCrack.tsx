@@ -7,6 +7,7 @@ import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { shareResult } from "@/lib/share";
+import { getCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX = 5;
 const STORE_KEY = () => `fbl-crack-${getDayKey()}`;
@@ -132,6 +133,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
     revealed: h.revealed || (gameOver && i <= 4),
   }));
   const revealedCount = visibleHints.filter(h => h.revealed).length;
+  const community = getCommunityDifficulty("crack", `${getDayKey()}-${player.id}`);
 
   async function share() {
     const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
@@ -177,6 +179,21 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
+      <div className="grid grid-cols-3 gap-1.5 rounded-xl px-3 py-2" style={{ background: "white", border: "1px solid rgba(124,58,237,0.14)" }}>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Dificultad</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{community.label}</div>
+        </div>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Aciertan</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#1e6b2e" }}>{community.completion}%</div>
+        </div>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Media</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#7c3aed" }}>{community.attempts} intentos</div>
+        </div>
+      </div>
+
       {/* Cromo visual */}
       <div className="rounded-2xl p-3 flex items-center gap-3"
         style={{ background: "linear-gradient(135deg,#18181b 0%,#2b2142 100%)", border: `1px solid ${PURPLE_BD}`, boxShadow: "0 6px 22px rgba(0,0,0,0.10)" }}>
@@ -192,7 +209,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
               <span className="font-bebas text-[24px]">{gameOver ? player.displayName.slice(0, 1).toUpperCase() : "?"}</span>
             </div>
             <div className="font-bebas text-[18px] leading-none break-words" style={{ color: gameOver ? "#18181b" : "white" }}>
-              {gameOver ? player.displayName.toUpperCase() : "?????"}
+              {gameOver ? player.displayName.toUpperCase() : "?"}
             </div>
           </div>
         </div>

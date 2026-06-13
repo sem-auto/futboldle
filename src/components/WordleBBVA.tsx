@@ -8,6 +8,7 @@ import { loadGameCounts, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import { useStats } from "@/lib/useStats";
 import { shareResult } from "@/lib/share";
+import { getCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX = 6;
 const KB  = [
@@ -56,7 +57,7 @@ function keyState(key:string, rows:Row[]):"correct"|"partial"|"wrong"|"idle" {
   for(const g of rows){
     if(!g.submitted) continue;
     g.letters.forEach((l,i)=>{
-      if(l===key&&(p[g.states[i]]??0)>(p[best]??0)) best=g.states[i] as "correct"|"partial"|"wrong";
+      if(l===key&&((p[g.states[i]] ?? 0)>(p[best] ?? 0))) best=g.states[i] as "correct"|"partial"|"wrong";
     });
   }
   return best;
@@ -276,7 +277,7 @@ export default function WordleBBVA({onBack}:Props) {
     const newExtraIdx = dayState.extras.length+1;
     setMode("extra"); setExtraIdx(newExtraIdx);
     const p=getExtraPlayer(newExtraIdx);
-    const existing=dayState.extras[newExtraIdx-1]??null;
+    const existing=dayState.extras[newExtraIdx-1] ?? null;
     setShowResult(false);
     startGame(p, existing);
   }
@@ -308,6 +309,7 @@ export default function WordleBBVA({onBack}:Props) {
   const modeLabel = mode==="daily"
     ? `RETO DEL DÍA · #${getDayNumber()}`
     : `EXTRA #${extraIdx}`;
+  const community = getCommunityDifficulty("wordle", `${getDayKey()}-${player.id}`);
 
   // Is daily already completed (loaded from storage)?
   const dailyDone = !!dayState?.daily;
@@ -338,6 +340,21 @@ export default function WordleBBVA({onBack}:Props) {
           Adivina el apellido de un{" "}
           <span className="font-oswald font-semibold" style={{color:"var(--gold)"}}>Hombre BBVA</span>
         </p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-1.5 rounded-xl px-3 py-2" style={{ background: "white", border: "1px solid var(--b2)" }}>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Dificultad</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{community.label}</div>
+        </div>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Completan</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#1e6b2e" }}>{community.completion}%</div>
+        </div>
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Media</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "var(--gold)" }}>{community.attempts} intentos</div>
+        </div>
       </div>
 
       {showHint && !gameOver && (
@@ -518,7 +535,7 @@ export default function WordleBBVA({onBack}:Props) {
               onMouseEnter={e=>{ (e.currentTarget as HTMLElement).style.borderColor="var(--b-gold)"; (e.currentTarget as HTMLElement).style.color="#18181b"; }}
               onMouseLeave={e=>{ (e.currentTarget as HTMLElement).style.borderColor=""; (e.currentTarget as HTMLElement).style.color=""; }}>
               {mode==="daily"
-                ? `JUGAR EXTRA #${(dayState?.extras.length??0)+1} →`
+                ? `JUGAR EXTRA #${(dayState?.extras.length ?? 0)+1} →`
                 : `JUGAR EXTRA #${extraIdx+1} →`}
             </button>
           </div>
