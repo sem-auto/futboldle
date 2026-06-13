@@ -16,6 +16,7 @@ import { getDayNumber, getDayKey } from "@/lib/daily";
 import { useStats } from "@/lib/useStats";
 import { getAlbumProgress } from "@/lib/album";
 import { shareResult } from "@/lib/share";
+import { getCommunityDifficulty } from "@/lib/communityStats";
 
 type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
 
@@ -155,7 +156,17 @@ function GamePill({ done, won }: { done: boolean; won?: boolean }) {
 }
 
 /* ─── WORDLE card ─── */
-function WordleCard({ onClick, done, won, extras }: { onClick: () => void; done: boolean; won: boolean; extras: number }) {
+function DifficultyLine({ label, completion, color }: { label: string; completion: number; color: string }) {
+  return (
+    <div className="mt-2 flex items-center justify-between gap-2 text-[9px] font-semibold">
+      <span className="px-2 py-0.5 rounded-full" style={{ background: `${color}12`, color }}>{label}</span>
+      <span style={{ color: "#9a9a8a" }}>{completion}% lo completan</span>
+    </div>
+  );
+}
+
+/* ─── WORDLE card ─── */
+function WordleCard({ onClick, done, won, extras, difficulty }: { onClick: () => void; done: boolean; won: boolean; extras: number; difficulty: { label: string; completion: number } }) {
   // Mini wordle board: 3 rows x 6 cols
   const board = [
     [{l:"F",s:"ok"},{l:"A",s:"no"},{l:"L",s:"amb"},{l:"C",s:"no"},{l:"A",s:"no"},{l:"O",s:"ok"}],
@@ -233,13 +244,14 @@ function WordleCard({ onClick, done, won, extras }: { onClick: () => void; done:
         <div className="font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#c8920a" }}>
           {done ? (extras > 0 ? `Extra #${extras + 1} →` : "Ver extras →") : "JUGAR →"}
         </div>
+        <DifficultyLine label={difficulty.label} completion={difficulty.completion} color="#c8920a" />
       </div>
     </button>
   );
 }
 
 /* ─── TRAYECTORIA card ─── */
-function TrayCard({ onClick, done, won }: { onClick: () => void; done: boolean; won: boolean }) {
+function TrayCard({ onClick, done, won, difficulty }: { onClick: () => void; done: boolean; won: boolean; difficulty: { label: string; completion: number } }) {
   return (
     <button onClick={onClick}
       className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
@@ -286,6 +298,7 @@ function TrayCard({ onClick, done, won }: { onClick: () => void; done: boolean; 
         <div className="font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#1e6b2e" }}>
           {done ? "Ver resultado →" : "JUGAR →"}
         </div>
+        <DifficultyLine label={difficulty.label} completion={difficulty.completion} color="#1e6b2e" />
       </div>
     </button>
   );
@@ -479,32 +492,50 @@ function ProfileCompact({ played, won, streak, bestStreak, albumProgress, onAlbu
   const winPct = played > 0 ? Math.round((won / played) * 100) : 0;
   const nextMilestone = [7, 30, 50, 100].find(day => streak < day) ?? 100;
   const streakProgress = Math.min(100, Math.round((streak / nextMilestone) * 100));
+  const remainingCards = Math.max(0, albumProgress.total - albumProgress.unlockedCount);
+  const nextRewardAt = [10, 25, 50, 100, 150, 200, albumProgress.total].find(goal => albumProgress.unlockedCount < goal) ?? albumProgress.total;
+  const cardsToReward = Math.max(0, nextRewardAt - albumProgress.unlockedCount);
 
   return (
-    <div className="grid grid-cols-4 gap-2 rounded-xl px-3 py-2"
+    <div className="grid grid-cols-4 gap-2 rounded-xl px-3 py-3"
       style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
-      <div>
+      <button onClick={onAlbum} className="col-span-4 text-left rounded-xl px-3 py-3 transition-colors"
+        style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.24)" }}>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Álbum BBVA</div>
+            <div className="font-bebas text-[34px] leading-none mt-1" style={{ color: "#18181b" }}>
+              {albumProgress.unlockedCount}/{albumProgress.total}
+            </div>
+            <div className="text-[10px] font-semibold mt-0.5" style={{ color: "#8a6200" }}>{albumProgress.percent}% completado</div>
+          </div>
+          <div className="text-right text-[10px] font-semibold leading-snug max-w-[150px]" style={{ color: "#6b6b72" }}>
+            Te faltan {remainingCards} cromos para completar la colección.
+          </div>
+        </div>
+        <div className="h-2 rounded-full overflow-hidden mt-3" style={{ background: "#efe4c9" }}>
+          <div className="h-full rounded-full" style={{ width: `${albumProgress.percent}%`, background: "linear-gradient(90deg,#c8920a,#fac840)" }} />
+        </div>
+      </button>
+      <div className="rounded-lg px-2 py-1.5" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.05)" }}>
         <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Partidas</div>
         <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>{played}</div>
         <div className="text-[9px]" style={{ color: "#9a9a8a" }}>jugadas</div>
       </div>
-      <div>
+      <div className="rounded-lg px-2 py-1.5" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.05)" }}>
         <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Victorias</div>
         <div className="font-bebas text-[18px] leading-none" style={{ color: "#1e6b2e" }}>{winPct}%</div>
         <div className="text-[9px]" style={{ color: "#9a9a8a" }}>{won}/{played}</div>
       </div>
-      <div>
-        <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Racha</div>
+      <div className="rounded-lg px-2 py-1.5" style={{ background: "#fff8e6", border: "1px solid rgba(200,146,10,0.16)" }}>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#c8920a" }}>Racha</div>
         <div className="font-bebas text-[18px] leading-none" style={{ color: "#c8920a" }}>{streak}</div>
         <div className="text-[9px]" style={{ color: "#9a9a8a" }}>mejor {bestStreak}</div>
       </div>
-      <button onClick={onAlbum} className="text-left rounded-lg px-2 py-1 transition-colors"
-        style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.20)" }}>
-        <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#c8920a" }}>Album</div>
-        <div className="font-bebas text-[18px] leading-none" style={{ color: "#18181b" }}>
-          {albumProgress.unlockedCount}/{albumProgress.total}
-        </div>
-        <div className="text-[9px]" style={{ color: "#9a9a8a" }}>{albumProgress.percent}%</div>
+      <button onClick={onAlbum} className="rounded-lg px-2 py-1.5 text-left"
+        style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.05)" }}>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#bbb" }}>Acceso</div>
+        <div className="font-oswald font-semibold uppercase tracking-wider text-[10px] mt-1" style={{ color: "#c8920a" }}>Ver álbum →</div>
       </button>
       <div className="col-span-4 flex gap-2 pt-1">
         <a href="/perfil" className="text-[10px] font-semibold px-2 py-1 rounded-lg" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Perfil</a>
@@ -520,6 +551,17 @@ function ProfileCompact({ played, won, streak, bestStreak, albumProgress, onAlbu
           <div className="h-full rounded-full" style={{ width: `${streakProgress}%`, background: "#c8920a" }} />
         </div>
       </div>
+      <div className="col-span-4 rounded-lg px-2 py-2" style={{ background: "#f0faf2", border: "1px solid rgba(30,107,46,0.14)" }}>
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <div className="text-[8px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#1e6b2e" }}>Próxima recompensa</div>
+            <div className="text-[11px] font-semibold" style={{ color: "#18181b" }}>
+              {cardsToReward === 1 ? "🎁 Próximo cromo especial en 1 cromo" : `🎁 Próximo cromo especial en ${cardsToReward} cromos`}
+            </div>
+          </div>
+          <div className="text-[20px]">🎴</div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -531,6 +573,10 @@ export default function HomePage() {
   const { stats, refresh } = useStats();
   const goHome = () => setView("home");
   const hasShareableResult = wordleDone || trayDone || top10Done || crackDone;
+  const wordleDifficulty = getCommunityDifficulty("wordle", `${getDayKey()}-home`);
+  const trayDifficulty = getCommunityDifficulty("trayectoria", `${getDayKey()}-home`);
+  const top10Difficulty = getCommunityDifficulty("top10", `${getDayKey()}-home`);
+  const crackDifficulty = getCommunityDifficulty("crack", `${getDayKey()}-home`);
 
   useEffect(() => {
     setAlbumProgress(getAlbumProgress());
@@ -547,8 +593,10 @@ export default function HomePage() {
       }
     } catch {}
     const completedCount = [wordleDone && wordleWon, trayDone && trayWon, top10Done && top10Won, crackDone && crackWon].filter(Boolean).length;
+    const failedCount = [wordleDone && !wordleWon, trayDone && !trayWon, top10Done && !top10Won, crackDone && !crackWon].filter(Boolean).length;
     const lines = [
       "\u26bd Futboldle #" + getDayNumber(),
+      "Minijuegos diarios de fútbol nostalgia",
       "Liga BBVA 2005-2016",
       "",
       dailyShareSquare(wordleDone, wordleWon) + " Wordle BBVA",
@@ -557,9 +605,11 @@ export default function HomePage() {
       dailyShareSquare(crackDone, crackWon) + " Cromo oculto",
       "",
       "🔥 Hoy: " + completedCount + "/4 retos",
+      failedCount > 0 ? "💥 Fallados: " + failedCount : "✅ Sin fallos",
       "\ud83c\udfb4 " + albumProgress.unlockedCount + "/" + albumProgress.total + " cromos" + lastCard,
       "\ud83d\udd25 Racha: " + stats.streak,
       "",
+      "Reta a tu grupo:",
       "https://futboldle.es",
     ];
     const text = lines.join("\\n");
@@ -702,6 +752,30 @@ export default function HomePage() {
           </button>
         </div>
 
+        <section className="flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Colección</div>
+              <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>TU PROGRESO</h3>
+            </div>
+            <button onClick={() => setView("album")} className="text-[10px] font-semibold px-2.5 py-1 rounded-lg"
+              style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.18)", color: "#c8920a" }}>
+              Ver álbum
+            </button>
+          </div>
+          <ProfileCompact
+            played={stats.played}
+            won={stats.won}
+            streak={stats.streak}
+            bestStreak={stats.bestStreak}
+            albumProgress={albumProgress}
+            onAlbum={() => setView("album")}
+          />
+          <div className="text-center text-[10px]" style={{ color: "#9a9a8a" }}>
+            Tu progreso se guarda en este navegador.
+          </div>
+        </section>
+
         {/* Barra de progreso diaria */}
         <DailyProgress wordleDone={wordleDone} wordleWon={wordleWon} trayDone={trayDone} trayWon={trayWon} top10Done={top10Done} top10Won={top10Won} crackDone={crackDone} crackWon={crackWon} streak={stats.streak} />
 
@@ -722,8 +796,8 @@ export default function HomePage() {
 
         {/* ── FILA 1: Wordle + Trayectoria (igual importancia) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3">
-          <WordleCard onClick={() => setView("wordle")} done={wordleDone} won={wordleWon} extras={extras} />
-          <TrayCard onClick={() => setView("trayectoria")} done={trayDone} won={trayWon} />
+          <WordleCard onClick={() => setView("wordle")} done={wordleDone} won={wordleWon} extras={extras} difficulty={wordleDifficulty} />
+          <TrayCard onClick={() => setView("trayectoria")} done={trayDone} won={trayWon} difficulty={trayDifficulty} />
         </div>
 
         {/* ── FILA 2: Top 10 + Cromo oculto ── */}
@@ -746,6 +820,7 @@ export default function HomePage() {
               <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>TOP 10 BBVA</div>
               <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Completa las listas históricas</div>
               <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#1a4fa0" }}>{top10Done ? "VER RESULTADO →" : "JUGAR →"}</div>
+              <DifficultyLine label={top10Difficulty.label} completion={top10Difficulty.completion} color="#1a4fa0" />
             </div>
           </button>
           {/* CROMO OCULTO */}
@@ -766,6 +841,7 @@ export default function HomePage() {
               <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>CROMO OCULTO</div>
               <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Revela el jugador por pistas</div>
               <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#7c3aed" }}>{crackDone ? "VER RESULTADO →" : "JUGAR →"}</div>
+              <DifficultyLine label={crackDifficulty.label} completion={crackDifficulty.completion} color="#7c3aed" />
             </div>
           </button>
         </div>
@@ -785,30 +861,6 @@ export default function HomePage() {
             <QuickGameCard title="CLUB OCULTO" subtitle="Adivina el equipo por sus cromos." emoji="🏟️" accent="#1a4fa0" onClick={() => setView("clubOculto")} />
             <QuickGameCard title="ONCE BBVA" subtitle="Rellena una plantilla de época." emoji="👕" accent="#b81c14" onClick={() => setView("once")} />
             <QuickGameCard title="¿QUIÉN FALTA?" subtitle="Reconstruye la memoria del equipo." emoji="❔" accent="#7c3aed" onClick={() => setView("quienFalta")} />
-          </div>
-        </section>
-
-        <section className="flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Colección</div>
-              <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>TU PROGRESO</h3>
-            </div>
-            <button onClick={() => setView("album")} className="text-[10px] font-semibold px-2.5 py-1 rounded-lg"
-              style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.18)", color: "#c8920a" }}>
-              Ver álbum
-            </button>
-          </div>
-          <ProfileCompact
-            played={stats.played}
-            won={stats.won}
-            streak={stats.streak}
-            bestStreak={stats.bestStreak}
-            albumProgress={albumProgress}
-            onAlbum={() => setView("album")}
-          />
-          <div className="text-center text-[10px]" style={{ color: "#9a9a8a" }}>
-            Tu progreso se guarda en este navegador.
           </div>
         </section>
 

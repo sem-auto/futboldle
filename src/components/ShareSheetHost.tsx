@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { FUTBOLDLE_URL, normalizeShareText, SharePayload } from "@/lib/share";
@@ -103,3 +103,4 @@ export default function ShareSheetHost() {
     </div>
   );
 }
+
