@@ -6,7 +6,7 @@ import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
-import { shareResult } from "@/lib/share";
+import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { CAREER_AUDIT } from "@/data/trayectoriaAudit";
 import { getCommunityDifficulty } from "@/lib/communityStats";
 
@@ -157,9 +157,21 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   const community = getCommunityDifficulty("trayectoria", `${getDayKey()}-${player.id}`);
 
   async function share() {
-    const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
-    const txt = `⚽ Futboldle\n🟩 Trayectoria BBVA #${getDayNumber()}\n${score}\n\nhttps://futboldle.es`;
-    shareResult(txt, () => { setCopied(true); setTimeout(() => setCopied(false), 2500); });
+    const marks = Array.from({ length: MAX }, (_, index) => {
+      if (won && index === guesses.length - 1) return "🟩";
+      if (index < guesses.length) return "🟨";
+      return "⬛";
+    }).join("");
+    const txt = buildProgressiveShare("Trayectoria BBVA", marks, guesses.length, won, "intentos");
+    shareGameResult(txt, {
+      modeId: "trayectoria-bbva",
+      challengeId: `${getDayKey()}-${player.id}`,
+      seasonId: "bbva",
+      won,
+      attempts: guesses.length,
+      title: "Trayectoria BBVA",
+      onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 2500); },
+    });
   }
 
   if (!loaded) return (

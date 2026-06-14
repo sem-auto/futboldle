@@ -3,13 +3,14 @@ import Script from "next/script";
 import { Suspense } from "react";
 import GoogleAnalyticsPageView from "@/components/GoogleAnalyticsPageView";
 import ShareSheetHost from "@/components/ShareSheetHost";
+import AchievementToast from "@/components/AchievementToast";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = "G-Q4DBT40EYL";
 const SITE_URL = "https://futboldle.es";
 const SITE_TITLE = "Futboldle ⚽";
-const SITE_DESCRIPTION =
-  "Minijuegos diarios de fútbol nostalgia para enfermos de la Liga BBVA: Wordle fútbol, Top10, trayectorias, cromos y Hombres BBVA.";
+const SITE_DESCRIPTION = "Minijuegos diarios para enfermos de la Liga BBVA.";
+const SOCIAL_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -22,7 +23,7 @@ const jsonLd = {
   inLanguage: "es",
   description: SITE_DESCRIPTION,
   genre: ["Fútbol", "Trivia", "Word game", "Nostalgia deportiva"],
-  image: `${SITE_URL}/icon.png`,
+  image: SOCIAL_IMAGE_URL,
   offers: {
     "@type": "Offer",
     price: "0",
@@ -40,6 +41,7 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: "Futboldle",
+  manifest: "/manifest.webmanifest",
   authors: [{ name: "Futboldle" }],
   creator: "Futboldle",
   publisher: "Futboldle",
@@ -109,24 +111,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: `${SITE_URL}/icon.png`,
-        width: 512,
-        height: 512,
-        alt: "Futboldle - minijuegos diarios de fútbol nostalgia",
-      },
-      {
-        url: `${SITE_URL}/og-image.png`,
+        url: SOCIAL_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: "Futboldle - Liga BBVA y Hombres BBVA",
+        alt: "Futboldle - minijuegos diarios para enfermos de la Liga BBVA",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [`${SITE_URL}/icon.png`],
+    images: [SOCIAL_IMAGE_URL],
   },
 };
 
@@ -155,10 +151,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="theme-color" content="#0b1410" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
@@ -168,6 +160,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Suspense>
         {children}
         <ShareSheetHost />
+        <AchievementToast />
       </body>
     </html>
   );

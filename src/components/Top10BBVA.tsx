@@ -8,7 +8,7 @@ import { unlockPlayer } from "@/lib/album";
 import { recordGameCompletion, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
-import { shareResult } from "@/lib/share";
+import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 import { getCommunityDifficulty } from "@/lib/communityStats";
 
 function norm(s: string) {
@@ -209,8 +209,16 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
   async function share() {
     const score = surrendered ? `X/${challenge.answers.length}` : `${guessedAnswers.length}/${challenge.answers.length}`;
     const grid = challenge.answers.map(a => guessedAnswers.includes(norm(a.answer)) ? "🟩" : "⬛").join("");
-    const txt = `⚽ Futboldle\n🟨 Top10 BBVA #${getDayNumber()}\n${challenge.title}\n${score}\n\n${grid}\n\nhttps://futboldle.es`;
-    shareResult(txt, () => { setCopied(true); setTimeout(() => setCopied(false), 2500); });
+    const txt = buildScoreShare("Top10 BBVA", `${score} encontrados`, `Dificultad: ${community.label}\n${grid}`);
+    shareGameResult(txt, {
+      modeId: "top10-bbva",
+      challengeId: challenge.id,
+      seasonId: "bbva",
+      won: guessedAnswers.length === challenge.answers.length && !surrendered,
+      attempts: allGuesses.length,
+      title: "Top10 BBVA",
+      onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 2500); },
+    });
   }
 
   if (!loaded) return (

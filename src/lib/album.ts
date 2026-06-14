@@ -1,5 +1,6 @@
 import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { trackEvent } from "./analytics";
+import { syncAchievements } from "./achievements";
 import { normalize } from "./normalize";
 
 const ALBUM_KEY = "fbl-album-unlocked-v1";
@@ -163,11 +164,12 @@ export function unlockPlayer(playerId: number, source = "Futboldle") {
     const player = bbvaPlayers.find(p => p.id === playerId);
     if (player) {
       const rarity = getPlayerRarity(player);
-      localStorage.setItem("fbl-last-card-unlock-v1", JSON.stringify({ id: player.id, name: player.displayName, rarity, at: Date.now() }));
-      window.dispatchEvent(new CustomEvent("fbl-card-unlocked", { detail: { id: player.id, name: player.displayName, rarity, clubs: player.clubs, position: player.position } }));
+      localStorage.setItem("fbl-last-card-unlock-v1", JSON.stringify({ id: player.id, name: player.displayName, rarity, source, at: Date.now() }));
+      window.dispatchEvent(new CustomEvent("fbl-card-unlocked", { detail: { id: player.id, name: player.displayName, rarity, clubs: player.clubs, position: player.position, source, season: "Liga BBVA 2005-2016" } }));
       trackEvent("card_unlocked", { playerId: player.id, player: player.displayName, rarity, source });
     }
     syncTrophies();
+    syncAchievements();
   } catch {}
 }
 

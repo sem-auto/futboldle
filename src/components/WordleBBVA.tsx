@@ -7,7 +7,7 @@ import { unlockPlayer } from "@/lib/album";
 import { loadGameCounts, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import { useStats } from "@/lib/useStats";
-import { shareResult } from "@/lib/share";
+import { buildWordleShare, shareGameResult } from "@/lib/resultShare";
 import { getCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX = 6;
@@ -45,10 +45,9 @@ function evaluate(guess:string[],answer:string[]):LS[] {
   return r;
 }
 
-function shareText(states:LS[][],won:boolean,label:string):string {
-  const score = won?`${states.length}/${MAX}`:`X/${MAX}`;
+function shareText(states:LS[][],won:boolean):string {
   const e=(s:LS)=>s==="correct"?"🟩":s==="partial"?"🟨":"⬛";
-  return `⚽ Futboldle\n🟩 Wordle BBVA ${label}\n${score}\n\n${states.map(r=>r.map(e).join("")).join("\n")}\n\nhttps://futboldle.es`;
+  return buildWordleShare(states.map(r=>r.map(e).join("")), states.length, won);
 }
 
 function keyState(key:string, rows:Row[]):"correct"|"partial"|"wrong"|"idle" {
@@ -284,12 +283,17 @@ export default function WordleBBVA({onBack}:Props) {
 
   // ── Share ──
   async function handleShare(){
-    const label = mode==="daily"
-      ? `Diario #${getDayNumber()}`
-      : `Extra #${extraIdx}`;
     const submitted=rows.filter(r=>r.submitted);
-    const text=shareText(submitted.map(r=>r.states),won,label);
-    shareResult(text, () => { setCopied(true); setTimeout(()=>setCopied(false),2500); });
+    const text=shareText(submitted.map(r=>r.states),won);
+    shareGameResult(text, {
+      modeId: "wordle-bbva",
+      challengeId: mode === "daily" ? getDayKey() : `${getDayKey()}-extra-${extraIdx}`,
+      seasonId: "bbva",
+      won,
+      attempts: submitted.length,
+      title: "Wordle BBVA",
+      onCopied: () => { setCopied(true); setTimeout(()=>setCopied(false),2500); },
+    });
   }
 
   if(!loaded) return (

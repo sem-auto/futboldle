@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Futboldle",
     short_name: "Futboldle",
-    description: "Minijuegos diarios de fútbol nostalgia para enfermos de la Liga BBVA.",
+    description: "Minijuegos diarios para enfermos de la Liga BBVA.",
     start_url: "/",
     display: "standalone",
     background_color: "#f6f2ea",

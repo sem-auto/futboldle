@@ -6,7 +6,7 @@ import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
-import { shareResult } from "@/lib/share";
+import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 
 type Case = {
   club: string;
@@ -111,8 +111,21 @@ export default function ClubOcultoBBVA({ onBack }: { onBack: () => void }) {
   }
 
   async function share() {
-    const text = `⚽ Futboldle\nClub oculto #${getDayNumber()}\n${won ? "🟩" : "🟥"} ${won ? guesses.length : "X"}/${MAX}\n\nhttps://futboldle.es`;
-    shareResult(text, () => { setCopied(true); setTimeout(() => setCopied(false), 1800); });
+    const rows = Array.from({ length: MAX }, (_, index) => {
+      if (won && index === guesses.length - 1) return "🟩";
+      if (index < guesses.length) return "🟨";
+      return "⬛";
+    }).join("");
+    const text = buildProgressiveShare("Club Oculto", rows, guesses.length, won, "intentos");
+    shareGameResult(text, {
+      modeId: "club-oculto",
+      challengeId: `${getDayKey()}-${item.club}`,
+      seasonId: "bbva",
+      won,
+      attempts: guesses.length,
+      title: "Club Oculto",
+      onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); },
+    });
   }
 
   return (

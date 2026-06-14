@@ -3,16 +3,16 @@ import { useEffect, useState } from "react";
 import { shareResult } from "@/lib/share";
 
 export default function IconUnlockToast() {
-  const [card, setCard] = useState<{ name: string; rarity: string; clubs: string[]; position: string } | null>(null);
+  const [card, setCard] = useState<{ name: string; rarity: string; clubs: string[]; position: string; source?: string; season?: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     function onCard(event: Event) {
-      const detail = (event as CustomEvent<{ name?: string; rarity?: string; clubs?: string[]; position?: string }>).detail;
+      const detail = (event as CustomEvent<{ name?: string; rarity?: string; clubs?: string[]; position?: string; source?: string; season?: string }>).detail;
       if (!detail?.name) return;
       setCopied(false);
-      setCard({ name: detail.name, rarity: detail.rarity ?? "CROMO", clubs: detail.clubs ?? [], position: detail.position ?? "Jugador" });
-      window.setTimeout(() => setCard(null), 5200);
+      setCard({ name: detail.name, rarity: detail.rarity ?? "CROMO", clubs: detail.clubs ?? [], position: detail.position ?? "Jugador", source: detail.source, season: detail.season });
+      window.setTimeout(() => setCard(null), 6200);
     }
     window.addEventListener("fbl-card-unlocked", onCard);
     return () => window.removeEventListener("fbl-card-unlocked", onCard);
@@ -22,7 +22,7 @@ export default function IconUnlockToast() {
 
   async function shareCard() {
     if (!card) return;
-    const text = `🎴 Nuevo cromo en Futboldle\n${card.name} · ${card.rarity}\n${card.position}${card.clubs.length ? ` · ${card.clubs.join(" / ")}` : ""}\n\nhttps://futboldle.es`;
+    const text = `🎴 Nuevo cromo en Futboldle\n${card.name} · ${card.rarity}\n${card.position}${card.clubs.length ? ` · ${card.clubs.join(" / ")}` : ""}\n${card.source ? `Origen: ${card.source}` : ""}\n\nhttps://futboldle.es`;
     shareResult(text, () => { setCopied(true); window.setTimeout(() => setCopied(false), 1800); });
   }
 
@@ -37,12 +37,14 @@ export default function IconUnlockToast() {
             style={{ background: "#18181b", color: "#fac840", border: "2px solid rgba(200,146,10,0.75)" }}>
             <span className="font-bebas text-[30px]">{card.name.slice(0, 1).toUpperCase()}</span>
           </div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: "#8a6406" }}>🎴 NUEVO CROMO</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: "#8a6406" }}>HAS DESBLOQUEADO</div>
           <div className="font-bebas text-[30px] leading-none mt-1">{card.name.toUpperCase()}</div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] mt-1" style={{ color: "#8a6406" }}>{card.rarity}</div>
           <div className="mt-2 text-[11px] leading-snug" style={{ color: "#4b3b20" }}>
             <div>{card.position}</div>
             {card.clubs.length > 0 && <div>{card.clubs.join(" · ")}</div>}
+            {card.source && <div className="mt-1 font-semibold">{card.source}</div>}
+            {card.season && <div>{card.season}</div>}
           </div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2">
@@ -55,6 +57,10 @@ export default function IconUnlockToast() {
             {copied ? "Copiado" : "Compartir"}
           </button>
         </div>
+        <button onClick={() => setCard(null)} className="mt-2 w-full font-oswald font-semibold uppercase tracking-wider text-[10px] px-3 py-2 rounded-lg"
+          style={{ background: "rgba(255,255,255,0.12)", color: "white" }}>
+          Seguir jugando
+        </button>
       </div>
     </div>
   );

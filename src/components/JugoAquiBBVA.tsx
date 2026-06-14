@@ -6,7 +6,7 @@ import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
-import { shareResult } from "@/lib/share";
+import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 
 type Case = {
   answer: string;
@@ -74,8 +74,16 @@ export default function JugoAquiBBVA({ onBack }: { onBack: () => void }) {
   }
 
   async function share() {
-    const text = `⚽ Futboldle\n¿Jugó aquí? #${getDayNumber()}\n${won ? "🟩" : "🟥"} ${player?.displayName ?? item.answer} / ${item.club}\n\nhttps://futboldle.es`;
-    shareResult(text, () => { setCopied(true); setTimeout(() => setCopied(false), 1800); });
+    const text = buildScoreShare("¿Jugó Aquí?", `${won ? "🟩 acertado" : "🟥 fallado"}`, `${player?.displayName ?? item.answer} / ${item.club}`);
+    shareGameResult(text, {
+      modeId: "jugo-aqui",
+      challengeId: `${getDayKey()}-${item.answer}-${item.club}`,
+      seasonId: "bbva",
+      won,
+      attempts: picked === null ? 0 : 1,
+      title: "¿Jugó Aquí?",
+      onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); },
+    });
   }
 
   return (

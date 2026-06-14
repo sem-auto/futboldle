@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
@@ -6,8 +6,8 @@ import { getDailyStatdleChallenge } from "@/data/statdleChallenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
-import { shareResult } from "@/lib/share";
-import { trackEvent } from "@/lib/analytics";
+import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
+import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered } from "@/lib/analytics";
 
 const MAX_ATTEMPTS = 6;
 
@@ -57,6 +57,8 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
   const revealedCount = Math.min(challenge.clues.length, Math.max(1, guesses.length + 1));
 
   useEffect(() => {
+    trackModeEntered("statdle-bbva", "bbva", { challenge: challenge.id });
+    trackChallengeStarted("statdle-bbva", challenge.id, { seasonId: "bbva" });
     trackEvent("mode_started", { mode: "statdle", season: "bbva" });
     trackEvent("statdle_started", { challenge: challenge.id });
     try {
@@ -100,6 +102,11 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
     if (correct) unlockPlayer(player.id, "Statdle BBVA");
     if (isOver) {
       recordGameResult("statdle", `${getDayKey()}-${challenge.id}`, correct);
+      if (correct) {
+        trackChallengeCompleted("statdle-bbva", challenge.id, { seasonId: "bbva", won: true, attempts: nextGuesses.length });
+      } else {
+        trackChallengeFailed("statdle-bbva", challenge.id, { seasonId: "bbva", attempts: nextGuesses.length });
+      }
       trackEvent("mode_completed", { mode: "statdle", season: "bbva", won: correct, attempts: nextGuesses.length });
       trackEvent("statdle_completed", { challenge: challenge.id, won: correct, attempts: nextGuesses.length });
     }
@@ -111,15 +118,21 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
       if (index < guesses.length) return "🟨";
       return "⬛";
     }).join("");
-    const score = won ? `Lo saqué en ${guesses.length} pista${guesses.length === 1 ? "" : "s"}` : "No lo saqué";
-    const text = `Statdle BBVA #${getDayNumber()}\n${rows}\n${score}\n\nfutboldle.es`;
-    shareResult(text, () => { setCopied(true); setTimeout(() => setCopied(false), 1800); }, "Statdle BBVA");
+    const text = buildProgressiveShare("Statdle BBVA", rows, guesses.length, won);
+    shareGameResult(text, {
+      modeId: "statdle-bbva",
+      challengeId: challenge.id,
+      seasonId: "bbva",
+      won,
+      attempts: guesses.length,
+      title: "Statdle BBVA",
+      onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); },
+    });
   }
-
   if (!player) {
     return (
       <div>
-        <button onClick={onBack} className="text-[12px] font-semibold mb-3" style={{ color: "#6b6b72" }}>← Volver</button>
+        <button onClick={onBack} className="text-[12px] font-semibold mb-3" style={{ color: "#6b6b72" }}>{"\u2190 Volver"}</button>
         <div className="rounded-2xl p-5" style={{ background: "white" }}>No hay Statdle disponible hoy.</div>
       </div>
     );
@@ -127,13 +140,13 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="w-full">
-      <button onClick={onBack} className="text-[12px] font-semibold mb-3" style={{ color: "#6b6b72" }}>← Volver</button>
+      <button onClick={onBack} className="text-[12px] font-semibold mb-3" style={{ color: "#6b6b72" }}>{"\u2190 Volver"}</button>
 
       <section className="rounded-2xl overflow-hidden" style={{ background: "white", boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}>
         <div className="px-5 py-5" style={{ background: "linear-gradient(135deg,#18181b,#c8920a)", color: "white" }}>
-          <div className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/70 mb-2">Nuevo modo · #{getDayNumber()}</div>
+          <div className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/70 mb-2">Nuevo modo {"\u00b7"} #{getDayNumber()}</div>
           <h1 className="font-bebas text-[42px] leading-none">STATDLE BBVA</h1>
-          <p className="text-[12px] text-white/75 mt-1">Adivina el jugador por sus estadísticas.</p>
+          <p className="text-[12px] text-white/75 mt-1">Adivina el jugador por sus estadisticas.</p>
         </div>
 
         <div className="p-4 flex flex-col gap-3">
@@ -180,7 +193,7 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
                       className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-gray-50"
                       style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
                       <span className="font-semibold">{item.displayName}</span>
-                      <span className="block text-[10px]" style={{ color: "#9a9a8a" }}>{item.mainClub} · {item.position}</span>
+                      <span className="block text-[10px]" style={{ color: "#9a9a8a" }}>{item.mainClub} {"\u00b7"} {item.position}</span>
                     </button>
                   ))}
                 </div>
@@ -211,7 +224,7 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
             <div className="rounded-xl p-4" style={{ background: won ? "#f0faf2" : "#fff5f5", border: `1px solid ${won ? "rgba(30,107,46,0.22)" : "rgba(184,28,20,0.18)"}` }}>
               <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? "Correcto" : "Era"}</div>
               <div className="font-bebas text-[34px] leading-none" style={{ color: "#18181b" }}>{player.displayName}</div>
-              <div className="text-[12px]" style={{ color: "#6b6b72" }}>{player.mainClub} · {player.position} · {player.nationality}</div>
+              <div className="text-[12px]" style={{ color: "#6b6b72" }}>{player.mainClub} {"\u00b7"} {player.position} {"\u00b7"} {player.nationality}</div>
               <button onClick={share} className="mt-3 w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
                 style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Copiado" : "Compartir resultado"}</button>
             </div>
@@ -221,3 +234,4 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
     </div>
   );
 }
+

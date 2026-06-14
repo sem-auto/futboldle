@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getProfileSummary } from "@/lib/profile";
 import { getAlbumObjectives, getAlbumProgress, getAlbumRarityProgress, getTrophyShowcase } from "@/lib/album";
-import { trackEvent } from "@/lib/analytics";
+import { trackAlbumOpened } from "@/lib/analytics";
+import { ACHIEVEMENTS, getUnlockedAchievements } from "@/lib/achievements";
 
 type Summary = ReturnType<typeof getProfileSummary>;
 type AlbumProgress = ReturnType<typeof getAlbumProgress>;
@@ -28,6 +29,7 @@ export default function ProgresoPage() {
   const [rarities, setRarities] = useState<RarityProgress | null>(null);
   const [objectives, setObjectives] = useState<Objective[]>([]);
   const [trophies, setTrophies] = useState<Trophy[]>([]);
+  const [achievements, setAchievements] = useState<string[]>([]);
 
   useEffect(() => {
     setSummary(getProfileSummary());
@@ -35,7 +37,8 @@ export default function ProgresoPage() {
     setRarities(getAlbumRarityProgress());
     setObjectives(getAlbumObjectives());
     setTrophies(getTrophyShowcase());
-    trackEvent("album_visit", { source: "progreso" });
+    setAchievements(getUnlockedAchievements());
+    trackAlbumOpened({ source: "progreso" });
   }, []);
 
   if (!summary || !album || !rarities) return null;
@@ -112,6 +115,24 @@ export default function ProgresoPage() {
             ) : (
               <p className="text-[12px] mt-2" style={{ color: "#9a9a8a" }}>Todas las recompensas disponibles están completadas.</p>
             )}
+          </div>
+        </section>
+
+        <section className="rounded-2xl p-4" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+          <h2 className="font-bebas text-[27px] leading-none" style={{ color: "#18181b" }}>LOGROS</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+            {ACHIEVEMENTS.map(item => {
+              const unlocked = achievements.includes(item.id);
+              return (
+                <div key={item.id} className="rounded-xl px-3 py-2"
+                  style={{ background: unlocked ? "#fff8e6" : "#f3efe8", border: `1px solid ${unlocked ? "rgba(200,146,10,0.25)" : "rgba(0,0,0,0.06)"}` }}>
+                  <div className="font-oswald font-semibold text-[13px]" style={{ color: unlocked ? "#18181b" : "#aaa" }}>
+                    {unlocked ? "🏆" : "🔒"} {item.label}
+                  </div>
+                  <p className="text-[10px] mt-0.5" style={{ color: "#9a9a8a" }}>{item.description}</p>
+                </div>
+              );
+            })}
           </div>
         </section>
       </div>

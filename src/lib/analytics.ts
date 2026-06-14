@@ -13,7 +13,10 @@ type AnalyticsEvent =
   | "mode_entered"
   | "challenge_started"
   | "challenge_completed"
+  | "challenge_failed"
   | "challenge_shared"
+  | "album_opened"
+  | "achievement_unlocked"
   | "top10_completed"
   | "card_unlocked"
   | "trophy_unlocked"
@@ -78,6 +81,15 @@ export function trackChallengeCompleted(modeId: string, challengeId: string, pay
   trackEvent("challenge_completed", { modeId, challengeId, ...payload });
 }
 
+export function trackChallengeFailed(modeId: string, challengeId: string, payload: AnalyticsPayload = {}) {
+  trackEvent("challenge_failed", { modeId, challengeId, won: false, ...payload });
+}
+
 export function trackChallengeShared(modeId: string, challengeId: string, payload: AnalyticsPayload = {}) {
   trackEvent("challenge_shared", { modeId, challengeId, ...payload });
+}
+
+export function trackAlbumOpened(payload: AnalyticsPayload = {}) {
+  trackEvent("album_opened", payload);
+  trackEvent("album_visit", payload);
 }

@@ -6,7 +6,7 @@ import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
-import { shareResult } from "@/lib/share";
+import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { getCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX = 5;
@@ -136,10 +136,21 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
   const community = getCommunityDifficulty("crack", `${getDayKey()}-${player.id}`);
 
   async function share() {
-    const score = won ? `${guesses.length}/${MAX}` : `X/${MAX}`;
-    const revCount = visibleHints.filter(h => h.revealed).length;
-    const txt = `⚽ Futboldle\n🟪 Cromo oculto #${getDayNumber()}\n${score}\n\n🔍 ${revCount} pistas usadas\n\nhttps://futboldle.es`;
-    shareResult(txt, () => { setCopied(true); setTimeout(() => setCopied(false), 2500); });
+    const rows = Array.from({ length: MAX }, (_, index) => {
+      if (won && index === guesses.length - 1) return "🟩";
+      if (index < guesses.length) return "🟨";
+      return "⬛";
+    }).join("");
+    const txt = buildProgressiveShare("Cromo Oculto", rows, guesses.length, won, "pistas");
+    shareGameResult(txt, {
+      modeId: "cromo-oculto",
+      challengeId: `${getDayKey()}-${player.id}`,
+      seasonId: "bbva",
+      won,
+      attempts: guesses.length,
+      title: "Cromo Oculto",
+      onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 2500); },
+    });
   }
 
   if (!loaded) return (

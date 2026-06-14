@@ -6,7 +6,7 @@ import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
-import { shareResult } from "@/lib/share";
+import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 
 type Case = {
   player: string;
@@ -73,8 +73,16 @@ export default function FichajeInventoBBVA({ onBack }: { onBack: () => void }) {
   }
 
   async function share() {
-    const text = `⚽ Futboldle\nFichaje o invento #${getDayNumber()}\n${won ? "🟩" : "🟥"} ${item.player} → ${item.club}\n\nhttps://futboldle.es`;
-    shareResult(text, () => { setCopied(true); setTimeout(() => setCopied(false), 1800); });
+    const text = buildScoreShare("Fichaje o Invento", `${won ? "🟩 acertado" : "🟥 fallado"}`, `${item.player} → ${item.club}`);
+    shareGameResult(text, {
+      modeId: "fichaje-invento",
+      challengeId: `${getDayKey()}-${item.player}-${item.club}`,
+      seasonId: "bbva",
+      won,
+      attempts: picked === null ? 0 : 1,
+      title: "Fichaje o Invento",
+      onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); },
+    });
   }
 
   return (

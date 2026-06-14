@@ -1,4 +1,5 @@
 import { getAlbumEntries, getCollectionProfileStats } from "./album";
+import { syncAchievements } from "./achievements";
 import { loadStats } from "./useStats";
 
 type GameKey = "wordle" | "trayectoria" | "top10" | "top20" | "crack" | "statdle" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
@@ -64,6 +65,7 @@ export function recordGameResult(game: GameKey, uniqueKey: string, won: boolean)
     const dayKey = uniqueKey.slice(0, 10);
     updateGlobalStats(`fbl-result-counted-${game}-${uniqueKey}`, won, dayKey);
     if (won) recordGameCompletion(game, uniqueKey);
+    syncAchievements({ modeId: game, won });
   } catch {}
 }
 
