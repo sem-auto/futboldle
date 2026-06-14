@@ -10,6 +10,7 @@ import FichajeInventoBBVA from "@/components/FichajeInventoBBVA";
 import ClubOcultoBBVA from "@/components/ClubOcultoBBVA";
 import OnceBBVA from "@/components/OnceBBVA";
 import QuienFaltaBBVA from "@/components/QuienFaltaBBVA";
+import StatdleBBVA from "@/components/StatdleBBVA";
 import IconUnlockToast from "@/components/IconUnlockToast";
 import PromoBanner, { SidebarAds } from "@/components/PromoBanner";
 import { getDayNumber, getDayKey } from "@/lib/daily";
@@ -17,8 +18,9 @@ import { useStats } from "@/lib/useStats";
 import { getAlbumProgress } from "@/lib/album";
 import { shareResult } from "@/lib/share";
 import { getCommunityDifficulty } from "@/lib/communityStats";
+import { seasons } from "@/data/product";
 
-type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
+type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "statdle" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
 
 const BBVA_PHRASES = [
   "¿Te acuerdas de Apoño?",
@@ -40,6 +42,8 @@ function useDailyStatus() {
   const [top10Won,   setTop10Won]   = useState(false);
   const [crackDone,  setCrackDone]  = useState(false);
   const [crackWon,   setCrackWon]   = useState(false);
+  const [statdleDone, setStatdleDone] = useState(false);
+  const [statdleWon, setStatdleWon] = useState(false);
 
   useEffect(() => {
     const key = getDayKey();
@@ -86,9 +90,13 @@ function useDailyStatus() {
       const crack = localStorage.getItem(`fbl-crack-done-${key}`);
       if (crack) { setCrackDone(true); setCrackWon(crack === "won"); }
     } catch {}
+    try {
+      const statdle = localStorage.getItem(`fbl-statdle-done-${key}`);
+      if (statdle) { setStatdleDone(true); setStatdleWon(statdle === "won"); }
+    } catch {}
   }, []);
 
-  return { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon };
+  return { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon };
 }
 
 /* ─── Header ─── */
@@ -304,6 +312,39 @@ function TrayCard({ onClick, done, won, difficulty }: { onClick: () => void; don
   );
 }
 
+function StatdleCard({ onClick, done, won, difficulty }: { onClick: () => void; done: boolean; won: boolean; difficulty: { label: string; completion: number } }) {
+  return (
+    <button onClick={onClick}
+      className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
+      style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(200,146,10,0.24)", display: "flex", flexDirection: "column" }}>
+      <div className="h-[3px]" style={{ background: "#18181b" }}/>
+      <div className="px-3 md:px-4 py-3 md:py-4 flex flex-col flex-1">
+        <div className="flex items-start justify-between mb-2">
+          <div className="text-[25px] md:text-[30px] leading-none">📊</div>
+          <div className="flex items-center gap-1">
+            <div className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(24,24,27,0.08)", color: "#18181b" }}>Nuevo</div>
+            <GamePill done={done} won={won} />
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-1 mb-2">
+          {["PJ", "G", "Club"].map((label, index) => (
+            <div key={label} className="rounded-lg px-2 py-1 text-center"
+              style={{ background: index === 0 ? "#fffbf5" : "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
+              <div className="text-[7px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#9a9a8a" }}>{label}</div>
+              <div className="font-bebas text-[15px] leading-none" style={{ color: index === 0 ? "#c8920a" : "#18181b" }}>?</div>
+            </div>
+          ))}
+        </div>
+        <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1 mb-0.5" style={{ color: "#18181b" }}>STATDLE BBVA</div>
+        <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Adivina por estadísticas</div>
+        <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#18181b" }}>{done ? "VER RESULTADO →" : "JUGAR →"}</div>
+        <DifficultyLine label={difficulty.label} completion={difficulty.completion} color="#18181b" />
+      </div>
+    </button>
+  );
+}
+
 /* ─── Coming soon card ─── */
 interface CSCardProps {
   title: string; subtitle: string; emoji: string; accent: string;
@@ -360,6 +401,39 @@ function QuickGameCard({ title, subtitle, emoji, accent, onClick }: {
   );
 }
 
+function SeasonsBlock() {
+  return (
+    <section className="rounded-2xl px-3 py-3 md:px-4"
+      style={{ background: "rgba(255,255,255,0.66)", border: "1px solid rgba(0,0,0,0.07)" }}>
+      <div className="flex items-end justify-between gap-2 mb-2.5">
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Futboldle</div>
+          <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>EL FÚTBOL QUE ECHAMOS DE MENOS</h3>
+        </div>
+        <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Temporadas</div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+        {seasons.map(season => {
+          const active = season.status === "active";
+          return (
+            <div key={season.id} className="rounded-xl px-3 py-2"
+              style={{ background: active ? "#f0faf2" : "#fff", border: `1px solid ${active ? "rgba(30,107,46,0.20)" : "rgba(0,0,0,0.07)"}` }}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="font-bebas text-[17px] leading-none" style={{ color: "#18181b" }}>{season.name}</div>
+                <span className="text-[7px] font-semibold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full"
+                  style={{ background: active ? "rgba(30,107,46,0.12)" : "#f8f5f0", color: active ? "#1e6b2e" : "#9a9a8a" }}>
+                  {active ? "Activa" : "Próximamente"}
+                </span>
+              </div>
+              <div className="text-[10px] mt-1" style={{ color: "#9a9a8a" }}>{season.subtitle}</div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 /* ─── Podium deco para Top 10 ─── */
 function PodiumDeco() {
   return (
@@ -398,12 +472,12 @@ function AttrDeco() {
 }
 
 /* ─── Barra de progreso diaria ─── */
-function DailyProgress({ wordleDone, wordleWon, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, streak }: {
-  wordleDone: boolean; wordleWon: boolean; trayDone: boolean; trayWon: boolean; top10Done: boolean; top10Won: boolean; crackDone: boolean; crackWon: boolean; streak: number;
+function DailyProgress({ wordleDone, wordleWon, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon, streak }: {
+  wordleDone: boolean; wordleWon: boolean; trayDone: boolean; trayWon: boolean; top10Done: boolean; top10Won: boolean; crackDone: boolean; crackWon: boolean; statdleDone: boolean; statdleWon: boolean; streak: number;
 }) {
-  const total = 4;
-  const completed = (wordleDone&&wordleWon?1:0)+(trayDone&&trayWon?1:0)+(top10Done&&top10Won?1:0)+(crackDone&&crackWon?1:0);
-  const failed = (wordleDone&&!wordleWon?1:0)+(trayDone&&!trayWon?1:0)+(top10Done&&!top10Won?1:0)+(crackDone&&!crackWon?1:0);
+  const total = 5;
+  const completed = (wordleDone&&wordleWon?1:0)+(trayDone&&trayWon?1:0)+(top10Done&&top10Won?1:0)+(crackDone&&crackWon?1:0)+(statdleDone&&statdleWon?1:0);
+  const failed = (wordleDone&&!wordleWon?1:0)+(trayDone&&!trayWon?1:0)+(top10Done&&!top10Won?1:0)+(crackDone&&!crackWon?1:0)+(statdleDone&&!statdleWon?1:0);
   const pending = total - completed - failed;
   const pct = Math.round((completed / total) * 100);
   return (
@@ -432,6 +506,10 @@ function DailyProgress({ wordleDone, wordleWon, trayDone, trayWon, top10Done, to
             <span className="text-[9px]" style={{ color:"#ddd" }}>·</span>
             <span className="text-[10px] flex items-center gap-1" style={{ color: crackDone?(crackWon?"#1e6b2e":"#b81c14"):"#bbb" }}>
               {crackDone?(crackWon?"✅":"❌"):"⬜"} Cromo
+            </span>
+            <span className="text-[9px]" style={{ color:"#ddd" }}>·</span>
+            <span className="text-[10px] flex items-center gap-1" style={{ color: statdleDone?(statdleWon?"#1e6b2e":"#b81c14"):"#bbb" }}>
+              {statdleDone?(statdleWon?"✅":"❌"):"⬜"} Statdle
             </span>
 
 
@@ -569,14 +647,15 @@ function ProfileCompact({ played, won, streak, bestStreak, albumProgress, onAlbu
 export default function HomePage() {
   const [view, setView] = useState<View>("home");
   const [albumProgress, setAlbumProgress] = useState({ unlockedCount: 0, total: 0, percent: 0 });
-  const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon } = useDailyStatus();
+  const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon } = useDailyStatus();
   const { stats, refresh } = useStats();
   const goHome = () => setView("home");
-  const hasShareableResult = wordleDone || trayDone || top10Done || crackDone;
+  const hasShareableResult = wordleDone || trayDone || top10Done || crackDone || statdleDone;
   const wordleDifficulty = getCommunityDifficulty("wordle", `${getDayKey()}-home`);
   const trayDifficulty = getCommunityDifficulty("trayectoria", `${getDayKey()}-home`);
   const top10Difficulty = getCommunityDifficulty("top10", `${getDayKey()}-home`);
   const crackDifficulty = getCommunityDifficulty("crack", `${getDayKey()}-home`);
+  const statdleDifficulty = getCommunityDifficulty("statdle", `${getDayKey()}-home`);
 
   useEffect(() => {
     setAlbumProgress(getAlbumProgress());
@@ -592,8 +671,8 @@ export default function HomePage() {
         if (card?.name && card?.rarity) lastCard = `\n🎴 Último cromo: ${card.name} (${card.rarity})`;
       }
     } catch {}
-    const completedCount = [wordleDone && wordleWon, trayDone && trayWon, top10Done && top10Won, crackDone && crackWon].filter(Boolean).length;
-    const failedCount = [wordleDone && !wordleWon, trayDone && !trayWon, top10Done && !top10Won, crackDone && !crackWon].filter(Boolean).length;
+    const completedCount = [wordleDone && wordleWon, trayDone && trayWon, top10Done && top10Won, crackDone && crackWon, statdleDone && statdleWon].filter(Boolean).length;
+    const failedCount = [wordleDone && !wordleWon, trayDone && !trayWon, top10Done && !top10Won, crackDone && !crackWon, statdleDone && !statdleWon].filter(Boolean).length;
     const lines = [
       "\u26bd Futboldle #" + getDayNumber(),
       "Minijuegos diarios de fútbol nostalgia",
@@ -603,8 +682,9 @@ export default function HomePage() {
       dailyShareSquare(trayDone, trayWon) + " Trayectoria BBVA",
       dailyShareSquare(top10Done, top10Won) + " Top10 BBVA",
       dailyShareSquare(crackDone, crackWon) + " Cromo oculto",
+      dailyShareSquare(statdleDone, statdleWon) + " Statdle BBVA",
       "",
-      "🔥 Hoy: " + completedCount + "/4 retos",
+      "🔥 Hoy: " + completedCount + "/5 retos",
       failedCount > 0 ? "💥 Fallados: " + failedCount : "✅ Sin fallos",
       "\ud83c\udfb4 " + albumProgress.unlockedCount + "/" + albumProgress.total + " cromos" + lastCard,
       "\ud83d\udd25 Racha: " + stats.streak,
@@ -634,6 +714,17 @@ export default function HomePage() {
       <Header onLogoClick={goHome} />
       <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <AdivinaElCrack onBack={goHome} />
+      </main>
+    </div>
+  );
+
+  if (view === "statdle") return (
+    <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
+      <SidebarAds />
+      <IconUnlockToast />
+      <Header onLogoClick={goHome} />
+      <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
+        <StatdleBBVA onBack={goHome} />
       </main>
     </div>
   );
@@ -752,6 +843,77 @@ export default function HomePage() {
           </button>
         </div>
 
+        {/* Barra de progreso diaria */}
+        <DailyProgress wordleDone={wordleDone} wordleWon={wordleWon} trayDone={trayDone} trayWon={trayWon} top10Done={top10Done} top10Won={top10Won} crackDone={crackDone} crackWon={crackWon} statdleDone={statdleDone} statdleWon={statdleWon} streak={stats.streak} />
+
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>El día</div>
+            <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>RETOS DIARIOS</h3>
+          </div>
+          {hasShareableResult ? (
+            <button onClick={shareDailyResult} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg"
+              style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)", color: "#6b6b72" }}>
+              Compartir
+            </button>
+          ) : (
+            <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>5 principales</div>
+          )}
+        </div>
+
+        {/* ── FILA 1: Wordle + Trayectoria (igual importancia) ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3">
+          <WordleCard onClick={() => setView("wordle")} done={wordleDone} won={wordleWon} extras={extras} difficulty={wordleDifficulty} />
+          <TrayCard onClick={() => setView("trayectoria")} done={trayDone} won={trayWon} difficulty={trayDifficulty} />
+        </div>
+
+        {/* ── FILA 2: Top 10 + Cromo oculto + Statdle ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 md:gap-3">
+          {/* TOP 10 BBVA */}
+          <button onClick={() => setView("top10")}
+            className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
+            style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(26,79,160,0.20)", display: "flex", flexDirection: "column" }}>
+            <div className="h-[3px]" style={{ background: "#1a4fa0" }}/>
+            <div className="px-3 md:px-4 py-3 md:py-4 flex flex-col flex-1">
+              <div className="flex items-start justify-between mb-2">
+                <div className="text-[25px] md:text-[30px] leading-none">🏆</div>
+                <div className="flex items-center gap-1">
+                  <div className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+                    style={{ background: "rgba(26,79,160,0.10)", color: "#1a4fa0" }}>Hoy</div>
+                  <GamePill done={top10Done} won={top10Won} />
+                </div>
+              </div>
+              <PodiumDeco />
+              <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>TOP 10 BBVA</div>
+              <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Completa las listas históricas</div>
+              <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#1a4fa0" }}>{top10Done ? "VER RESULTADO →" : "JUGAR →"}</div>
+              <DifficultyLine label={top10Difficulty.label} completion={top10Difficulty.completion} color="#1a4fa0" />
+            </div>
+          </button>
+          <StatdleCard onClick={() => setView("statdle")} done={statdleDone} won={statdleWon} difficulty={statdleDifficulty} />
+          {/* CROMO OCULTO */}
+          <button onClick={() => setView("crack")}
+            className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
+            style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(124,58,237,0.20)", display: "flex", flexDirection: "column" }}>
+            <div className="h-[3px]" style={{ background: "#7c3aed" }}/>
+            <div className="px-3 md:px-4 py-3 md:py-4 flex flex-col flex-1">
+              <div className="flex items-start justify-between mb-2">
+                <div className="text-[25px] md:text-[30px] leading-none">🌍</div>
+                <div className="flex items-center gap-1">
+                  <div className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+                    style={{ background: "rgba(124,58,237,0.10)", color: "#7c3aed" }}>Hoy</div>
+                  <GamePill done={crackDone} won={crackWon} />
+                </div>
+              </div>
+              <AttrDeco />
+              <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>CROMO OCULTO</div>
+              <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Revela el jugador por pistas</div>
+              <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#7c3aed" }}>{crackDone ? "VER RESULTADO →" : "JUGAR →"}</div>
+              <DifficultyLine label={crackDifficulty.label} completion={crackDifficulty.completion} color="#7c3aed" />
+            </div>
+          </button>
+        </div>
+
         <section className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
             <div>
@@ -776,76 +938,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Barra de progreso diaria */}
-        <DailyProgress wordleDone={wordleDone} wordleWon={wordleWon} trayDone={trayDone} trayWon={trayWon} top10Done={top10Done} top10Won={top10Won} crackDone={crackDone} crackWon={crackWon} streak={stats.streak} />
-
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>El día</div>
-            <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>RETOS DIARIOS</h3>
-          </div>
-          {hasShareableResult ? (
-            <button onClick={shareDailyResult} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg"
-              style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)", color: "#6b6b72" }}>
-              Compartir
-            </button>
-          ) : (
-            <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>4 principales</div>
-          )}
-        </div>
-
-        {/* ── FILA 1: Wordle + Trayectoria (igual importancia) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3">
-          <WordleCard onClick={() => setView("wordle")} done={wordleDone} won={wordleWon} extras={extras} difficulty={wordleDifficulty} />
-          <TrayCard onClick={() => setView("trayectoria")} done={trayDone} won={trayWon} difficulty={trayDifficulty} />
-        </div>
-
-        {/* ── FILA 2: Top 10 + Cromo oculto ── */}
-        <div className="grid grid-cols-2 gap-2.5 md:gap-3">
-          {/* TOP 10 BBVA */}
-          <button onClick={() => setView("top10")}
-            className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
-            style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(26,79,160,0.20)", display: "flex", flexDirection: "column" }}>
-            <div className="h-[3px]" style={{ background: "#1a4fa0" }}/>
-            <div className="px-3 md:px-4 py-3 md:py-4 flex flex-col flex-1">
-              <div className="flex items-start justify-between mb-2">
-                <div className="text-[25px] md:text-[30px] leading-none">🏆</div>
-                <div className="flex items-center gap-1">
-                  <div className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
-                    style={{ background: "rgba(26,79,160,0.10)", color: "#1a4fa0" }}>Hoy</div>
-                  <GamePill done={top10Done} won={top10Won} />
-                </div>
-              </div>
-              <PodiumDeco />
-              <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>TOP 10 BBVA</div>
-              <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Completa las listas históricas</div>
-              <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#1a4fa0" }}>{top10Done ? "VER RESULTADO →" : "JUGAR →"}</div>
-              <DifficultyLine label={top10Difficulty.label} completion={top10Difficulty.completion} color="#1a4fa0" />
-            </div>
-          </button>
-          {/* CROMO OCULTO */}
-          <button onClick={() => setView("crack")}
-            className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
-            style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(124,58,237,0.20)", display: "flex", flexDirection: "column" }}>
-            <div className="h-[3px]" style={{ background: "#7c3aed" }}/>
-            <div className="px-3 md:px-4 py-3 md:py-4 flex flex-col flex-1">
-              <div className="flex items-start justify-between mb-2">
-                <div className="text-[25px] md:text-[30px] leading-none">🌍</div>
-                <div className="flex items-center gap-1">
-                  <div className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
-                    style={{ background: "rgba(124,58,237,0.10)", color: "#7c3aed" }}>Hoy</div>
-                  <GamePill done={crackDone} won={crackWon} />
-                </div>
-              </div>
-              <AttrDeco />
-              <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>CROMO OCULTO</div>
-              <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Revela el jugador por pistas</div>
-              <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#7c3aed" }}>{crackDone ? "VER RESULTADO →" : "JUGAR →"}</div>
-              <DifficultyLine label={crackDifficulty.label} completion={crackDifficulty.completion} color="#7c3aed" />
-            </div>
-          </button>
-        </div>
-
         <section className="rounded-2xl px-3 py-3 md:px-4 md:py-4"
           style={{ background: "rgba(255,255,255,0.70)", border: "1px solid rgba(0,0,0,0.07)" }}>
           <div className="flex items-end justify-between gap-2 mb-2.5">
@@ -863,6 +955,8 @@ export default function HomePage() {
             <QuickGameCard title="¿QUIÉN FALTA?" subtitle="Reconstruye la memoria del equipo." emoji="❔" accent="#7c3aed" onClick={() => setView("quienFalta")} />
           </div>
         </section>
+
+        <SeasonsBlock />
 
         {/* Ads + footer */}
         <PromoBanner />

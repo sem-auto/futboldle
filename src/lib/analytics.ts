@@ -1,6 +1,10 @@
 type AnalyticsEvent =
   | "game_started"
   | "game_completed"
+  | "mode_started"
+  | "mode_completed"
+  | "statdle_started"
+  | "statdle_completed"
   | "top10_completed"
   | "card_unlocked"
   | "trophy_unlocked"

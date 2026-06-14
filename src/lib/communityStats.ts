@@ -1,12 +1,13 @@
 import { getDayNumber } from "./daily";
 
-type GameKey = "wordle" | "trayectoria" | "top10" | "crack";
+type GameKey = "wordle" | "trayectoria" | "top10" | "crack" | "statdle";
 
 const BASE: Record<GameKey, { completion: number; attempts?: number }> = {
   wordle: { completion: 54, attempts: 4.4 },
   trayectoria: { completion: 49, attempts: 3.2 },
   top10: { completion: 28 },
   crack: { completion: 45, attempts: 3.6 },
+  statdle: { completion: 52, attempts: 4.1 },
 };
 
 function stableOffset(seed: string, range: number) {
