@@ -8,7 +8,7 @@ import "./globals.css";
 
 const GA_MEASUREMENT_ID = "G-Q4DBT40EYL";
 const SITE_URL = "https://futboldle.es";
-const SITE_TITLE = "Futboldle ⚽";
+const SITE_TITLE = "Futboldle";
 const SITE_DESCRIPTION = "Minijuegos diarios para enfermos de la Liga BBVA.";
 const SOCIAL_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
@@ -16,13 +16,13 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Futboldle",
-  alternateName: ["Wordle fútbol", "Minijuegos Liga BBVA", "Hombres BBVA"],
+  alternateName: ["Wordle futbol", "Minijuegos Liga BBVA", "Hombres BBVA"],
   url: SITE_URL,
   applicationCategory: "GameApplication",
   operatingSystem: "Web",
   inLanguage: "es",
   description: SITE_DESCRIPTION,
-  genre: ["Fútbol", "Trivia", "Word game", "Nostalgia deportiva"],
+  genre: ["Futbol", "Trivia", "Word game", "Nostalgia deportiva"],
   image: SOCIAL_IMAGE_URL,
   offers: {
     "@type": "Offer",
@@ -30,7 +30,7 @@ const jsonLd = {
     priceCurrency: "EUR",
   },
   keywords:
-    "minijuegos de fútbol, minijuegos Liga Española, wordle fútbol, Liga BBVA, Hombres BBVA, fútbol retro, fútbol nostalgia, juegos fútbol antiguos",
+    "minijuegos de futbol, minijuegos Liga Espanola, wordle futbol, Liga BBVA, Hombres BBVA, futbol retro, futbol nostalgia, juegos futbol antiguos",
 };
 
 export const metadata: Metadata = {
@@ -48,33 +48,22 @@ export const metadata: Metadata = {
   category: "games",
   keywords: [
     "Futboldle",
-    "minijuegos de fútbol",
     "minijuegos de futbol",
-    "minijuegos Liga Española",
-    "minijuegos liga española",
-    "juegos de fútbol",
+    "minijuegos Liga Espanola",
     "juegos de futbol",
-    "juegos fútbol online",
     "juegos futbol online",
-    "wordle fútbol",
     "wordle futbol",
-    "wordle de fútbol",
     "wordle de futbol",
     "Liga BBVA",
     "Hombres BBVA",
     "hombres bbva juego",
     "minijuegos hombres bbva",
-    "juego fútbol antiguo",
     "juego futbol antiguo",
-    "fútbol retro",
     "futbol retro",
-    "fútbol nostalgia",
     "futbol nostalgia",
-    "fútbol antiguo",
     "futbol antiguo",
     "juego Liga BBVA",
     "juegos Liga BBVA",
-    "trivia fútbol",
     "trivia futbol",
     "adivinar futbolistas",
     "adivina el jugador",
@@ -149,6 +138,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <meta property="og:title" content="Futboldle" />
+        <meta property="og:description" content="Minijuegos diarios para enfermos de la Liga BBVA." />
+        <meta property="og:image" content="https://futboldle.es/og-image.png" />
+        <meta property="og:image:secure_url" content="https://futboldle.es/og-image.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:url" content="https://futboldle.es" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Futboldle" />
+        <meta name="twitter:description" content="Minijuegos diarios para enfermos de la Liga BBVA." />
+        <meta name="twitter:image" content="https://futboldle.es/og-image.png" />
+        <meta name="twitter:image:alt" content="Futboldle" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="theme-color" content="#0b1410" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
