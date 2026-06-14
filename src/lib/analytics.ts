@@ -5,6 +5,15 @@ type AnalyticsEvent =
   | "mode_completed"
   | "statdle_started"
   | "statdle_completed"
+  | "mundialdle_started"
+  | "mundialdle_completed"
+  | "mundialdle_failed"
+  | "season_opened_world_cups"
+  | "season_entered"
+  | "mode_entered"
+  | "challenge_started"
+  | "challenge_completed"
+  | "challenge_shared"
   | "top10_completed"
   | "card_unlocked"
   | "trophy_unlocked"
@@ -51,4 +60,24 @@ export function trackCrackCompleted(payload: AnalyticsPayload = {}) {
 
 export function trackCromoUnlocked(payload: AnalyticsPayload = {}) {
   trackEvent("card_unlocked", payload);
+}
+
+export function trackSeasonEntered(seasonId: string, payload: AnalyticsPayload = {}) {
+  trackEvent("season_entered", { seasonId, ...payload });
+}
+
+export function trackModeEntered(modeId: string, seasonId: string, payload: AnalyticsPayload = {}) {
+  trackEvent("mode_entered", { modeId, seasonId, ...payload });
+}
+
+export function trackChallengeStarted(modeId: string, challengeId: string, payload: AnalyticsPayload = {}) {
+  trackEvent("challenge_started", { modeId, challengeId, ...payload });
+}
+
+export function trackChallengeCompleted(modeId: string, challengeId: string, payload: AnalyticsPayload = {}) {
+  trackEvent("challenge_completed", { modeId, challengeId, ...payload });
+}
+
+export function trackChallengeShared(modeId: string, challengeId: string, payload: AnalyticsPayload = {}) {
+  trackEvent("challenge_shared", { modeId, challengeId, ...payload });
 }

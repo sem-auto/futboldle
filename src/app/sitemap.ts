@@ -24,10 +24,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${SITE_URL}/world-cups`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/world-cups/mundialdle`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
+    {
       url: `${SITE_URL}/perfil`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.5,
+    },
+    {
+      url: `${SITE_URL}/progreso`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.7,
     },
     {
       url: `${SITE_URL}/vitrina`,

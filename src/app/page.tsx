@@ -1,5 +1,6 @@
 ﻿"use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import WordleBBVA from "@/components/WordleBBVA";
 import TrayectoriaBBVA from "@/components/TrayectoriaBBVA";
 import Top10BBVA from "@/components/Top10BBVA";
@@ -11,16 +12,18 @@ import ClubOcultoBBVA from "@/components/ClubOcultoBBVA";
 import OnceBBVA from "@/components/OnceBBVA";
 import QuienFaltaBBVA from "@/components/QuienFaltaBBVA";
 import StatdleBBVA from "@/components/StatdleBBVA";
+import Mundialdle from "@/components/Mundialdle";
 import IconUnlockToast from "@/components/IconUnlockToast";
-import PromoBanner, { SidebarAds } from "@/components/PromoBanner";
+import { SidebarAds } from "@/components/PromoBanner";
 import { getDayNumber, getDayKey } from "@/lib/daily";
 import { useStats } from "@/lib/useStats";
 import { getAlbumProgress } from "@/lib/album";
 import { shareResult } from "@/lib/share";
 import { getCommunityDifficulty } from "@/lib/communityStats";
 import { seasons } from "@/data/product";
+import { trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 
-type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "statdle" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
+type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "statdle" | "mundialdle" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
 
 const BBVA_PHRASES = [
   "¿Te acuerdas de Apoño?",
@@ -44,6 +47,8 @@ function useDailyStatus() {
   const [crackWon,   setCrackWon]   = useState(false);
   const [statdleDone, setStatdleDone] = useState(false);
   const [statdleWon, setStatdleWon] = useState(false);
+  const [mundialdleDone, setMundialdleDone] = useState(false);
+  const [mundialdleWon, setMundialdleWon] = useState(false);
 
   useEffect(() => {
     const key = getDayKey();
@@ -94,15 +99,24 @@ function useDailyStatus() {
       const statdle = localStorage.getItem(`fbl-statdle-done-${key}`);
       if (statdle) { setStatdleDone(true); setStatdleWon(statdle === "won"); }
     } catch {}
+    try {
+      const mundialdle = localStorage.getItem(`fbl-mundialdle-done-${key}`);
+      if (mundialdle) { setMundialdleDone(true); setMundialdleWon(mundialdle === "won"); }
+    } catch {}
   }, []);
 
-  return { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon };
+  return { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon, mundialdleDone, mundialdleWon };
 }
 
 /* ─── Header ─── */
 function Header({ onLogoClick }: { onLogoClick: () => void }) {
   const { stats } = useStats();
+  const [cards, setCards] = useState(0);
   const phrase = BBVA_PHRASES[getDayNumber() % BBVA_PHRASES.length];
+
+  useEffect(() => {
+    setCards(getAlbumProgress().unlockedCount);
+  }, []);
 
   return (
     <header className="sticky top-0 z-20" style={{ background: "white", borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
@@ -123,26 +137,16 @@ function Header({ onLogoClick }: { onLogoClick: () => void }) {
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Racha si existe */}
-          {stats.streak > 0 && (
-            <div className="flex items-center gap-1 px-2 py-1 rounded-lg"
-              style={{ background: "#fff8e6", border: "1px solid rgba(200,146,10,0.25)" }}>
-              <span className="text-[11px]">🔥</span>
-              <span className="font-bebas text-[14px] leading-none" style={{ color: "#c8920a" }}>{stats.streak}</span>
-            </div>
-          )}
-          {/* Día */}
-          <div className="text-[8px] md:text-[9px] font-semibold px-1.5 md:px-2 py-0.5 md:py-1 rounded-lg"
-            style={{ background: "rgba(0,0,0,0.04)", color: "#9a9a8a" }}>
-            Día #{getDayNumber()}
-          </div>
-          {/* Social */}
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
-            className="w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors" style={{ color: "#555" }}>
-            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-            </svg>
-          </a>
+          <Link href="/progreso" className="flex items-center gap-1 px-2 py-1 rounded-lg"
+            style={{ background: "#fff8e6", border: "1px solid rgba(200,146,10,0.25)" }}>
+            <span className="text-[11px]">🔥</span>
+            <span className="font-bebas text-[14px] leading-none" style={{ color: "#c8920a" }}>{stats.streak}</span>
+          </Link>
+          <Link href="/progreso" className="flex items-center gap-1 px-2 py-1 rounded-lg"
+            style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.18)" }}>
+            <span className="text-[11px]">🎴</span>
+            <span className="font-bebas text-[14px] leading-none" style={{ color: "#174ea6" }}>{cards}</span>
+          </Link>
         </div>
       </div>
     </header>
@@ -345,6 +349,33 @@ function StatdleCard({ onClick, done, won, difficulty }: { onClick: () => void; 
   );
 }
 
+function MundialdleHomeCard({ onClick, done, won }: { onClick: () => void; done: boolean; won: boolean }) {
+  return (
+    <button onClick={onClick}
+      className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
+      style={{ background: "white", boxShadow: "0 3px 14px rgba(23,78,166,0.15)", border: "1px solid rgba(23,78,166,0.22)", display: "flex", flexDirection: "column" }}>
+      <div className="px-3 md:px-4 py-3 md:py-4 relative overflow-hidden flex flex-col flex-1"
+        style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
+        <div className="absolute right-2 top-2 text-[54px] opacity-15 leading-none">🏆</div>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <span className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+            style={{ background: "rgba(255,255,255,0.18)", color: "white" }}>Nuevo</span>
+          <GamePill done={done} won={won} />
+        </div>
+        <div className="text-[24px] leading-none mb-2">🌍</div>
+        <div className="font-bebas text-[20px] md:text-[22px] leading-none">MUNDIALDLE</div>
+        <div className="text-[10px] leading-snug mt-0.5 flex-1 text-white/70">Adivina el jugador mundialista</div>
+        <div className="flex flex-wrap gap-1 mt-3">
+          {["🏆 Mundial", "🇪🇸 Selección", "🔵 Club"].map(chip => (
+            <span key={chip} className="text-[8px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.14)" }}>{chip}</span>
+          ))}
+        </div>
+        <div className="mt-3 font-oswald font-semibold uppercase tracking-wider text-[10px] text-white">{done ? "VER RESULTADO →" : "JUGAR →"}</div>
+      </div>
+    </button>
+  );
+}
+
 /* ─── Coming soon card ─── */
 interface CSCardProps {
   title: string; subtitle: string; emoji: string; accent: string;
@@ -402,32 +433,44 @@ function QuickGameCard({ title, subtitle, emoji, accent, onClick }: {
 }
 
 function SeasonsBlock() {
+  function statusFor(status: string) {
+    if (status === "active") return { label: "Activa", color: "#1e6b2e", bg: "rgba(30,107,46,0.12)", border: "rgba(30,107,46,0.20)", card: "#f0faf2" };
+    if (status === "new") return { label: "Nuevo", color: "#174ea6", bg: "rgba(23,78,166,0.12)", border: "rgba(23,78,166,0.22)", card: "#eef3ff" };
+    return { label: "Próximamente", color: "#9a9a8a", bg: "#f8f5f0", border: "rgba(0,0,0,0.07)", card: "#fff" };
+  }
+
   return (
     <section className="rounded-2xl px-3 py-3 md:px-4"
       style={{ background: "rgba(255,255,255,0.66)", border: "1px solid rgba(0,0,0,0.07)" }}>
       <div className="flex items-end justify-between gap-2 mb-2.5">
         <div>
-          <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Futboldle</div>
-          <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>EL FÚTBOL QUE ECHAMOS DE MENOS</h3>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Explorar</div>
+          <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>TEMPORADAS</h3>
         </div>
         <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Temporadas</div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
-        {seasons.map(season => {
-          const active = season.status === "active";
-          return (
-            <div key={season.id} className="rounded-xl px-3 py-2"
-              style={{ background: active ? "#f0faf2" : "#fff", border: `1px solid ${active ? "rgba(30,107,46,0.20)" : "rgba(0,0,0,0.07)"}` }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {seasons.filter(season => season.id === "bbva" || season.id === "world-cups").map(season => {
+          const status = statusFor(season.status);
+          const content = (
+            <div className="rounded-xl px-3 py-2 h-full transition-transform active:scale-[0.98]"
+              style={{ background: status.card, border: `1px solid ${status.border}` }}>
               <div className="flex items-center justify-between gap-2">
                 <div className="font-bebas text-[17px] leading-none" style={{ color: "#18181b" }}>{season.name}</div>
                 <span className="text-[7px] font-semibold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full"
-                  style={{ background: active ? "rgba(30,107,46,0.12)" : "#f8f5f0", color: active ? "#1e6b2e" : "#9a9a8a" }}>
-                  {active ? "Activa" : "Próximamente"}
+                  style={{ background: status.bg, color: status.color }}>
+                  {status.label}
                 </span>
               </div>
               <div className="text-[10px] mt-1" style={{ color: "#9a9a8a" }}>{season.subtitle}</div>
             </div>
           );
+
+          if (season.id === "world-cups") {
+            return <Link key={season.id} href="/world-cups" onClick={() => trackSeasonEntered("world-cups")} className="block">{content}</Link>;
+          }
+
+          return <Link key={season.id} href="/" onClick={() => trackSeasonEntered("bbva")} className="block">{content}</Link>;
         })}
       </div>
     </section>
@@ -647,15 +690,20 @@ function ProfileCompact({ played, won, streak, bestStreak, albumProgress, onAlbu
 export default function HomePage() {
   const [view, setView] = useState<View>("home");
   const [albumProgress, setAlbumProgress] = useState({ unlockedCount: 0, total: 0, percent: 0 });
-  const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon } = useDailyStatus();
+  const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon, mundialdleDone, mundialdleWon } = useDailyStatus();
   const { stats, refresh } = useStats();
   const goHome = () => setView("home");
-  const hasShareableResult = wordleDone || trayDone || top10Done || crackDone || statdleDone;
+  const hasShareableResult = wordleDone || trayDone || top10Done || crackDone || statdleDone || mundialdleDone;
   const wordleDifficulty = getCommunityDifficulty("wordle", `${getDayKey()}-home`);
   const trayDifficulty = getCommunityDifficulty("trayectoria", `${getDayKey()}-home`);
   const top10Difficulty = getCommunityDifficulty("top10", `${getDayKey()}-home`);
   const crackDifficulty = getCommunityDifficulty("crack", `${getDayKey()}-home`);
   const statdleDifficulty = getCommunityDifficulty("statdle", `${getDayKey()}-home`);
+
+  function openMode(nextView: View, modeId: string, seasonId = "bbva") {
+    trackModeEntered(modeId, seasonId, { source: "home" });
+    setView(nextView);
+  }
 
   useEffect(() => {
     setAlbumProgress(getAlbumProgress());
@@ -671,8 +719,8 @@ export default function HomePage() {
         if (card?.name && card?.rarity) lastCard = `\n🎴 Último cromo: ${card.name} (${card.rarity})`;
       }
     } catch {}
-    const completedCount = [wordleDone && wordleWon, trayDone && trayWon, top10Done && top10Won, crackDone && crackWon, statdleDone && statdleWon].filter(Boolean).length;
-    const failedCount = [wordleDone && !wordleWon, trayDone && !trayWon, top10Done && !top10Won, crackDone && !crackWon, statdleDone && !statdleWon].filter(Boolean).length;
+    const completedCount = [wordleDone && wordleWon, trayDone && trayWon, top10Done && top10Won, crackDone && crackWon, statdleDone && statdleWon, mundialdleDone && mundialdleWon].filter(Boolean).length;
+    const failedCount = [wordleDone && !wordleWon, trayDone && !trayWon, top10Done && !top10Won, crackDone && !crackWon, statdleDone && !statdleWon, mundialdleDone && !mundialdleWon].filter(Boolean).length;
     const lines = [
       "\u26bd Futboldle #" + getDayNumber(),
       "Minijuegos diarios de fútbol nostalgia",
@@ -683,8 +731,9 @@ export default function HomePage() {
       dailyShareSquare(top10Done, top10Won) + " Top10 BBVA",
       dailyShareSquare(crackDone, crackWon) + " Cromo oculto",
       dailyShareSquare(statdleDone, statdleWon) + " Statdle BBVA",
+      dailyShareSquare(mundialdleDone, mundialdleWon) + " Mundialdle",
       "",
-      "🔥 Hoy: " + completedCount + "/5 retos",
+      "🔥 Hoy: " + completedCount + "/6 retos",
       failedCount > 0 ? "💥 Fallados: " + failedCount : "✅ Sin fallos",
       "\ud83c\udfb4 " + albumProgress.unlockedCount + "/" + albumProgress.total + " cromos" + lastCard,
       "\ud83d\udd25 Racha: " + stats.streak,
@@ -725,6 +774,17 @@ export default function HomePage() {
       <Header onLogoClick={goHome} />
       <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <StatdleBBVA onBack={goHome} />
+      </main>
+    </div>
+  );
+
+  if (view === "mundialdle") return (
+    <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
+      <SidebarAds />
+      <IconUnlockToast />
+      <Header onLogoClick={goHome} />
+      <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
+        <Mundialdle onBack={goHome} />
       </main>
     </div>
   );
@@ -819,37 +879,17 @@ export default function HomePage() {
 
   return (
     <div className="min-h-dvh flex flex-col" style={{ background: "#f6f2ea" }}>
-      <SidebarAds />
       <IconUnlockToast />
       <Header onLogoClick={goHome} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5 flex flex-col gap-3 md:gap-4 overflow-x-hidden">
 
-        {/* Row 0: fecha + hoy se juega + racha */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 md:gap-2.5">
-          <div className="flex-shrink-0">
-            <h2 className="font-bebas text-[22px] md:text-[24px] leading-none" style={{ color: "#18181b" }}>HOY SE JUEGA</h2>
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <h2 className="font-bebas text-[28px] md:text-[32px] leading-none" style={{ color: "#18181b" }}>HOY SE JUEGA</h2>
             <p className="text-[9px]" style={{ color: "#9a9a8a" }}>
               {new Date().toLocaleDateString("es-ES", { weekday:"long", day:"numeric", month:"long" })} · Día #{getDayNumber()}
             </p>
-          </div>
-          <div className="sm:ml-3 flex-1">
-            <TodayStrip wordleDone={wordleDone} trayDone={trayDone} onWordle={()=>setView("wordle")} onTray={()=>setView("trayectoria")}/>
-          </div>
-          <button onClick={() => setView("album")}
-            className="flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-lg"
-            style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.18)", color: "#c8920a" }}>
-            Album · {albumProgress.unlockedCount}
-          </button>
-        </div>
-
-        {/* Barra de progreso diaria */}
-        <DailyProgress wordleDone={wordleDone} wordleWon={wordleWon} trayDone={trayDone} trayWon={trayWon} top10Done={top10Done} top10Won={top10Won} crackDone={crackDone} crackWon={crackWon} statdleDone={statdleDone} statdleWon={statdleWon} streak={stats.streak} />
-
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>El día</div>
-            <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>RETOS DIARIOS</h3>
           </div>
           {hasShareableResult ? (
             <button onClick={shareDailyResult} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg"
@@ -857,20 +897,17 @@ export default function HomePage() {
               Compartir
             </button>
           ) : (
-            <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>5 principales</div>
+            <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Retos diarios</div>
           )}
         </div>
 
-        {/* ── FILA 1: Wordle + Trayectoria (igual importancia) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3">
-          <WordleCard onClick={() => setView("wordle")} done={wordleDone} won={wordleWon} extras={extras} difficulty={wordleDifficulty} />
-          <TrayCard onClick={() => setView("trayectoria")} done={trayDone} won={trayWon} difficulty={trayDifficulty} />
+          <WordleCard onClick={() => openMode("wordle", "wordle-bbva")} done={wordleDone} won={wordleWon} extras={extras} difficulty={wordleDifficulty} />
+          <TrayCard onClick={() => openMode("trayectoria", "trayectoria-bbva")} done={trayDone} won={trayWon} difficulty={trayDifficulty} />
         </div>
 
-        {/* ── FILA 2: Top 10 + Cromo oculto + Statdle ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 md:gap-3">
-          {/* TOP 10 BBVA */}
-          <button onClick={() => setView("top10")}
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 md:gap-3">
+          <button onClick={() => openMode("top10", "top10-bbva")}
             className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
             style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(26,79,160,0.20)", display: "flex", flexDirection: "column" }}>
             <div className="h-[3px]" style={{ background: "#1a4fa0" }}/>
@@ -890,9 +927,9 @@ export default function HomePage() {
               <DifficultyLine label={top10Difficulty.label} completion={top10Difficulty.completion} color="#1a4fa0" />
             </div>
           </button>
-          <StatdleCard onClick={() => setView("statdle")} done={statdleDone} won={statdleWon} difficulty={statdleDifficulty} />
-          {/* CROMO OCULTO */}
-          <button onClick={() => setView("crack")}
+          <StatdleCard onClick={() => openMode("statdle", "statdle-bbva")} done={statdleDone} won={statdleWon} difficulty={statdleDifficulty} />
+          <MundialdleHomeCard onClick={() => openMode("mundialdle", "mundialdle", "world-cups")} done={mundialdleDone} won={mundialdleWon} />
+          <button onClick={() => openMode("crack", "cromo-oculto")}
             className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
             style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(124,58,237,0.20)", display: "flex", flexDirection: "column" }}>
             <div className="h-[3px]" style={{ background: "#7c3aed" }}/>
@@ -914,56 +951,23 @@ export default function HomePage() {
           </button>
         </div>
 
-        <section className="flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Colección</div>
-              <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>TU PROGRESO</h3>
-            </div>
-            <button onClick={() => setView("album")} className="text-[10px] font-semibold px-2.5 py-1 rounded-lg"
-              style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.18)", color: "#c8920a" }}>
-              Ver álbum
-            </button>
-          </div>
-          <ProfileCompact
-            played={stats.played}
-            won={stats.won}
-            streak={stats.streak}
-            bestStreak={stats.bestStreak}
-            albumProgress={albumProgress}
-            onAlbum={() => setView("album")}
-          />
-          <div className="text-center text-[10px]" style={{ color: "#9a9a8a" }}>
-            Tu progreso se guarda en este navegador.
-          </div>
-        </section>
-
         <section className="rounded-2xl px-3 py-3 md:px-4 md:py-4"
           style={{ background: "rgba(255,255,255,0.70)", border: "1px solid rgba(0,0,0,0.07)" }}>
           <div className="flex items-end justify-between gap-2 mb-2.5">
             <div>
               <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Más nostalgia</div>
-              <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>SIGUE JUGANDO</h3>
+              <h3 className="font-bebas text-[21px] leading-none" style={{ color: "#18181b" }}>EXTRAS</h3>
             </div>
             <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Retos extra</div>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
-            <QuickGameCard title="¿JUGÓ AQUÍ?" subtitle="Jugador y club. ¿Verdad o trampa?" emoji="✅" accent="#1e6b2e" onClick={() => setView("jugoAqui")} />
-            <QuickGameCard title="FICHAJE O INVENTO" subtitle="Operaciones raras de la era BBVA." emoji="📝" accent="#c8920a" onClick={() => setView("fichaje")} />
-            <QuickGameCard title="CLUB OCULTO" subtitle="Adivina el equipo por sus cromos." emoji="🏟️" accent="#1a4fa0" onClick={() => setView("clubOculto")} />
-            <QuickGameCard title="ONCE BBVA" subtitle="Rellena una plantilla de época." emoji="👕" accent="#b81c14" onClick={() => setView("once")} />
-            <QuickGameCard title="¿QUIÉN FALTA?" subtitle="Reconstruye la memoria del equipo." emoji="❔" accent="#7c3aed" onClick={() => setView("quienFalta")} />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <QuickGameCard title="¿JUGÓ AQUÍ?" subtitle="Jugador y club. ¿Verdad o trampa?" emoji="✅" accent="#1e6b2e" onClick={() => openMode("jugoAqui", "jugo-aqui")} />
+            <QuickGameCard title="FICHAJE O INVENTO" subtitle="Operaciones raras de la era BBVA." emoji="📝" accent="#c8920a" onClick={() => openMode("fichaje", "fichaje-invento")} />
+            <QuickGameCard title="CLUB OCULTO" subtitle="Adivina el equipo por sus cromos." emoji="🏟️" accent="#1a4fa0" onClick={() => openMode("clubOculto", "club-oculto")} />
           </div>
         </section>
 
         <SeasonsBlock />
-
-        {/* Ads + footer */}
-        <PromoBanner />
-
-        <div className="text-center py-2">
-          <p className="text-[9px]" style={{ color: "#ccc" }}>Futboldle · Liga BBVA Archive · No afiliado a LaLiga</p>
-        </div>
 
       </main>
     </div>
