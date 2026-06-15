@@ -46,6 +46,20 @@ function clueStyle(tone?: string) {
   return { background: "#f8f5f0", border: "rgba(0,0,0,0.07)", color: "#18181b" };
 }
 
+function selectionFlag(value: string) {
+  if (value === "Espana") return "\uD83C\uDDEA\uD83C\uDDF8";
+  if (value === "Alemania") return "\uD83C\uDDE9\uD83C\uDDEA";
+  if (value === "Argentina") return "\uD83C\uDDE6\uD83C\uDDF7";
+  if (value === "Brasil") return "\uD83C\uDDE7\uD83C\uDDF7";
+  if (value === "Francia") return "\uD83C\uDDEB\uD83C\uDDF7";
+  if (value === "Italia") return "\uD83C\uDDEE\uD83C\uDDF9";
+  if (value === "Portugal") return "\uD83C\uDDF5\uD83C\uDDF9";
+  if (value === "Uruguay") return "\uD83C\uDDFA\uD83C\uDDFE";
+  if (value === "Holanda") return "\uD83C\uDDF3\uD83C\uDDF1";
+  if (value === "Croacia") return "\uD83C\uDDED\uD83C\uDDF7";
+  return "\uD83C\uDF0D";
+}
+
 function clueIcon(label: string, value: string) {
   if (label === "Mundial") return "\uD83C\uDFC6";
   if (label === "Goles" || label === "Momento" || label === "Partido mitico") return "\u26BD";
@@ -57,17 +71,7 @@ function clueIcon(label: string, value: string) {
   if (label === "Posicion" && value === "Centrocampista") return "\uD83E\uDDE0";
   if (label === "Posicion") return "\uD83C\uDFAF";
   if (label === "Seleccion") {
-    if (value === "Espana") return "\uD83C\uDDEA\uD83C\uDDF8";
-    if (value === "Alemania") return "\uD83C\uDDE9\uD83C\uDDEA";
-    if (value === "Argentina") return "\uD83C\uDDE6\uD83C\uDDF7";
-    if (value === "Brasil") return "\uD83C\uDDE7\uD83C\uDDF7";
-    if (value === "Francia") return "\uD83C\uDDEB\uD83C\uDDF7";
-    if (value === "Italia") return "\uD83C\uDDEE\uD83C\uDDF9";
-    if (value === "Portugal") return "\uD83C\uDDF5\uD83C\uDDF9";
-    if (value === "Uruguay") return "\uD83C\uDDFA\uD83C\uDDFE";
-    if (value === "Holanda") return "\uD83C\uDDF3\uD83C\uDDF1";
-    if (value === "Croacia") return "\uD83C\uDDED\uD83C\uDDF7";
-    return "\uD83C\uDF0D";
+    return selectionFlag(value);
   }
   if (label === "Club") return "\uD83C\uDFDF\uFE0F";
   if (label === "Estilo") return "\uD83E\uDDF1";
@@ -181,9 +185,9 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
           <h1 className="font-bebas text-[42px] leading-none">MUNDIALDLE</h1>
           <p className="text-[12px] text-white/75 mt-1">Adivina el jugador mundialista.</p>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>{"\uD83C\uDF0D"} 2002-2026</span>
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>{"\uD83C\uDFDF\uFE0F"} Selecciones</span>
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>{"\uD83C\uDFA6"} Nostalgia mundial</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>{"\uD83C\uDFC6"} Mundial</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>{"\uD83C\uDDE9\uD83C\uDDEA"} Selecci{"\u00f3"}n</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>{"\uD83C\uDFDF\uFE0F"} Club</span>
           </div>
         </div>
 
@@ -198,8 +202,8 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
               const visible = index < revealedCount || gameOver;
               const style = clueStyle(clue.tone);
               return (
-                <div key={`${clue.label}-${index}`} className="flex items-center gap-2 rounded-xl px-3 py-2 min-h-[58px]"
-                  style={{ background: visible ? style.background : "#f3efe8", border: `1px solid ${visible ? style.border : "rgba(0,0,0,0.06)"}` }}>
+                <div key={`${clue.label}-${index}`} className="flex items-center gap-2 rounded-xl px-3 py-2 min-h-[64px] transition-transform"
+                  style={{ background: visible ? `linear-gradient(135deg,${style.background},#ffffff)` : "#f3efe8", border: `1px solid ${visible ? style.border : "rgba(0,0,0,0.06)"}`, boxShadow: visible ? "0 2px 10px rgba(0,0,0,0.05)" : "none" }}>
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-[17px]"
                     style={{ background: visible ? "white" : "#ddd7ca", color: "white", boxShadow: visible ? "0 1px 5px rgba(0,0,0,0.08)" : "none" }}>
                     {visible ? clueIcon(clue.label, clue.value) : index + 1}
@@ -263,12 +267,27 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
 
           {gameOver && (
             <div className="rounded-xl p-4" style={{ background: won ? "#f0faf2" : "#fff5f5", border: `1px solid ${won ? "rgba(30,107,46,0.22)" : "rgba(184,28,20,0.18)"}` }}>
-              <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? "Correcto" : "Era"}</div>
-              <div className="font-bebas text-[34px] leading-none" style={{ color: "#18181b" }}>{player.name}</div>
-              <div className="text-[12px]" style={{ color: "#6b6b72" }}>{player.nationality} {"\u00b7"} {player.position} {"\u00b7"} Mundial {challenge.worldCup}</div>
+              <div className="flex items-center gap-3">
+                <div className="w-16 h-20 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: "linear-gradient(145deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)", boxShadow: "0 3px 12px rgba(0,0,0,0.08)" }}>
+                  <div className="text-center">
+                    <div className="text-[24px] leading-none">{selectionFlag(player.nationality)}</div>
+                    <div className="font-bebas text-[28px] leading-none mt-1" style={{ color: "#18181b" }}>{player.name.slice(0, 1)}</div>
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? "Leyenda mundialista desbloqueada" : "Era"}</div>
+                  <div className="font-bebas text-[34px] leading-none" style={{ color: "#18181b" }}>{player.name}</div>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}>{selectionFlag(player.nationality)} {player.nationality}</span>
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#18181b" }}>{clueIcon("Posicion", player.position)} {player.position}</span>
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>{"\uD83C\uDFC6"} Mundial {challenge.worldCup}</span>
+                  </div>
+                </div>
+              </div>
               {challenge.funFact && (
                 <div className="mt-3 rounded-xl px-3 py-2 text-[12px] leading-snug" style={{ background: "white", border: "1px solid rgba(23,78,166,0.16)", color: "#3a3a3f" }}>
-                  <span className="font-semibold">Dato:</span> {challenge.funFact}
+                  <span className="font-semibold">{"\u00bfSab\u00edas que...?"}</span> {challenge.funFact}
                 </div>
               )}
               <button onClick={share} className="mt-3 w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"

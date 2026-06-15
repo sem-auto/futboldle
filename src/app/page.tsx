@@ -352,21 +352,21 @@ function StatdleCard({ onClick, done, won, difficulty }: { onClick: () => void; 
 function MundialdleHomeCard({ onClick, done, won }: { onClick: () => void; done: boolean; won: boolean }) {
   return (
     <button onClick={onClick}
-      className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
-      style={{ background: "white", boxShadow: "0 3px 14px rgba(23,78,166,0.15)", border: "1px solid rgba(23,78,166,0.22)", display: "flex", flexDirection: "column" }}>
+      className="w-full h-full min-h-[190px] text-left rounded-2xl overflow-hidden game-card"
+      style={{ background: "white", boxShadow: "0 6px 18px rgba(23,78,166,0.18)", border: "1px solid rgba(23,78,166,0.30)", display: "flex", flexDirection: "column" }}>
       <div className="px-3 md:px-4 py-3 md:py-4 relative overflow-hidden flex flex-col flex-1"
         style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
         <div className="absolute right-2 top-2 text-[54px] opacity-15 leading-none">🏆</div>
         <div className="flex items-center justify-between gap-2 mb-3">
           <span className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
-            style={{ background: "rgba(255,255,255,0.18)", color: "white" }}>Nuevo</span>
+            style={{ background: "#facc15", color: "#0f172a", boxShadow: "0 1px 8px rgba(250,204,21,0.35)" }}>Nuevo</span>
           <GamePill done={done} won={won} />
         </div>
-        <div className="text-[24px] leading-none mb-2">🌍</div>
-        <div className="font-bebas text-[20px] md:text-[22px] leading-none">MUNDIALDLE</div>
+        <div className="text-[27px] leading-none mb-2">🌍</div>
+        <div className="font-bebas text-[21px] md:text-[23px] leading-none">MUNDIALDLE</div>
         <div className="text-[10px] leading-snug mt-0.5 flex-1 text-white/70">Adivina el jugador mundialista</div>
         <div className="flex flex-wrap gap-1 mt-3">
-          {["🏆 Mundial", "🇪🇸 Selección", "🔵 Club"].map(chip => (
+          {["🏆 Mundial", "🇩🇪 Selección", "🏟 Club"].map(chip => (
             <span key={chip} className="text-[8px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.14)" }}>{chip}</span>
           ))}
         </div>
@@ -880,6 +880,7 @@ export default function HomePage() {
   return (
     <div className="min-h-dvh flex flex-col" style={{ background: "#f6f2ea" }}>
       <IconUnlockToast />
+      <SidebarAds />
       <Header onLogoClick={goHome} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5 flex flex-col gap-3 md:gap-4 overflow-x-hidden">

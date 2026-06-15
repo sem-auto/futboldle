@@ -1,5 +1,6 @@
 export type WorldCupPosition = "Portero" | "Defensa" | "Centrocampista" | "Delantero";
 export type WorldCupIconicLevel = "icono" | "legendario" | "core" | "culto";
+export type WorldCupCategory = "Leyenda" | "Campeon del mundo" | "Goleador" | "Heroe inesperado" | "Portero iconico";
 
 export type WorldCupPlayer = {
   id: string;
@@ -11,12 +12,34 @@ export type WorldCupPlayer = {
   worldCups: number[];
   mainWorldCup: number;
   iconicLevel: WorldCupIconicLevel;
+  categories: WorldCupCategory[];
   clubsByWorldCup?: {
     year: number;
     club: string;
     age?: number;
   }[];
 };
+
+const championIds = new Set([
+  "iker-casillas", "sergio-ramos", "carles-puyol", "xavi", "andres-iniesta", "david-villa", "fernando-torres", "sergio-busquets", "xabi-alonso", "gerard-pique", "cesc-fabregas", "david-silva",
+  "lionel-messi", "angel-di-maria", "dibu-martinez",
+  "ronaldo-nazario", "ronaldinho", "rivaldo", "kaka", "cafu", "roberto-carlos",
+  "zinedine-zidane", "thierry-henry", "kylian-mbappe", "antoine-griezmann", "paul-pogba", "ngolo-kante",
+  "miroslav-klose", "thomas-muller", "mesut-ozil", "philipp-lahm", "manuel-neuer", "bastian-schweinsteiger", "toni-kroos", "mario-gotze",
+  "gianluigi-buffon", "fabio-cannavaro", "andrea-pirlo", "francesco-totti", "alessandro-del-piero", "marco-materazzi", "fabio-grosso",
+]);
+
+const heroIds = new Set(["mario-gotze", "fabio-grosso", "marco-materazzi", "james-rodriguez", "dibu-martinez", "diego-forlan"]);
+
+function inferCategories(id: string, position: WorldCupPosition, iconicLevel: WorldCupIconicLevel): WorldCupCategory[] {
+  const categories: WorldCupCategory[] = [];
+  if (iconicLevel === "icono" || iconicLevel === "legendario") categories.push("Leyenda");
+  if (championIds.has(id)) categories.push("Campeon del mundo");
+  if (position === "Delantero") categories.push("Goleador");
+  if (position === "Portero") categories.push("Portero iconico");
+  if (heroIds.has(id) || iconicLevel === "culto") categories.push("Heroe inesperado");
+  return categories.length ? categories : ["Leyenda"];
+}
 
 const wc = (id: string, name: string, aliases: string[], nationality: string, flag: string, position: WorldCupPosition, worldCups: number[], mainWorldCup: number, iconicLevel: WorldCupIconicLevel, club?: string, age?: number): WorldCupPlayer => ({
   id,
@@ -28,6 +51,7 @@ const wc = (id: string, name: string, aliases: string[], nationality: string, fl
   worldCups,
   mainWorldCup,
   iconicLevel,
+  categories: inferCategories(id, position, iconicLevel),
   clubsByWorldCup: club ? [{ year: mainWorldCup, club, age }] : undefined,
 });
 
