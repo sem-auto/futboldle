@@ -39,7 +39,7 @@ export const mundialdleChallenges: MundialdleChallenge[] = [
     { icon: "", label: "Posicion", value: "Delantero", tone: "red" },
     { icon: "", label: "Club", value: "PSG", tone: "neutral" },
   ] },
-  { id: "mbappe-2018", playerId: "kylian-mbappe", worldCup: 2018, source: "FIFA / estadisticas del Mundial 2018", clues: [
+  { id: "mbappe-2018", playerId: "kylian-mbappe", worldCup: 2018, source: "FIFA / estadisticas del Mundial 2018", funFact: "Kylian Mbappe marco en la final del Mundial 2018 con solo 19 anos.", clues: [
     { icon: "", label: "Mundial", value: "Mundial 2018", tone: "gold" },
     { icon: "", label: "Edad", value: "19 anos", tone: "blue" },
     { icon: "", label: "Goles", value: "4 goles", tone: "green" },
@@ -47,7 +47,7 @@ export const mundialdleChallenges: MundialdleChallenge[] = [
     { icon: "", label: "Posicion", value: "Delantero", tone: "neutral" },
     { icon: "", label: "Club", value: "PSG", tone: "blue" },
   ] },
-  { id: "klose-2006", playerId: "miroslav-klose", worldCup: 2006, source: "FIFA / estadisticas del Mundial 2006", clues: [
+  { id: "klose-2006", playerId: "miroslav-klose", worldCup: 2006, source: "FIFA / estadisticas del Mundial 2006", funFact: "Miroslav Klose termino su carrera como maximo goleador historico de los Mundiales.", clues: [
     { icon: "", label: "Mundial", value: "Mundial 2006", tone: "gold" },
     { icon: "", label: "Rol", value: "Maximo goleador", tone: "gold" },
     { icon: "", label: "Goles", value: "5 goles", tone: "green" },
@@ -95,7 +95,7 @@ export const mundialdleChallenges: MundialdleChallenge[] = [
     { icon: "", label: "Estilo", value: "Portero-libero", tone: "green" },
     { icon: "", label: "Club", value: "Bayern", tone: "neutral" },
   ] },
-  { id: "sneijder-2010", playerId: "wesley-sneijder", worldCup: 2010, source: "FIFA / Mundial 2010", clues: [
+  { id: "sneijder-2010", playerId: "wesley-sneijder", worldCup: 2010, source: "FIFA / Mundial 2010", funFact: "Wesley Sneijder fue uno de los grandes protagonistas del Mundial 2010.", clues: [
     { icon: "", label: "Mundial", value: "Mundial 2010", tone: "gold" },
     { icon: "", label: "Rol", value: "Finalista", tone: "blue" },
     { icon: "", label: "Goles", value: "5 goles", tone: "green" },
@@ -103,7 +103,7 @@ export const mundialdleChallenges: MundialdleChallenge[] = [
     { icon: "", label: "Posicion", value: "Centrocampista", tone: "blue" },
     { icon: "", label: "Club", value: "Inter", tone: "neutral" },
   ] },
-  { id: "robben-2014", playerId: "arjen-robben", worldCup: 2014, source: "FIFA / Mundial 2014", clues: [
+  { id: "robben-2014", playerId: "arjen-robben", worldCup: 2014, source: "FIFA / Mundial 2014", funFact: "Arjen Robben fue una de las grandes figuras de Holanda en Brasil 2014.", clues: [
     { icon: "", label: "Mundial", value: "Mundial 2014", tone: "gold" },
     { icon: "", label: "Rol", value: "Figura de semifinalista", tone: "green" },
     { icon: "", label: "Seleccion", value: "Holanda", tone: "red" },
@@ -111,7 +111,7 @@ export const mundialdleChallenges: MundialdleChallenge[] = [
     { icon: "", label: "Pista", value: "Velocidad y recorte hacia dentro", tone: "gold" },
     { icon: "", label: "Club", value: "Bayern", tone: "neutral" },
   ] },
-  { id: "pirlo-2006", playerId: "andrea-pirlo", worldCup: 2006, source: "FIFA / Mundial 2006", clues: [
+  { id: "pirlo-2006", playerId: "andrea-pirlo", worldCup: 2006, source: "FIFA / Mundial 2006", funFact: "Andrea Pirlo fue clave en la Italia campeona del Mundial 2006.", clues: [
     { icon: "", label: "Mundial", value: "Mundial 2006", tone: "gold" },
     { icon: "", label: "Rol", value: "Campeon", tone: "gold" },
     { icon: "", label: "Seleccion", value: "Italia", tone: "red" },

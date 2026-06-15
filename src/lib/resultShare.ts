@@ -10,6 +10,7 @@ type ShareCommon = {
   seasonId?: string;
   won?: boolean;
   attempts?: number;
+  timeSpent?: number;
   title?: string;
   onCopied?: () => void;
 };
@@ -23,9 +24,11 @@ export function shareGameResult(text: string, common: ShareCommon) {
     seasonId: common.seasonId,
     won: common.won,
     attempts: common.attempts,
+    timeSpent: common.timeSpent,
     dayNumber: getDayNumber(),
     shared: true,
   });
+
   shareResult(normalized, common.onCopied, common.title ?? "Futboldle");
 }
 
@@ -33,7 +36,7 @@ export function buildWordleShare(rows: string[], attempts: number, won: boolean)
   return [
     `Wordle BBVA #${getDayNumber()}`,
     rows.join(""),
-    won ? `Lo resolví en ${attempts} intento${attempts === 1 ? "" : "s"}.` : "No lo resolví hoy.",
+    won ? `Lo resolv\u00ed en ${attempts} intento${attempts === 1 ? "" : "s"}.` : "No lo resolv\u00ed hoy.",
     FUTBOLDLE_URL,
   ].join("\n");
 }
@@ -42,7 +45,7 @@ export function buildProgressiveShare(title: string, marks: string, attempts: nu
   return [
     `${prefix}${title} #${getDayNumber()}`,
     marks,
-    won ? `Lo resolví en ${attempts} ${unit}.` : "No lo resolví hoy.",
+    won ? `Lo resolv\u00ed en ${attempts} ${unit}.` : "No lo resolv\u00ed hoy.",
     FUTBOLDLE_URL,
   ].filter(Boolean).join("\n");
 }

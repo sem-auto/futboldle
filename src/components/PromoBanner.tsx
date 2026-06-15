@@ -48,6 +48,35 @@ export function SidebarAds() {
   );
 }
 
+export function MobileAdBanner({ slot = 0 }: { slot?: 0 | 1 }) {
+  const ad = ADS[slot];
+
+  return (
+    <a
+      href={ad.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="xl:hidden flex items-center rounded-2xl overflow-hidden transition-all duration-150 active:scale-[0.99]"
+      style={{ background: "white", border: `1px solid ${ad.accent}26`, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}
+    >
+      <div className="w-[4px] self-stretch shrink-0" style={{ background: ad.accent }} />
+      <div className="flex-1 min-w-0 px-3 py-2.5">
+        <div className="text-[8px] font-semibold uppercase tracking-[0.15em] mb-0.5" style={{ color: ad.accent }}>
+          <span aria-hidden="true">{ad.eyebrowIcon}</span> {ad.eyebrow}
+        </div>
+        <div className="font-oswald font-semibold text-[14px] leading-tight truncate" style={{ color: "#18181b" }}>{ad.title}</div>
+        <div className="text-[10px] leading-snug line-clamp-1" style={{ color: "#777" }}>{ad.desc}</div>
+      </div>
+      <div className="shrink-0 mr-2">
+        <div className="font-oswald font-semibold text-[9px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg whitespace-nowrap"
+          style={{ background: ad.accent, color: "white" }}>
+          {ad.cta}
+        </div>
+      </div>
+    </a>
+  );
+}
+
 function SideCard({ ad }: { ad: typeof ADS[0] }) {
   return (
     <a

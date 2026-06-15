@@ -5,7 +5,7 @@ import { getDailyMundialdleChallenge, worldCupPlayers } from "@/data/worldcups";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { syncAchievements } from "@/lib/achievements";
-import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered } from "@/lib/analytics";
+import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 
 const MAX_ATTEMPTS = 6;
 
@@ -62,20 +62,29 @@ function selectionFlag(value: string) {
 
 function clueIcon(label: string, value: string) {
   if (label === "Mundial") return "\uD83C\uDFC6";
-  if (label === "Goles" || label === "Momento" || label === "Partido mitico") return "\u26BD";
+  if (label === "Goles") return "\u26BD";
+  if (label === "Momento" || label === "Partido mitico") return "\uD83C\uDFAF";
   if (label === "Premio") return "\uD83E\uDD47";
-  if (label === "Rol") return "\uD83D\uDC51";
+  if (label === "Rol") return value.includes("Finalista") ? "\uD83E\uDD48" : "\uD83E\uDD47";
   if (label === "Edad") return "\uD83D\uDC76";
   if (label === "Posicion" && value === "Portero") return "\uD83E\uDDE4";
   if (label === "Posicion" && value === "Defensa") return "\uD83D\uDEE1\uFE0F";
-  if (label === "Posicion" && value === "Centrocampista") return "\uD83E\uDDE0";
-  if (label === "Posicion") return "\uD83C\uDFAF";
+  if (label === "Posicion" && value === "Centrocampista") return "\uD83C\uDFAF";
+  if (label === "Posicion" && value === "Delantero") return "\uD83D\uDE80";
+  if (label === "Posicion") return "\u26BD";
   if (label === "Seleccion") {
     return selectionFlag(value);
   }
   if (label === "Club") return "\uD83C\uDFDF\uFE0F";
   if (label === "Estilo") return "\uD83E\uDDF1";
   return "\u2B50";
+}
+
+function rarityLabel(level: string) {
+  if (level === "icono") return "Leyenda";
+  if (level === "legendario") return "Legendario";
+  if (level === "core") return "Estrella";
+  return "Culto";
 }
 
 export default function Mundialdle({ onBack }: { onBack?: () => void }) {
@@ -89,13 +98,15 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
   const [won, setWon] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [startedAt] = useState(() => Date.now());
 
   const suggestions = useMemo(() => getSuggestions(query), [query]);
   const revealedCount = Math.min(challenge.clues.length, Math.max(1, guesses.length + 1));
 
   useEffect(() => {
+    trackSeasonEntered("world-cups", { modeId: "mundialdle" });
     trackModeEntered("mundialdle", "world-cups", { challenge: challenge.id });
-    trackChallengeStarted("mundialdle", challenge.id, { seasonId: "world-cups", worldCup: challenge.worldCup });
+    trackChallengeStarted("mundialdle", challenge.id, { seasonId: "world-cups", worldCup: challenge.worldCup, modeId: "mundialdle" });
     trackEvent("game_started", { game: "mundialdle", season: "world-cups", challenge: challenge.id });
     trackEvent("mundialdle_started", { challenge: challenge.id, worldCup: challenge.worldCup });
 
@@ -138,11 +149,13 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
     persist(nextGuesses, correct, isOver);
 
     if (isOver) {
-      trackChallengeCompleted("mundialdle", challenge.id, { seasonId: "world-cups", won: correct, attempts: nextGuesses.length });
+      const timeSpent = Math.round((Date.now() - startedAt) / 1000);
+      trackChallengeCompleted("mundialdle", challenge.id, { seasonId: "world-cups", modeId: "mundialdle", won: correct, attempts: nextGuesses.length, timeSpent, shared: false });
       if (!correct) trackChallengeFailed("mundialdle", challenge.id, { seasonId: "world-cups", attempts: nextGuesses.length });
       syncAchievements({ modeId: "mundialdle", won: correct });
       trackEvent("game_completed", { game: "mundialdle", season: "world-cups", challenge: challenge.id, won: correct, attempts: nextGuesses.length });
       trackEvent("mundialdle_completed", { challenge: challenge.id, won: correct, attempts: nextGuesses.length });
+      if (correct) trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "mundialdle", playerId: challenge.playerId, challengeId: challenge.id });
       if (!correct) trackEvent("mundialdle_failed", { challenge: challenge.id, attempts: nextGuesses.length });
     }
   }
@@ -161,6 +174,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
       seasonId: "world-cups",
       won,
       attempts: guesses.length,
+      timeSpent: Math.round((Date.now() - startedAt) / 1000),
       title: "Mundialdle",
       onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); },
     });
@@ -237,7 +251,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                     <button key={item.id} onMouseDown={() => submit(item.name)}
                       className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-gray-50"
                       style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-                      <span className="font-semibold">{item.name}</span>
+                      <span className="font-semibold">{item.flag} {item.name}</span>
                       <span className="block text-[10px]" style={{ color: "#9a9a8a" }}>{item.nationality} {"\u00b7"} {item.position}</span>
                     </button>
                   ))}
@@ -268,18 +282,21 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
           {gameOver && (
             <div className="rounded-xl p-4" style={{ background: won ? "#f0faf2" : "#fff5f5", border: `1px solid ${won ? "rgba(30,107,46,0.22)" : "rgba(184,28,20,0.18)"}` }}>
               <div className="flex items-center gap-3">
-                <div className="w-16 h-20 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: "linear-gradient(145deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)", boxShadow: "0 3px 12px rgba(0,0,0,0.08)" }}>
+                <div className="w-20 h-24 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden"
+                  style={{ background: "linear-gradient(145deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.32)", boxShadow: "0 6px 18px rgba(0,0,0,0.12)" }}>
+                  <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: "#d6a20f" }} />
                   <div className="text-center">
-                    <div className="text-[24px] leading-none">{selectionFlag(player.nationality)}</div>
-                    <div className="font-bebas text-[28px] leading-none mt-1" style={{ color: "#18181b" }}>{player.name.slice(0, 1)}</div>
+                    <div className="text-[26px] leading-none">{player.flag || selectionFlag(player.nationality)}</div>
+                    <div className="font-bebas text-[34px] leading-none mt-1" style={{ color: "#18181b" }}>{player.name.slice(0, 1)}</div>
+                    <div className="text-[7px] font-semibold uppercase tracking-[0.12em] mt-1" style={{ color: "#8a6200" }}>Cromo</div>
                   </div>
                 </div>
                 <div className="min-w-0">
                   <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? "Leyenda mundialista desbloqueada" : "Era"}</div>
-                  <div className="font-bebas text-[34px] leading-none" style={{ color: "#18181b" }}>{player.name}</div>
+                  <div className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>{player.flag || selectionFlag(player.nationality)} {player.name}</div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
-                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}>{selectionFlag(player.nationality)} {player.nationality}</span>
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>{"\u2B50"} {rarityLabel(player.iconicLevel)}</span>
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}>{player.flag || selectionFlag(player.nationality)} {player.nationality}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#18181b" }}>{clueIcon("Posicion", player.position)} {player.position}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>{"\uD83C\uDFC6"} Mundial {challenge.worldCup}</span>
                   </div>

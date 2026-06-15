@@ -14,7 +14,7 @@ import QuienFaltaBBVA from "@/components/QuienFaltaBBVA";
 import StatdleBBVA from "@/components/StatdleBBVA";
 import Mundialdle from "@/components/Mundialdle";
 import IconUnlockToast from "@/components/IconUnlockToast";
-import { SidebarAds } from "@/components/PromoBanner";
+import { MobileAdBanner, SidebarAds } from "@/components/PromoBanner";
 import { getDayNumber, getDayKey } from "@/lib/daily";
 import { useStats } from "@/lib/useStats";
 import { getAlbumProgress } from "@/lib/album";
@@ -952,6 +952,8 @@ export default function HomePage() {
           </button>
         </div>
 
+        <MobileAdBanner slot={0} />
+
         <section className="rounded-2xl px-3 py-3 md:px-4 md:py-4"
           style={{ background: "rgba(255,255,255,0.70)", border: "1px solid rgba(0,0,0,0.07)" }}>
           <div className="flex items-end justify-between gap-2 mb-2.5">
@@ -967,6 +969,8 @@ export default function HomePage() {
             <QuickGameCard title="CLUB OCULTO" subtitle="Adivina el equipo por sus cromos." emoji="🏟️" accent="#1a4fa0" onClick={() => openMode("clubOculto", "club-oculto")} />
           </div>
         </section>
+
+        <MobileAdBanner slot={1} />
 
         <SeasonsBlock />
 
