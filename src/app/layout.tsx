@@ -14,11 +14,12 @@ const SOCIAL_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
+  "@type": "VideoGame",
   name: "Futboldle",
   alternateName: ["Wordle futbol", "Minijuegos Liga BBVA", "Hombres BBVA"],
   url: SITE_URL,
   applicationCategory: "GameApplication",
+  gamePlatform: "Web",
   operatingSystem: "Web",
   inLanguage: "es",
   description: SITE_DESCRIPTION,

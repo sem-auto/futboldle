@@ -13,6 +13,8 @@ export type WorldCupPlayer = {
   mainWorldCup: number;
   iconicLevel: WorldCupIconicLevel;
   categories: WorldCupCategory[];
+  worldCupRole: string;
+  worldCupGoals?: number;
   clubsByWorldCup?: {
     year: number;
     club: string;
@@ -31,6 +33,28 @@ const championIds = new Set([
 
 const heroIds = new Set(["mario-gotze", "fabio-grosso", "marco-materazzi", "james-rodriguez", "dibu-martinez", "diego-forlan"]);
 
+const finalists = new Set([
+  "zinedine-zidane", "thierry-henry", "wesley-sneijder", "arjen-robben", "robin-van-persie", "luka-modric", "javier-mascherano", "gonzalo-higuain", "sergio-aguero",
+]);
+
+const semifinalists = new Set([
+  "diego-forlan", "luis-suarez", "edinson-cavani", "miroslav-klose", "thomas-muller", "bastian-schweinsteiger", "toni-kroos", "james-rodriguez",
+]);
+
+const notableGoals: Record<string, number> = {
+  "david-villa": 5,
+  "diego-forlan": 5,
+  "lionel-messi": 7,
+  "kylian-mbappe": 4,
+  "miroslav-klose": 5,
+  "ronaldo-nazario": 8,
+  "wesley-sneijder": 5,
+  "cristiano-ronaldo": 4,
+  "antoine-griezmann": 4,
+  "luka-modric": 2,
+  "james-rodriguez": 6,
+};
+
 function inferCategories(id: string, position: WorldCupPosition, iconicLevel: WorldCupIconicLevel): WorldCupCategory[] {
   const categories: WorldCupCategory[] = [];
   if (iconicLevel === "icono" || iconicLevel === "legendario") categories.push("Leyenda");
@@ -39,6 +63,14 @@ function inferCategories(id: string, position: WorldCupPosition, iconicLevel: Wo
   if (position === "Portero") categories.push("Portero iconico");
   if (heroIds.has(id) || iconicLevel === "culto") categories.push("Heroe inesperado");
   return categories.length ? categories : ["Leyenda"];
+}
+
+function inferRole(id: string) {
+  if (championIds.has(id)) return "Campeon";
+  if (finalists.has(id)) return "Finalista";
+  if (semifinalists.has(id)) return "Semifinalista";
+  if (heroIds.has(id)) return "Heroe inesperado";
+  return "Figura mundialista";
 }
 
 function flagForNationality(nationality: string) {
@@ -76,6 +108,8 @@ const wc = (id: string, name: string, aliases: string[], nationality: string, fl
   mainWorldCup,
   iconicLevel,
   categories: inferCategories(id, position, iconicLevel),
+  worldCupRole: inferRole(id),
+  worldCupGoals: notableGoals[id],
   clubsByWorldCup: club ? [{ year: mainWorldCup, club, age }] : undefined,
 });
 

@@ -54,30 +54,50 @@ function selectionFlag(value: string) {
   if (value === "Francia") return "\uD83C\uDDEB\uD83C\uDDF7";
   if (value === "Italia") return "\uD83C\uDDEE\uD83C\uDDF9";
   if (value === "Portugal") return "\uD83C\uDDF5\uD83C\uDDF9";
+  if (value === "Inglaterra") return "\uD83C\uDDEC\uD83C\uDDE7";
   if (value === "Uruguay") return "\uD83C\uDDFA\uD83C\uDDFE";
   if (value === "Holanda") return "\uD83C\uDDF3\uD83C\uDDF1";
   if (value === "Croacia") return "\uD83C\uDDED\uD83C\uDDF7";
+  if (value === "Colombia") return "\uD83C\uDDE8\uD83C\uDDF4";
+  if (value === "Japon") return "\uD83C\uDDEF\uD83C\uDDF5";
+  if (value === "Mexico") return "\uD83C\uDDF2\uD83C\uDDFD";
   return "\uD83C\uDF0D";
 }
 
-function clueIcon(label: string, value: string) {
+function worldCupDisplay(value: string) {
+  if (value.includes("2002")) return "Corea/Japon 2002";
+  if (value.includes("2006")) return "Alemania 2006";
+  if (value.includes("2010")) return "Sudafrica 2010";
+  if (value.includes("2014")) return "Brasil 2014";
+  if (value.includes("2018")) return "Rusia 2018";
+  if (value.includes("2022")) return "Catar 2022";
+  return value;
+}
+
+function positionCode(value: string) {
+  if (value === "Portero") return "GK";
+  if (value === "Defensa") return "DEF";
+  if (value === "Centrocampista") return "MID";
+  if (value === "Delantero") return "ATT";
+  return "POS";
+}
+
+function clueBadge(label: string, value: string) {
   if (label === "Mundial") return "\uD83C\uDFC6";
+  if (label === "Seleccion") return selectionFlag(value);
+  if (label === "Club") return "FC";
+  if (label === "Posicion") return positionCode(value);
+  if (label === "Rol") return value.includes("Finalista") ? "\uD83E\uDD48" : value.includes("Semifinalista") ? "\uD83E\uDD49" : "\uD83C\uDFC6";
   if (label === "Goles") return "\u26BD";
-  if (label === "Momento" || label === "Partido mitico") return "\uD83C\uDFAF";
-  if (label === "Premio") return "\uD83E\uDD47";
-  if (label === "Rol") return value.includes("Finalista") ? "\uD83E\uDD48" : "\uD83E\uDD47";
-  if (label === "Edad") return "\uD83D\uDC76";
-  if (label === "Posicion" && value === "Portero") return "\uD83E\uDDE4";
-  if (label === "Posicion" && value === "Defensa") return "\uD83D\uDEE1\uFE0F";
-  if (label === "Posicion" && value === "Centrocampista") return "\uD83C\uDFAF";
-  if (label === "Posicion" && value === "Delantero") return "\uD83D\uDE80";
-  if (label === "Posicion") return "\u26BD";
-  if (label === "Seleccion") {
-    return selectionFlag(value);
-  }
-  if (label === "Club") return "\uD83C\uDFDF\uFE0F";
-  if (label === "Estilo") return "\uD83E\uDDF1";
-  return "\u2B50";
+  if (label === "Premio") return "\u2B50";
+  return "\u25C6";
+}
+
+function clueValue(label: string, value: string) {
+  if (label === "Mundial") return worldCupDisplay(value);
+  if (label === "Seleccion") return `${selectionFlag(value)} ${value}`;
+  if (label === "Goles") return value;
+  return value;
 }
 
 function rarityLabel(level: string) {
@@ -220,12 +240,12 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                   style={{ background: visible ? `linear-gradient(135deg,${style.background},#ffffff)` : "#f3efe8", border: `1px solid ${visible ? style.border : "rgba(0,0,0,0.06)"}`, boxShadow: visible ? "0 2px 10px rgba(0,0,0,0.05)" : "none" }}>
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-[17px]"
                     style={{ background: visible ? "white" : "#ddd7ca", color: "white", boxShadow: visible ? "0 1px 5px rgba(0,0,0,0.08)" : "none" }}>
-                    {visible ? clueIcon(clue.label, clue.value) : index + 1}
+                    {visible ? clueBadge(clue.label, clue.value) : index + 1}
                   </div>
                   <div className="flex-1">
                     <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#9a9a8a" }}>{clue.label}</div>
                     <div className="font-oswald font-semibold text-[15px]" style={{ color: visible ? style.color : "#aaa" }}>
-                      {visible ? clue.value : "?????"}
+                      {visible ? clueValue(clue.label, clue.value) : "?????"}
                     </div>
                   </div>
                 </div>
@@ -297,7 +317,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>{"\u2B50"} {rarityLabel(player.iconicLevel)}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}>{player.flag || selectionFlag(player.nationality)} {player.nationality}</span>
-                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#18181b" }}>{clueIcon("Posicion", player.position)} {player.position}</span>
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#18181b" }}>{positionCode(player.position)} {player.position}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>{"\uD83C\uDFC6"} Mundial {challenge.worldCup}</span>
                   </div>
                 </div>
