@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { mundialdleChallenges, worldCupPlayers, worldCupTournaments } from "@/data/worldcups";
+import { mundialdleChallenges, worldCupChampionChallenges, worldCupPlayers } from "@/data/worldcups";
 import { trackEvent, trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 
 function ComingSoonCard({ title, subtitle }: { title: string; subtitle: string }) {
@@ -37,17 +37,31 @@ export default function WorldCupsPage() {
           </div>
 
           <div className="p-4 md:p-5 grid grid-cols-1 md:grid-cols-[1.35fr_0.65fr] gap-3">
-            <Link
-              href="/world-cups/mundialdle"
-              onClick={() => trackModeEntered("mundialdle", "world-cups", { source: "season_page" })}
-              className="rounded-2xl p-4 transition-transform active:scale-[0.99]"
-              style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.22)" }}
-            >
-              <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#174ea6" }}>Jugable ahora</div>
-              <h2 className="font-bebas text-[40px] leading-none" style={{ color: "#18181b" }}>MUNDIALDLE</h2>
-              <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>Adivina el jugador mundialista con pistas progresivas.</p>
-              <div className="mt-4 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ color: "#174ea6" }}>Jugar {"\u2192"}</div>
-            </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Link
+                href="/world-cups/mundialdle"
+                onClick={() => trackModeEntered("mundialdle", "world-cups", { source: "season_page" })}
+                className="rounded-2xl p-4 transition-transform active:scale-[0.99]"
+                style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.22)" }}
+              >
+                <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#174ea6" }}>Jugable ahora</div>
+                <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>MUNDIALDLE</h2>
+                <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>Adivina el jugador mundialista con pistas progresivas.</p>
+                <div className="mt-4 inline-flex rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: "#174ea6", color: "white" }}>Jugar {"\u2192"}</div>
+              </Link>
+
+              <Link
+                href="/world-cups/champions"
+                onClick={() => trackModeEntered("worldcup-champions", "world-cups", { source: "season_page" })}
+                className="rounded-2xl p-4 transition-transform active:scale-[0.99]"
+                style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.26)" }}
+              >
+                <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#c8920a" }}>Nuevo juego</div>
+                <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>CAMPEONES</h2>
+                <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>Te damos el a{"\u00f1"}o. Adivina campe{"\u00f3"}n y finalista.</p>
+                <div className="mt-4 inline-flex rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: "#c8920a", color: "white" }}>Jugar {"\u2192"}</div>
+              </Link>
+            </div>
 
             <div className="rounded-2xl p-4" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.20)" }}>
               <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Base inicial</div>
@@ -61,8 +75,8 @@ export default function WorldCupsPage() {
                   <div className="text-[10px]" style={{ color: "#9a9a8a" }}>retos</div>
                 </div>
                 <div>
-                  <div className="font-bebas text-[28px] leading-none" style={{ color: "#18181b" }}>{worldCupTournaments.length}</div>
-                  <div className="text-[10px]" style={{ color: "#9a9a8a" }}>mundiales</div>
+                  <div className="font-bebas text-[28px] leading-none" style={{ color: "#18181b" }}>{worldCupChampionChallenges.length}</div>
+                  <div className="text-[10px]" style={{ color: "#9a9a8a" }}>finales</div>
                 </div>
               </div>
             </div>
@@ -71,7 +85,7 @@ export default function WorldCupsPage() {
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ComingSoonCard title="Once Mundial" subtitle="Completa un once usando selecciones." />
-          <ComingSoonCard title="Camino al Titulo" subtitle="Adivina una seleccion por su recorrido." />
+          <ComingSoonCard title="Camino al T\u00edtulo" subtitle="Adivina una selecci\u00f3n por su recorrido." />
           <ComingSoonCard title="Cromo Mundial" subtitle="Revela al jugador como un cromo Panini." />
         </section>
       </div>
