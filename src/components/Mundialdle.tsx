@@ -175,7 +175,19 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
       syncAchievements({ modeId: "mundialdle", won: correct });
       trackEvent("game_completed", { game: "mundialdle", season: "world-cups", challenge: challenge.id, won: correct, attempts: nextGuesses.length });
       trackEvent("mundialdle_completed", { challenge: challenge.id, won: correct, attempts: nextGuesses.length });
-      if (correct) trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "mundialdle", playerId: challenge.playerId, challengeId: challenge.id });
+      if (correct) {
+        trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "mundialdle", playerId: challenge.playerId, challengeId: challenge.id });
+        window.dispatchEvent(new CustomEvent("fbl-card-unlocked", {
+          detail: {
+            name: player.name,
+            rarity: rarityLabel(player.iconicLevel),
+            clubs: player.clubsByWorldCup?.map(item => item.club) ?? [],
+            position: player.position,
+            source: "Mundialdle",
+            season: `Mundial ${challenge.worldCup}`,
+          },
+        }));
+      }
       if (!correct) trackEvent("mundialdle_failed", { challenge: challenge.id, attempts: nextGuesses.length });
     }
   }

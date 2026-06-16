@@ -23,6 +23,35 @@ export default function SeoGameLanding({ eyebrow, title, description, bullets }:
               </article>
             ))}
           </div>
+          <div className="px-4 pb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <section className="rounded-2xl p-4" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
+              <h2 className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>Como se juega</h2>
+              <p className="text-[12px] leading-relaxed mt-2" style={{ color: "#5f5f66" }}>
+                Entra cada dia, resuelve el reto y comparte el resultado. Futboldle mezcla wordle de futbol, rankings,
+                trayectorias y cromos con nostalgia de la Liga BBVA y Mundiales.
+              </p>
+            </section>
+            <section className="rounded-2xl p-4" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
+              <h2 className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>Por que engancha</h2>
+              <p className="text-[12px] leading-relaxed mt-2" style={{ color: "#5f5f66" }}>
+                Partidas rapidas, jugadores reconocibles, resultados compartibles y cromos desbloqueables. La idea es
+                jugar, recordar un nombre y volver manana.
+              </p>
+            </section>
+          </div>
+          <nav className="px-4 pb-4 flex flex-wrap gap-2">
+            {[
+              ["Liga BBVA", "/liga-bbva"],
+              ["Mundialdle", "/mundialdle"],
+              ["Album", "/album"],
+              ["Tops", "/tops"],
+            ].map(([label, href]) => (
+              <Link key={href} href={href} className="text-[11px] font-semibold px-3 py-2 rounded-xl"
+                style={{ background: "#fffaf0", color: "#8a6200", border: "1px solid rgba(200,146,10,0.20)" }}>
+                {label}
+              </Link>
+            ))}
+          </nav>
           <div className="px-4 pb-4">
             <Link href="/" className="block text-center font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
               style={{ background: "#18181b", color: "white" }}>

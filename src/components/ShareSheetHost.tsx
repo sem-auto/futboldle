@@ -57,8 +57,8 @@ export default function ShareSheetHost() {
         style={{ background: "white", border: "1px solid rgba(0,0,0,0.10)", boxShadow: "0 18px 60px rgba(0,0,0,0.28)" }}>
         <div className="px-4 py-3" style={{ background: "#18181b", color: "white" }}>
           <div className="text-[9px] font-semibold uppercase tracking-[0.2em]" style={{ color: "#fac840" }}>Compartir Futboldle</div>
-          <div className="font-bebas text-[26px] leading-none mt-1">PÁSASELO A TU GRUPO</div>
-          <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.70)" }}>WhatsApp, X, Instagram o copiar resultado.</p>
+          <div className="font-bebas text-[26px] leading-none mt-1">RETA A UN AMIGO</div>
+          <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.70)" }}>Manda tu resultado y que intenten superarte.</p>
         </div>
 
         <div className="p-3">
@@ -70,7 +70,7 @@ export default function ShareSheetHost() {
           <div className="grid grid-cols-2 gap-2 mt-3">
             <button onClick={nativeShare} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-2.5 rounded-xl"
               style={{ background: "#18181b", color: "white" }}>
-              Compartir...
+              Compartir nativo
             </button>
             <button onClick={copyText} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-2.5 rounded-xl"
               style={{ background: copied ? "#1e6b2e" : "#f8f5f0", color: copied ? "white" : "#18181b", border: "1px solid rgba(0,0,0,0.08)" }}>
@@ -84,13 +84,21 @@ export default function ShareSheetHost() {
               style={{ background: "#eef3ff", color: "#1a4fa0", border: "1px solid rgba(26,79,160,0.18)" }}>
               X
             </button>
+            <button onClick={() => openExternal(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(FUTBOLDLE_URL)}&quote=${encoded}`)} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-2.5 rounded-xl"
+              style={{ background: "#eef3ff", color: "#174ea6", border: "1px solid rgba(23,78,166,0.18)" }}>
+              Facebook
+            </button>
             <button onClick={() => openExternal(`https://t.me/share/url?url=${encodeURIComponent(FUTBOLDLE_URL)}&text=${encodeURIComponent(textWithoutUrl)}`)} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-2.5 rounded-xl"
               style={{ background: "#eef8ff", color: "#1673a8", border: "1px solid rgba(22,115,168,0.18)" }}>
               Telegram
             </button>
-            <button onClick={nativeShare} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-2.5 rounded-xl"
+            <button onClick={copyText} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-2.5 rounded-xl"
+              style={{ background: "#f5f0ff", color: "#6d28d9", border: "1px solid rgba(109,40,217,0.18)" }}>
+              Discord
+            </button>
+            <button onClick={nativeShare} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-2.5 rounded-xl col-span-2"
               style={{ background: "#fff0f7", color: "#b81c62", border: "1px solid rgba(184,28,98,0.18)" }}>
-              Instagram
+              Instagram / mas apps
             </button>
           </div>
 

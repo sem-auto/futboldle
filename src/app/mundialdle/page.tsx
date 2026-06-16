@@ -68,6 +68,18 @@ export default function MundialdleLandingPage() {
             Adivina el jugador mundialista con pistas de seleccion, posicion, club, rol y Mundial.
           </p>
         </section>
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {[
+            ["Selecciones", "Espana, Alemania, Argentina, Brasil, Italia, Francia y mas."],
+            ["Pistas claras", "Mundial, rol, goles, seleccion, posicion y club del momento."],
+            ["Nostalgia", "Jugadores reconocibles de 2002 a 2026, sin relleno oscuro."],
+          ].map(([heading, copy]) => (
+            <article key={heading} className="rounded-2xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.07)" }}>
+              <h2 className="font-bebas text-[24px] leading-none" style={{ color: "#18181b" }}>{heading}</h2>
+              <p className="text-[12px] mt-1" style={{ color: "#6b6b72" }}>{copy}</p>
+            </article>
+          ))}
+        </section>
         <Mundialdle />
       </div>
     </main>

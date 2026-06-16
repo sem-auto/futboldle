@@ -7081,7 +7081,7 @@ function normalizeTop10Text(value: string) {
 }
 
 function hasBrokenEncoding(value: string) {
-  return /[A-Za-z\u00c0-\u024f]\?[A-Za-z\u00c0-\u024f]/.test(value);
+  return /[A-Za-z\u00c0-\u024f]\?[A-Za-z\u00c0-\u024f]|\u00c3|\u00e2|\u00f0|\u00c2|\ufffd/.test(value);
 }
 
 function resolveTop10Player(answer: Top10Answer) {

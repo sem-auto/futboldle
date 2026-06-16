@@ -73,6 +73,22 @@ export default function LigaBBVALandingPage() {
               </article>
             ))}
           </div>
+          <div className="px-4 pb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <section className="rounded-2xl p-4" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
+              <h2 className="font-bebas text-[28px] leading-none" style={{ color: "#18181b" }}>Hombres BBVA</h2>
+              <p className="text-[12px] leading-relaxed mt-2" style={{ color: "#5f5f66" }}>
+                Futboldle esta pensado para recordar jugadores de LaLiga entre 2005 y 2016: delanteros de culto,
+                porteros miticos, mediapuntas de domingo y equipos que marcaron una epoca.
+              </p>
+            </section>
+            <section className="rounded-2xl p-4" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
+              <h2 className="font-bebas text-[28px] leading-none" style={{ color: "#18181b" }}>Minijuegos de futbol</h2>
+              <p className="text-[12px] leading-relaxed mt-2" style={{ color: "#5f5f66" }}>
+                Juega a Wordle BBVA, Trayectoria, Top10 y Statdle. Retos diarios cortos para compartir con amigos y
+                desbloquear cromos de futbol nostalgia.
+              </p>
+            </section>
+          </div>
           <div className="px-4 pb-4">
             <Link href="/" className="block text-center font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
               style={{ background: "#18181b", color: "white" }}>
