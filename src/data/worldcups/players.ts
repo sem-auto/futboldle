@@ -255,4 +255,7 @@ export const worldCupPlayers: WorldCupPlayer[] = [
   wc("arturo-vidal", "Arturo Vidal", ["Vidal"], "Chile", "", "Centrocampista", [2010, 2014], 2014, "core", "Juventus", 27),
   wc("asamoah-gyan", "Asamoah Gyan", ["Gyan"], "Ghana", "", "Delantero", [2006, 2010, 2014], 2010, "culto", "Rennes", 24),
   wc("keylor-navas", "Keylor Navas", ["Keylor", "Navas"], "CostaRica", "", "Portero", [2014, 2018, 2022], 2014, "legendario", "Levante", 27),
+  wc("dida", "Dida", ["Dida"], "Brasil", "", "Portero", [2002, 2006], 2002, "core", "Corinthians", 28),
+  wc("guillermo-ochoa", "Guillermo Ochoa", ["Ochoa", "Memo Ochoa"], "Mexico", "", "Portero", [2006, 2010, 2014, 2018, 2022], 2014, "core", "Ajaccio", 28),
+  wc("thibaut-courtois", "Thibaut Courtois", ["Courtois"], "Belgica", "", "Portero", [2014, 2018, 2022], 2018, "legendario", "Chelsea", 26),
 ];

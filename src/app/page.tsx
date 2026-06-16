@@ -352,7 +352,7 @@ function StatdleCard({ onClick, done, won, difficulty }: { onClick: () => void; 
 function MundialdleHomeCard({ onClick, done, won }: { onClick: () => void; done: boolean; won: boolean }) {
   return (
     <button onClick={onClick}
-      className="w-full h-full min-h-[190px] text-left rounded-2xl overflow-hidden game-card"
+      className="w-full h-full min-h-[160px] sm:min-h-[190px] text-left rounded-2xl overflow-hidden game-card"
       style={{ background: "white", boxShadow: "0 6px 18px rgba(23,78,166,0.18)", border: "1px solid rgba(23,78,166,0.30)", display: "flex", flexDirection: "column" }}>
       <div className="px-3 md:px-4 py-3 md:py-4 relative overflow-hidden flex flex-col flex-1"
         style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
@@ -418,14 +418,14 @@ function QuickGameCard({ title, subtitle, emoji, accent, onClick }: {
       className="w-full text-left rounded-2xl overflow-hidden transition-transform active:scale-[0.98]"
       style={{ background: "white", border: `1px solid ${accent}33`, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}>
       <div className="h-[3px]" style={{ background: accent }} />
-      <div className="px-3 py-3">
+      <div className="px-2.5 py-2.5 sm:px-3 sm:py-3">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <span className="text-[23px] leading-none">{emoji}</span>
+          <span className="text-[20px] sm:text-[23px] leading-none">{emoji}</span>
           <span className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
             style={{ background: `${accent}12`, color: accent }}>Extra</span>
         </div>
-        <div className="font-bebas text-[18px] md:text-[19px] leading-none" style={{ color: "#18181b" }}>{title}</div>
-        <div className="text-[10px] leading-snug mt-0.5 min-h-[26px]" style={{ color: "#9a9a8a" }}>{subtitle}</div>
+        <div className="font-bebas text-[15px] sm:text-[18px] md:text-[19px] leading-none" style={{ color: "#18181b" }}>{title}</div>
+        <div className="text-[9px] sm:text-[10px] leading-snug mt-0.5 min-h-[24px]" style={{ color: "#9a9a8a" }}>{subtitle}</div>
         <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: accent }}>JUGAR →</div>
       </div>
     </button>
@@ -883,7 +883,7 @@ export default function HomePage() {
       <SidebarAds />
       <Header onLogoClick={goHome} />
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5 flex flex-col gap-3 md:gap-4 overflow-x-hidden">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-3 md:px-4 py-2.5 md:py-5 flex flex-col gap-2.5 md:gap-4 overflow-x-hidden">
 
         <div className="flex items-center justify-between gap-2">
           <div>
@@ -902,12 +902,12 @@ export default function HomePage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
           <WordleCard onClick={() => openMode("wordle", "wordle-bbva")} done={wordleDone} won={wordleWon} extras={extras} difficulty={wordleDifficulty} />
           <TrayCard onClick={() => openMode("trayectoria", "trayectoria-bbva")} done={trayDone} won={trayWon} difficulty={trayDifficulty} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 md:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
           <button onClick={() => openMode("top10", "top10-bbva")}
             className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
             style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(26,79,160,0.20)", display: "flex", flexDirection: "column" }}>
@@ -954,7 +954,7 @@ export default function HomePage() {
 
         <MobileAdBanner slot={0} />
 
-        <section className="rounded-2xl px-3 py-3 md:px-4 md:py-4"
+        <section className="rounded-2xl px-3 py-2.5 md:px-4 md:py-4"
           style={{ background: "rgba(255,255,255,0.70)", border: "1px solid rgba(0,0,0,0.07)" }}>
           <div className="flex items-end justify-between gap-2 mb-2.5">
             <div>
@@ -963,7 +963,7 @@ export default function HomePage() {
             </div>
             <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Retos extra</div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <QuickGameCard title="¿JUGÓ AQUÍ?" subtitle="Jugador y club. ¿Verdad o trampa?" emoji="✅" accent="#1e6b2e" onClick={() => openMode("jugoAqui", "jugo-aqui")} />
             <QuickGameCard title="FICHAJE O INVENTO" subtitle="Operaciones raras de la era BBVA." emoji="📝" accent="#c8920a" onClick={() => openMode("fichaje", "fichaje-invento")} />
             <QuickGameCard title="CLUB OCULTO" subtitle="Adivina el equipo por sus cromos." emoji="🏟️" accent="#1a4fa0" onClick={() => openMode("clubOculto", "club-oculto")} />
