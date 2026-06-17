@@ -4,7 +4,7 @@ import WorldCupChampions from "@/components/WorldCupChampions";
 
 const SITE_URL = "https://futboldle.es";
 const title = "Campeones del Mundo | Adivina el ganador del Mundial - Futboldle";
-const description = "Te damos el a\u00f1o del Mundial y tienes que adivinar el campe\u00f3n. En modo dif\u00edcil tambi\u00e9n el finalista.";
+const description = "Te damos la sede del Mundial y tienes que adivinar el campeón. En modo difícil también el finalista.";
 
 export const metadata: Metadata = {
   title,

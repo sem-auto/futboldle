@@ -8,7 +8,7 @@ import { trackEvent, trackModeEntered, trackSeasonEntered } from "@/lib/analytic
 function ComingSoonCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <article className="rounded-2xl p-4" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
-      <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>Proximamente</div>
+      <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>Próximamente</div>
       <h2 className="font-bebas text-[27px] leading-none" style={{ color: "#18181b" }}>{title}</h2>
       <p className="text-[12px] mt-1" style={{ color: "#6b6b72" }}>{subtitle}</p>
     </article>
@@ -49,15 +49,14 @@ export default function WorldCupsPage() {
           <div className="px-5 py-6 md:px-7 md:py-7" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 mb-2">Temporada 2</div>
             <h1 className="font-bebas text-[54px] md:text-[68px] leading-none">MUNDIALES</h1>
-            <p className="text-[15px] text-white/80 mt-1">2002-2026 {"\u00b7"} La primera expansion real de Futboldle.</p>
+            <p className="text-[15px] text-white/80 mt-1">2002-2026 {"\u00b7"} La primera expansión real de Futboldle.</p>
           </div>
 
           <div className="p-4 md:p-5 grid grid-cols-1 md:grid-cols-[1.35fr_0.65fr] gap-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <ActiveModeCard href="/world-cups/mundialdle" eyebrow="Jugable ahora" title="MUNDIALDLE" subtitle="Adivina el jugador mundialista con pistas progresivas." accent="blue" modeId="mundialdle" />
-              <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle={`Te damos el a\u00f1o. Adivina campe\u00f3n y finalista.`} accent="gold" modeId="worldcup-champions" />
-              <ActiveModeCard href="/world-cups/once" eyebrow="Nuevo juego" title="ONCE MUNDIAL" subtitle={`Completa un once usando selecciones.`} accent="blue" modeId="once-mundial" />
-              <ActiveModeCard href="/world-cups/camino" eyebrow="Nuevo juego" title="CAMINO" subtitle={`Adivina el campe\u00f3n por sus rivales.`} accent="gold" modeId="camino-titulo" />
+              <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle="Te damos la sede. Adivina campeón y finalista." accent="gold" modeId="worldcup-champions" />
+              <ActiveModeCard href="/world-cups/camino" eyebrow="Nuevo juego" title="CAMINO" subtitle="Adivina el campeón por sus rivales." accent="gold" modeId="camino-titulo" />
             </div>
 
             <div className="rounded-2xl p-4" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.20)" }}>
@@ -82,7 +81,7 @@ export default function WorldCupsPage() {
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ComingSoonCard title="Cromo Mundial" subtitle="Revela al jugador como un cromo Panini." />
-          <ComingSoonCard title={`Grupos M\u00edticos`} subtitle={`Recuerda fases de grupos hist\u00f3ricas.`} />
+          <ComingSoonCard title="Grupos Míticos" subtitle="Recuerda fases de grupos históricas." />
           <ComingSoonCard title="Finales" subtitle="Momentos y goleadores de finales." />
         </section>
       </div>

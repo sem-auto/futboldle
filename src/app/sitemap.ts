@@ -78,12 +78,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${SITE_URL}/world-cups/once`,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    {
       url: `${SITE_URL}/world-cups/camino`,
       lastModified: now,
       changeFrequency: "daily",

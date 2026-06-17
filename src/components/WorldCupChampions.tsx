@@ -76,6 +76,10 @@ export default function WorldCupChampions() {
   const [copied, setCopied] = useState(false);
   const [hideSuggestions, setHideSuggestions] = useState(false);
   const suggestions = useMemo(() => hideSuggestions ? [] : getCountrySuggestions(input), [hideSuggestions, input]);
+  const currentTarget = state.phase === "runnerUp" ? challenge.runnerUp : challenge.champion;
+  const currentLabel = state.phase === "runnerUp" ? "finalista" : "campeón";
+  const completed = state.won || state.failed;
+  const revealYear = completed || state.attempts.length > 0 || state.championSolved;
 
   useEffect(() => {
     trackModeEntered(MODE_ID, SEASON_ID, { source: "game_page" });
@@ -95,10 +99,6 @@ export default function WorldCupChampions() {
   useEffect(() => {
     saveState(state);
   }, [state]);
-
-  const currentTarget = state.phase === "runnerUp" ? challenge.runnerUp : challenge.champion;
-  const currentLabel = state.phase === "runnerUp" ? "finalista" : "campe\u00f3n";
-  const completed = state.won || state.failed;
 
   function finish(won: boolean, nextState: SavedState) {
     const payload = {
@@ -125,7 +125,7 @@ export default function WorldCupChampions() {
     if (correct && mode === "normal") {
       const next = { ...state, attempts: nextAttempts, won: true, phase: "done" as Phase, championSolved: true };
       setState(next);
-      setFeedback("Correcto. Sab\u00edas perfectamente de que Mundial hablamos.");
+      setFeedback("Correcto. Recordaste el campeón.");
       setInput("");
       finish(true, next);
       return;
@@ -134,7 +134,7 @@ export default function WorldCupChampions() {
     if (correct && state.phase === "champion") {
       const next = { ...state, attempts: nextAttempts, championSolved: true, phase: "runnerUp" as Phase };
       setState(next);
-      setFeedback("Campe\u00f3n correcto. Ahora busca el finalista.");
+      setFeedback("Campeón correcto. Ahora busca el finalista.");
       setInput("");
       return;
     }
@@ -142,7 +142,7 @@ export default function WorldCupChampions() {
     if (correct && state.phase === "runnerUp") {
       const next = { ...state, attempts: nextAttempts, won: true, phase: "done" as Phase };
       setState(next);
-      setFeedback("Perfecto. Campe\u00f3n y finalista.");
+      setFeedback("Perfecto. Campeón y finalista.");
       setInput("");
       finish(true, next);
       return;
@@ -169,8 +169,8 @@ export default function WorldCupChampions() {
   function share() {
     const score =
       mode === "hard"
-        ? `${state.won ? "Campe\u00f3n y finalista" : "Fallado"} - ${state.attempts.length}/${MAX_ATTEMPTS}`
-        : `${state.won ? "Campe\u00f3n acertado" : "Fallado"} - ${state.attempts.length}/${MAX_ATTEMPTS}`;
+        ? `${state.won ? "Campeón y finalista" : "Fallado"} - ${state.attempts.length}/${MAX_ATTEMPTS}`
+        : `${state.won ? "Campeón acertado" : "Fallado"} - ${state.attempts.length}/${MAX_ATTEMPTS}`;
     const detail = `${challenge.year}: ${challenge.champion}${mode === "hard" ? ` vs ${challenge.runnerUp}` : ""}`;
     const text = buildScoreShare("Campeones del Mundo", score, detail);
     shareGameResult(text, {
@@ -190,9 +190,9 @@ export default function WorldCupChampions() {
   return (
     <section className="rounded-3xl overflow-hidden" style={{ background: "white", boxShadow: "0 16px 40px rgba(0,0,0,0.10)" }}>
       <div className="px-5 py-6 md:px-7" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 mb-2">Mundiales · #{dayNumber}</div>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 mb-2">Mundiales {"\u00b7"} #{dayNumber}</div>
         <h1 className="font-bebas text-[48px] md:text-[60px] leading-none">CAMPEONES DEL MUNDO</h1>
-        <p className="text-[14px] text-white/82 mt-1">Te digo el año. Adivina quién levantó la Copa.</p>
+        <p className="text-[14px] text-white/82 mt-1">Te damos la sede. Adivina qué selección levantó la Copa.</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
@@ -200,7 +200,7 @@ export default function WorldCupChampions() {
             className="rounded-full px-3 py-2 text-[11px] font-semibold"
             style={{ background: mode === "normal" ? "white" : "rgba(255,255,255,0.16)", color: mode === "normal" ? "#174ea6" : "white" }}
           >
-            Normal: campe{"\u00f3"}n
+            Normal: campeón
           </button>
           <button
             type="button"
@@ -208,21 +208,21 @@ export default function WorldCupChampions() {
             className="rounded-full px-3 py-2 text-[11px] font-semibold"
             style={{ background: mode === "hard" ? "white" : "rgba(255,255,255,0.16)", color: mode === "hard" ? "#174ea6" : "white" }}
           >
-            Dif{"\u00ed"}cil: campe{"\u00f3"}n + finalista
+            Difícil: campeón + finalista
           </button>
         </div>
       </div>
 
       <div className="p-4 md:p-5 flex flex-col gap-4">
         <div className="rounded-2xl p-5 text-center" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.24)" }}>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#c8920a" }}>Mundial</div>
-          <div className="font-bebas text-[58px] leading-none mt-1" style={{ color: "#18181b" }}>{challenge.year}</div>
-          <div className="text-[12px]" style={{ color: "#8a8170" }}>Sede: {challenge.host}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#c8920a" }}>Sede</div>
+          <div className="font-bebas text-[50px] md:text-[58px] leading-none mt-1" style={{ color: "#18181b" }}>{challenge.host}</div>
+          <div className="text-[12px]" style={{ color: "#8a8170" }}>{revealYear ? `Mundial ${challenge.year}` : "Año oculto hasta el primer intento"}</div>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded-2xl p-3" style={{ background: state.championSolved ? "#ecfdf3" : "#f8fafc", border: "1px solid rgba(0,0,0,0.08)" }}>
-            <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: state.championSolved ? "#007a35" : "#9a9a8a" }}>Campe{"\u00f3"}n</div>
+            <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: state.championSolved ? "#007a35" : "#9a9a8a" }}>Campeón</div>
             <div className="font-oswald font-semibold text-[18px]" style={{ color: state.championSolved || completed ? "#18181b" : "#a0a0a0" }}>
               {state.championSolved || completed ? challenge.champion : "????"}
             </div>
@@ -230,7 +230,7 @@ export default function WorldCupChampions() {
           <div className="rounded-2xl p-3" style={{ background: state.won && mode === "hard" ? "#ecfdf3" : "#f8fafc", border: "1px solid rgba(0,0,0,0.08)" }}>
             <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: state.won && mode === "hard" ? "#007a35" : "#9a9a8a" }}>Finalista</div>
             <div className="font-oswald font-semibold text-[18px]" style={{ color: completed ? "#18181b" : "#a0a0a0" }}>
-              {completed ? challenge.runnerUp : mode === "hard" ? "????" : "Modo dif\u00edcil"}
+              {completed ? challenge.runnerUp : mode === "hard" ? "????" : "Modo difícil"}
             </div>
           </div>
         </div>
@@ -243,7 +243,7 @@ export default function WorldCupChampions() {
             <input
               value={input}
               onChange={(event) => { setInput(event.target.value); setHideSuggestions(false); }}
-              placeholder={state.phase === "runnerUp" ? "Pa\u00eds finalista..." : "Pa\u00eds campe\u00f3n..."}
+              placeholder={state.phase === "runnerUp" ? "País finalista..." : "País campeón..."}
               className="w-full rounded-2xl px-4 py-4 font-oswald text-[20px] outline-none"
               style={{ border: "2px solid #d7d7d2", color: "#18181b" }}
               autoComplete="off"
@@ -276,11 +276,11 @@ export default function WorldCupChampions() {
               {challenge.champion} {challenge.year}
             </h2>
             <p className="text-[13px] mt-1" style={{ color: "#5f645f" }}>
-              Campe{"\u00f3"}n: {challenge.champion} · Finalista: {challenge.runnerUp} · Final: {challenge.finalScore}
+              Campeón: {challenge.champion} {"\u00b7"} Finalista: {challenge.runnerUp} {"\u00b7"} Final: {challenge.finalScore}
             </p>
             {challenge.note && (
               <p className="mt-3 rounded-xl px-3 py-3 text-[13px]" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)", color: "#374151" }}>
-                Sab{"\u00ed"}as que... este Mundial se recuerda por el {challenge.note}.
+                Sabías que... este Mundial se recuerda por el {challenge.note}.
               </p>
             )}
             <button onClick={share} className="mt-4 w-full rounded-2xl py-4 font-oswald font-semibold uppercase tracking-wider" style={{ background: "#18181b", color: "white" }}>
@@ -291,7 +291,7 @@ export default function WorldCupChampions() {
 
         <div className="flex flex-wrap items-center justify-between gap-2 text-[12px]" style={{ color: "#8a8170" }}>
           <span>{state.attempts.length}/{MAX_ATTEMPTS} intentos</span>
-          <span>{worldCupChampionChallenges.length} Mundiales hist{"\u00f3"}ricos</span>
+          <span>{worldCupChampionChallenges.length} Mundiales históricos</span>
         </div>
 
         {feedback && <div className="text-[12px] font-semibold" style={{ color: state.won ? "#007a35" : "#c8920a" }}>{feedback}</div>}
