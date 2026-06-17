@@ -16,6 +16,7 @@ type AnalyticsEvent =
   | "challenge_failed"
   | "challenge_shared"
   | "album_opened"
+  | "ad_clicked"
   | "achievement_unlocked"
   | "top10_completed"
   | "card_unlocked"
@@ -92,4 +93,8 @@ export function trackChallengeShared(modeId: string, challengeId: string, payloa
 export function trackAlbumOpened(payload: AnalyticsPayload = {}) {
   trackEvent("album_opened", payload);
   trackEvent("album_visit", payload);
+}
+
+export function trackAdClicked(payload: AnalyticsPayload = {}) {
+  trackEvent("ad_clicked", payload);
 }

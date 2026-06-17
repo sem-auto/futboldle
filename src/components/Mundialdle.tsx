@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { getDailyMundialdleChallenge, worldCupPlayers } from "@/data/worldcups";
 import { getDayKey, getDayNumber } from "@/lib/daily";
-import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
+import { shareGameResult } from "@/lib/resultShare";
+import { FUTBOLDLE_URL } from "@/lib/share";
 import { syncAchievements } from "@/lib/achievements";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 
@@ -66,14 +67,84 @@ function countryCode(value: string) {
     Chile: "CL",
     Ghana: "GH",
     CostaRica: "CRC",
+    RepublicaCheca: "CZ",
+    "Corea del Sur": "KOR",
+    Marruecos: "MAR",
+    Australia: "AUS",
+    "Estados Unidos": "USA",
+    "Costa de Marfil": "CIV",
+    Camerun: "CMR",
+    Suecia: "SWE",
+    Ucrania: "UKR",
+    Polonia: "POL",
+    Dinamarca: "DEN",
+    Suiza: "SUI",
+    Turquia: "TUR",
+    Senegal: "SEN",
+    Argelia: "ALG",
+    Paraguay: "PAR",
+    Ecuador: "ECU",
+    Serbia: "SRB",
+    Gales: "WAL",
+    Noruega: "NOR",
+    Egipto: "EGY",
+    Nigeria: "NGA",
+    Peru: "PER",
   };
   return codes[value] ?? "INT";
 }
 
+function countryFlag(value: string) {
+  const flags: Record<string, string> = {
+    Espana: "🇪🇸",
+    Alemania: "🇩🇪",
+    Argentina: "🇦🇷",
+    Brasil: "🇧🇷",
+    Francia: "🇫🇷",
+    Italia: "🇮🇹",
+    Portugal: "🇵🇹",
+    Inglaterra: "🏴",
+    Uruguay: "🇺🇾",
+    Holanda: "🇳🇱",
+    Croacia: "🇭🇷",
+    Colombia: "🇨🇴",
+    Japon: "🇯🇵",
+    Mexico: "🇲🇽",
+    Belgica: "🇧🇪",
+    Chile: "🇨🇱",
+    Ghana: "🇬🇭",
+    CostaRica: "🇨🇷",
+    RepublicaCheca: "🇨🇿",
+    "Corea del Sur": "🇰🇷",
+    Marruecos: "🇲🇦",
+    Australia: "🇦🇺",
+    "Estados Unidos": "🇺🇸",
+    "Costa de Marfil": "🇨🇮",
+    Camerun: "🇨🇲",
+    Suecia: "🇸🇪",
+    Ucrania: "🇺🇦",
+    Polonia: "🇵🇱",
+    Dinamarca: "🇩🇰",
+    Suiza: "🇨🇭",
+    Turquia: "🇹🇷",
+    Senegal: "🇸🇳",
+    Argelia: "🇩🇿",
+    Paraguay: "🇵🇾",
+    Ecuador: "🇪🇨",
+    Serbia: "🇷🇸",
+    Gales: "🏴",
+    Noruega: "🇳🇴",
+    Egipto: "🇪🇬",
+    Nigeria: "🇳🇬",
+    Peru: "🇵🇪",
+  };
+  return flags[value] ?? "🌍";
+}
+
 function worldCupDisplay(value: string) {
-  if (value.includes("2002")) return "Corea/Japon 2002";
+  if (value.includes("2002")) return "Corea/Japón 2002";
   if (value.includes("2006")) return "Alemania 2006";
-  if (value.includes("2010")) return "Sudafrica 2010";
+  if (value.includes("2010")) return "Sudáfrica 2010";
   if (value.includes("2014")) return "Brasil 2014";
   if (value.includes("2018")) return "Rusia 2018";
   if (value.includes("2022")) return "Catar 2022";
@@ -89,14 +160,19 @@ function positionCode(value: string) {
 }
 
 function clueBadge(label: string, value: string) {
-  if (label === "Mundial") return "WC";
-  if (label === "Seleccion") return countryCode(value);
-  if (label === "Club") return "FC";
-  if (label === "Posicion") return positionCode(value);
-  if (label === "Rol") return value.includes("Finalista") ? "FIN" : value.includes("Semifinalista") ? "SF" : "WIN";
-  if (label === "Goles") return "GOL";
-  if (label === "Premio") return "MVP";
-  return "INFO";
+  if (label === "Mundial") return "🏆";
+  if (label === "Seleccion") return countryFlag(value);
+  if (label === "Club") return "🏟";
+  if (label === "Posicion" && value === "Portero") return "🧤";
+  if (label === "Posicion" && value === "Defensa") return "🛡";
+  if (label === "Posicion" && value === "Centrocampista") return "🎯";
+  if (label === "Posicion" && value === "Delantero") return "🚀";
+  if (label === "Rol") return value.includes("Finalista") ? "🥈" : value.includes("Semifinalista") ? "🥉" : "🥇";
+  if (label === "Goles") return "⚽";
+  if (label === "Premio") return "⭐";
+  if (label === "Edad") return "📅";
+  if (label === "Momento") return "✨";
+  return "💡";
 }
 
 function badgeVisual(label: string, value: string) {
@@ -114,7 +190,7 @@ function badgeVisual(label: string, value: string) {
 
 function clueValue(label: string, value: string) {
   if (label === "Mundial") return worldCupDisplay(value);
-  if (label === "Seleccion") return `${countryCode(value)} ${value}`;
+  if (label === "Seleccion") return `${countryFlag(value)} ${value}`;
   if (label === "Goles") return value;
   return value;
 }
@@ -214,13 +290,20 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
   }
 
   function share() {
+    if (!player) return;
     const rows = Array.from({ length: MAX_ATTEMPTS }, (_, index) => {
       if (won && index === guesses.length - 1) return "🟩";
       if (index < guesses.length) return "🟨";
       return "⬛";
     }).join("");
-    const flag = player ? `${countryCode(player.nationality)} ` : "WC ";
-    const text = buildProgressiveShare("Mundialdle", `${flag}${rows}`, guesses.length, won, "pistas", "");
+    const text = [
+      `🏆 Mundialdle #${getDayNumber()}`,
+      rows,
+      `${countryFlag(player.nationality)} Mundial ${challenge.worldCup}`,
+      `⚽ ${player.position}`,
+      won ? `Resuelto en ${guesses.length} intento${guesses.length === 1 ? "" : "s"}` : "No lo resolví hoy",
+      FUTBOLDLE_URL,
+    ].join("\n");
     shareGameResult(text, {
       modeId: "mundialdle",
       challengeId: challenge.id,
@@ -258,9 +341,9 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
           <h1 className="font-bebas text-[42px] leading-none">MUNDIALDLE</h1>
           <p className="text-[12px] text-white/75 mt-1">Adivina el jugador mundialista.</p>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>Copa Mundial</span>
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>Selecci{"\u00f3"}n</span>
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>Club del momento</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>🏆 Mundial</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>🌍 Selección</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>🏟 Club</span>
           </div>
         </div>
 
@@ -280,7 +363,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                   style={{ background: visible ? `linear-gradient(135deg,${style.background},#ffffff)` : "#f3efe8", border: `1px solid ${visible ? style.border : "rgba(0,0,0,0.06)"}`, boxShadow: visible ? "0 2px 10px rgba(0,0,0,0.05)" : "none" }}>
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[10px] font-black tracking-tight"
                     style={{ background: visible ? badge.background : "#ddd7ca", color: visible ? badge.color : "white", border: `1px solid ${visible ? badge.border : "rgba(0,0,0,0.06)"}`, boxShadow: visible ? "0 1px 6px rgba(0,0,0,0.10)" : "none" }}>
-                    {visible ? clueBadge(clue.label, clue.value).replace("WC", "CUP") : index + 1}
+                    {visible ? clueBadge(clue.label, clue.value) : index + 1}
                   </div>
                   <div className="flex-1">
                     <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#9a9a8a" }}>{clue.label}</div>
@@ -313,7 +396,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                       style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
                       <span className="inline-flex items-center gap-2 font-semibold">
                         <span className="inline-flex items-center justify-center rounded-md text-[9px] font-black px-1.5 py-0.5"
-                          style={{ background: "#0f172a", color: "white" }}>{countryCode(item.nationality)}</span>
+                          style={{ background: "#0f172a", color: "white" }}>{item.flag || countryFlag(item.nationality)}</span>
                         {item.name}
                       </span>
                       <span className="block text-[10px]" style={{ color: "#9a9a8a" }}>{item.nationality} {"\u00b7"} {item.position}</span>
@@ -350,21 +433,26 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                   style={{ background: "linear-gradient(145deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.32)", boxShadow: "0 6px 18px rgba(0,0,0,0.12)" }}>
                   <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: "#d6a20f" }} />
                   <div className="text-center">
-                    <div className="mx-auto rounded-md text-[14px] font-black px-2 py-1 inline-flex"
-                      style={{ background: "#0f172a", color: "white" }}>{countryCode(player.nationality)}</div>
+                    <div className="mx-auto rounded-md text-[22px] font-black px-2 py-1 inline-flex"
+                      style={{ background: "#0f172a", color: "white" }}>{player.flag || countryFlag(player.nationality)}</div>
                     <div className="font-bebas text-[34px] leading-none mt-1" style={{ color: "#18181b" }}>{player.name.slice(0, 1)}</div>
                     <div className="text-[7px] font-semibold uppercase tracking-[0.12em] mt-1" style={{ color: "#8a6200" }}>Cromo</div>
                   </div>
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? "Leyenda mundialista desbloqueada" : "Era"}</div>
-                  <div className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>{player.name}</div>
+                  <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? "🏆 Leyenda mundialista desbloqueada" : "Era"}</div>
+                  <div className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>{player.flag || countryFlag(player.nationality)} {player.name}</div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>STAR {rarityLabel(player.iconicLevel)}</span>
-                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}>{countryCode(player.nationality)} {player.nationality}</span>
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}>{player.flag || countryFlag(player.nationality)} {player.nationality}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#18181b" }}>{positionCode(player.position)} {player.position}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>WC Mundial {challenge.worldCup}</span>
                   </div>
+                  {won && (
+                    <div className="mt-2 text-[12px] font-semibold" style={{ color: "#1e6b2e" }}>
+                      📖 Otro cromo para tu colección.
+                    </div>
+                  )}
                 </div>
               </div>
               {challenge.funFact && (

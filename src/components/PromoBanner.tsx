@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { trackAdClicked } from "@/lib/analytics";
 
 const ADS = [
   {
@@ -56,6 +57,7 @@ export function MobileAdBanner({ slot = 0 }: { slot?: 0 | 1 }) {
       href={ad.url}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackAdClicked({ adId: ad.id, placement: "mobile-horizontal" })}
       className="xl:hidden flex items-center rounded-2xl overflow-hidden transition-all duration-150 active:scale-[0.99]"
       style={{ background: "white", border: `1px solid ${ad.accent}26`, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}
     >
@@ -83,6 +85,7 @@ function SideCard({ ad }: { ad: typeof ADS[0] }) {
       href={ad.url}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackAdClicked({ adId: ad.id, placement: "desktop-side" })}
       className="block rounded-2xl overflow-hidden group transition-all duration-150 hover:-translate-y-1"
       style={{ background: "white", boxShadow: "0 4px 16px rgba(0,0,0,0.10), 0 1px 0 rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.07)" }}
     >
@@ -122,6 +125,7 @@ export default function PromoBanner() {
           href={ad.url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackAdClicked({ adId: ad.id, placement: "mobile-rotator" })}
           className="flex items-center rounded-xl overflow-hidden transition-all duration-200 max-md:max-h-[128px] max-md:max-w-full"
           style={{
             background: "white",

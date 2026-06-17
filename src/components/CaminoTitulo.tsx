@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getDailyTitleRun } from "@/data/worldcups";
+import { getCountrySuggestions, getDailyTitleRun } from "@/data/worldcups";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackModeEntered } from "@/lib/analytics";
@@ -24,8 +24,10 @@ export default function CaminoTitulo() {
   const [won, setWon] = useState(false);
   const [failed, setFailed] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [hideSuggestions, setHideSuggestions] = useState(false);
   const completed = won || failed;
   const revealedCount = completed ? run.rivals.length : Math.min(run.rivals.length, 3 + guesses.length);
+  const suggestions = useMemo(() => hideSuggestions ? [] : getCountrySuggestions(query), [hideSuggestions, query]);
 
   useEffect(() => {
     trackModeEntered(MODE_ID, SEASON_ID, { source: "game_page" });
@@ -46,11 +48,10 @@ export default function CaminoTitulo() {
     } catch {}
   }
 
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (won || failed || !query.trim()) return;
+  function submitGuess(rawValue = query) {
+    if (won || failed || !rawValue.trim()) return;
 
-    const value = query.trim();
+    const value = rawValue.trim();
     const ok = run.aliases.some((alias) => fold(alias) === fold(value));
     const nextGuesses = [...guesses, value];
     const nextFailed = !ok && nextGuesses.length >= MAX_ATTEMPTS;
@@ -63,6 +64,11 @@ export default function CaminoTitulo() {
 
     if (ok) trackChallengeCompleted(MODE_ID, run.id, { seasonId: SEASON_ID, modeId: MODE_ID, won: true, attempts: nextGuesses.length, dayNumber });
     if (nextFailed) trackChallengeFailed(MODE_ID, run.id, { seasonId: SEASON_ID, modeId: MODE_ID, won: false, attempts: nextGuesses.length, dayNumber });
+  }
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    submitGuess();
   }
 
   function share() {
@@ -110,15 +116,34 @@ export default function CaminoTitulo() {
         </div>
 
         {!won && !failed ? (
-          <form onSubmit={submit} className="flex flex-col gap-2">
+          <form onSubmit={submit} className="relative flex flex-col gap-2">
             <input
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => { setQuery(event.target.value); setHideSuggestions(false); }}
               placeholder="Selección campeona..."
               className="w-full rounded-2xl px-4 py-4 font-oswald text-[19px] outline-none"
               style={{ border: "2px solid #d7d7d2", color: "#18181b" }}
               autoComplete="off"
             />
+            {suggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-[58px] z-30 rounded-2xl overflow-hidden max-h-60 overflow-y-auto" style={{ background: "white", border: "1px solid rgba(0,0,0,0.10)", boxShadow: "0 14px 28px rgba(0,0,0,0.12)" }}>
+                {suggestions.map((country) => (
+                  <button
+                    key={country}
+                    type="button"
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      setHideSuggestions(true);
+                      setQuery(country);
+                    }}
+                    className="w-full text-left px-4 py-3 text-[14px] font-semibold hover:bg-slate-50"
+                    style={{ color: "#18181b" }}
+                  >
+                    {country}
+                  </button>
+                ))}
+              </div>
+            )}
             <button type="submit" className="rounded-2xl py-4 font-oswald font-semibold uppercase tracking-wider" style={{ background: "#18181b", color: "white" }}>
               Probar
             </button>

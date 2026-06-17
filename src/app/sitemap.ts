@@ -78,10 +78,40 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${SITE_URL}/campeones-del-mundo`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.82,
+    },
+    {
       url: `${SITE_URL}/world-cups/camino`,
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/camino-al-titulo`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.82,
+    },
+    {
+      url: `${SITE_URL}/blog`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.45,
+    },
+    {
+      url: `${SITE_URL}/guias`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.45,
+    },
+    {
+      url: `${SITE_URL}/rankings`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.45,
     },
     {
       url: `${SITE_URL}/perfil`,
