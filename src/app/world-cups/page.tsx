@@ -15,6 +15,22 @@ function ComingSoonCard({ title, subtitle }: { title: string; subtitle: string }
   );
 }
 
+function ActiveModeCard({ href, eyebrow, title, subtitle, accent, modeId }: { href: string; eyebrow: string; title: string; subtitle: string; accent: string; modeId: string }) {
+  return (
+    <Link
+      href={href}
+      onClick={() => trackModeEntered(modeId, "world-cups", { source: "season_page" })}
+      className="rounded-2xl p-4 transition-transform active:scale-[0.99]"
+      style={{ background: accent === "gold" ? "#fffaf0" : "#eef3ff", border: `1px solid ${accent === "gold" ? "rgba(200,146,10,0.26)" : "rgba(23,78,166,0.22)"}` }}
+    >
+      <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: accent === "gold" ? "#c8920a" : "#174ea6" }}>{eyebrow}</div>
+      <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>{title}</h2>
+      <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>{subtitle}</p>
+      <div className="mt-4 inline-flex rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: accent === "gold" ? "#c8920a" : "#174ea6", color: "white" }}>Jugar {"\u2192"}</div>
+    </Link>
+  );
+}
+
 export default function WorldCupsPage() {
   useEffect(() => {
     trackEvent("season_opened_world_cups", { season: "world-cups" });
@@ -38,29 +54,10 @@ export default function WorldCupsPage() {
 
           <div className="p-4 md:p-5 grid grid-cols-1 md:grid-cols-[1.35fr_0.65fr] gap-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Link
-                href="/world-cups/mundialdle"
-                onClick={() => trackModeEntered("mundialdle", "world-cups", { source: "season_page" })}
-                className="rounded-2xl p-4 transition-transform active:scale-[0.99]"
-                style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.22)" }}
-              >
-                <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#174ea6" }}>Jugable ahora</div>
-                <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>MUNDIALDLE</h2>
-                <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>Adivina el jugador mundialista con pistas progresivas.</p>
-                <div className="mt-4 inline-flex rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: "#174ea6", color: "white" }}>Jugar {"\u2192"}</div>
-              </Link>
-
-              <Link
-                href="/world-cups/champions"
-                onClick={() => trackModeEntered("worldcup-champions", "world-cups", { source: "season_page" })}
-                className="rounded-2xl p-4 transition-transform active:scale-[0.99]"
-                style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.26)" }}
-              >
-                <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#c8920a" }}>Nuevo juego</div>
-                <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>CAMPEONES</h2>
-                <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>Te damos el a{"\u00f1"}o. Adivina campe{"\u00f3"}n y finalista.</p>
-                <div className="mt-4 inline-flex rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: "#c8920a", color: "white" }}>Jugar {"\u2192"}</div>
-              </Link>
+              <ActiveModeCard href="/world-cups/mundialdle" eyebrow="Jugable ahora" title="MUNDIALDLE" subtitle="Adivina el jugador mundialista con pistas progresivas." accent="blue" modeId="mundialdle" />
+              <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle={`Te damos el a\u00f1o. Adivina campe\u00f3n y finalista.`} accent="gold" modeId="worldcup-champions" />
+              <ActiveModeCard href="/world-cups/once" eyebrow="Nuevo juego" title="ONCE MUNDIAL" subtitle={`Completa un once usando selecciones.`} accent="blue" modeId="once-mundial" />
+              <ActiveModeCard href="/world-cups/camino" eyebrow="Nuevo juego" title="CAMINO" subtitle={`Adivina el campe\u00f3n por sus rivales.`} accent="gold" modeId="camino-titulo" />
             </div>
 
             <div className="rounded-2xl p-4" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.20)" }}>
@@ -84,9 +81,9 @@ export default function WorldCupsPage() {
         </section>
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <ComingSoonCard title="Once Mundial" subtitle="Completa un once usando selecciones." />
-          <ComingSoonCard title={`Camino al T\u00edtulo`} subtitle={`Adivina una selecci\u00f3n por su recorrido.`} />
           <ComingSoonCard title="Cromo Mundial" subtitle="Revela al jugador como un cromo Panini." />
+          <ComingSoonCard title={`Grupos M\u00edticos`} subtitle={`Recuerda fases de grupos hist\u00f3ricas.`} />
+          <ComingSoonCard title="Finales" subtitle="Momentos y goleadores de finales." />
         </section>
       </div>
     </main>

@@ -137,9 +137,10 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
   const [won, setWon] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [hideSuggestions, setHideSuggestions] = useState(false);
   const [startedAt] = useState(() => Date.now());
 
-  const suggestions = useMemo(() => getSuggestions(query), [query]);
+  const suggestions = useMemo(() => hideSuggestions ? [] : getSuggestions(query), [hideSuggestions, query]);
   const revealedCount = Math.min(challenge.clues.length, Math.max(1, guesses.length + 1));
 
   useEffect(() => {
@@ -183,6 +184,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
 
     setGuesses(nextGuesses);
     setQuery("");
+    setHideSuggestions(true);
     setWon(correct);
     setGameOver(isOver);
     persist(nextGuesses, correct, isOver);
@@ -245,14 +247,20 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
 
       <section className="rounded-2xl overflow-hidden" style={{ background: "white", boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}>
         <div className="px-5 py-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
-          <div className="absolute right-4 top-3 font-bebas text-[82px] opacity-15 leading-none">WC</div>
+          <div className="absolute -right-5 -top-7 h-32 w-32 opacity-20">
+            <div className="absolute left-9 top-2 h-16 w-14 rounded-b-[24px] rounded-t-md" style={{ background: "white" }} />
+            <div className="absolute left-6 top-8 h-10 w-5 rounded-l-full border-4 border-white border-r-0" />
+            <div className="absolute right-6 top-8 h-10 w-5 rounded-r-full border-4 border-white border-l-0" />
+            <div className="absolute left-[55px] top-[66px] h-8 w-4" style={{ background: "white" }} />
+            <div className="absolute left-10 top-[94px] h-4 w-12 rounded-t-md" style={{ background: "white" }} />
+          </div>
           <div className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/70 mb-2">Mundiales {"\u00b7"} #{getDayNumber()}</div>
           <h1 className="font-bebas text-[42px] leading-none">MUNDIALDLE</h1>
           <p className="text-[12px] text-white/75 mt-1">Adivina el jugador mundialista.</p>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>WC Mundial</span>
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>SEL Selecci{"\u00f3"}n</span>
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>FC Club</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>Copa Mundial</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>Selecci{"\u00f3"}n</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>Club del momento</span>
           </div>
         </div>
 
@@ -272,7 +280,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                   style={{ background: visible ? `linear-gradient(135deg,${style.background},#ffffff)` : "#f3efe8", border: `1px solid ${visible ? style.border : "rgba(0,0,0,0.06)"}`, boxShadow: visible ? "0 2px 10px rgba(0,0,0,0.05)" : "none" }}>
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[10px] font-black tracking-tight"
                     style={{ background: visible ? badge.background : "#ddd7ca", color: visible ? badge.color : "white", border: `1px solid ${visible ? badge.border : "rgba(0,0,0,0.06)"}`, boxShadow: visible ? "0 1px 6px rgba(0,0,0,0.10)" : "none" }}>
-                    {visible ? clueBadge(clue.label, clue.value) : index + 1}
+                    {visible ? clueBadge(clue.label, clue.value).replace("WC", "CUP") : index + 1}
                   </div>
                   <div className="flex-1">
                     <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#9a9a8a" }}>{clue.label}</div>
@@ -289,7 +297,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
             <div className="relative">
               <input
                 value={query}
-                onChange={event => setQuery(event.target.value)}
+                onChange={event => { setQuery(event.target.value); setHideSuggestions(false); }}
                 onKeyDown={event => { if (event.key === "Enter") submit(suggestions[0]?.name ?? query); }}
                 placeholder="Escribe un jugador mundialista..."
                 className="w-full px-4 py-3 rounded-xl text-[14px] font-medium outline-none"
@@ -300,7 +308,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                 <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-72 overflow-y-auto"
                   style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
                   {suggestions.map(item => (
-                    <button key={item.id} onMouseDown={() => submit(item.name)}
+                    <button key={item.id} onMouseDown={event => { event.preventDefault(); setHideSuggestions(true); submit(item.name); }}
                       className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-gray-50"
                       style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
                       <span className="inline-flex items-center gap-2 font-semibold">
