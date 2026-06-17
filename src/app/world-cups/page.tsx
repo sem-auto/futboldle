@@ -85,7 +85,7 @@ export default function WorldCupsPage() {
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ComingSoonCard title="Once Mundial" subtitle="Completa un once usando selecciones." />
-          <ComingSoonCard title="Camino al T\u00edtulo" subtitle="Adivina una selecci\u00f3n por su recorrido." />
+          <ComingSoonCard title={`Camino al T\u00edtulo`} subtitle={`Adivina una selecci\u00f3n por su recorrido.`} />
           <ComingSoonCard title="Cromo Mundial" subtitle="Revela al jugador como un cromo Panini." />
         </section>
       </div>

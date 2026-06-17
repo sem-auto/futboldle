@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { BBVAPlayer } from "@/data/bbvaPlayers";
 import { normalize } from "@/lib/normalize";
 
@@ -79,8 +80,20 @@ export default function PlayerSearch({
   onEnterNoMatch,
   placeholder = "Escribe el nombre del jugador...",
 }: Props) {
+  const [hideSuggestions, setHideSuggestions] = useState(false);
+
+  useEffect(() => {
+    setHideSuggestions(false);
+  }, [value]);
+
   const suggestions = getSuggestions(players, value, usedIds);
-  const showEmpty = value.trim().length >= 2 && suggestions.length === 0;
+  const visibleSuggestions = hideSuggestions ? [] : suggestions;
+  const showEmpty = !hideSuggestions && value.trim().length >= 2 && suggestions.length === 0;
+
+  function selectPlayer(player: BBVAPlayer) {
+    setHideSuggestions(true);
+    onSelect(player);
+  }
 
   return (
     <div className="relative">
@@ -90,7 +103,7 @@ export default function PlayerSearch({
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => {
           if (e.key !== "Enter") return;
-          if (suggestions.length > 0) onSelect(suggestions[0]);
+          if (visibleSuggestions.length > 0) selectPlayer(visibleSuggestions[0]);
           else onEnterNoMatch?.();
         }}
         placeholder={placeholder}
@@ -102,13 +115,16 @@ export default function PlayerSearch({
         spellCheck={false}
       />
 
-      {(suggestions.length > 0 || showEmpty) && (
+      {(visibleSuggestions.length > 0 || showEmpty) && (
         <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-96 overflow-y-auto"
           style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
-          {suggestions.map(player => (
+          {visibleSuggestions.map(player => (
             <button
               key={player.id}
-              onMouseDown={() => onSelect(player)}
+              onMouseDown={event => {
+                event.preventDefault();
+                selectPlayer(player);
+              }}
               className="w-full px-4 py-2.5 text-left border-b last:border-0 transition-colors"
               style={{ borderColor: "rgba(0,0,0,0.06)" }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = `${accent}12`; }}

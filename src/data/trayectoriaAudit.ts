@@ -149,6 +149,7 @@ export const CAREER_AUDIT: Record<number, CareerAudit> = {
   195: career(["Barcelona", "Liverpool", "Atlético"]),
   196: career(["Real Sociedad", "Atlético de Madrid", "Barcelona"]),
   197: career(["Barcelona", "Al Sadd"]),
+  334: career(["Barcelona", "Inter", "Mallorca"]),
   198: career(["Barcelona", "Vissel Kobe"]),
   199: career(["Real Madrid", "Porto"]),
   200: career(["Barcelona"]),

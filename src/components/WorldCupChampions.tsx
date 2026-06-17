@@ -74,7 +74,8 @@ export default function WorldCupChampions() {
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState("");
   const [copied, setCopied] = useState(false);
-  const suggestions = useMemo(() => getCountrySuggestions(input), [input]);
+  const [hideSuggestions, setHideSuggestions] = useState(false);
+  const suggestions = useMemo(() => hideSuggestions ? [] : getCountrySuggestions(input), [hideSuggestions, input]);
 
   useEffect(() => {
     trackModeEntered(MODE_ID, SEASON_ID, { source: "game_page" });
@@ -241,7 +242,7 @@ export default function WorldCupChampions() {
             </label>
             <input
               value={input}
-              onChange={(event) => setInput(event.target.value)}
+              onChange={(event) => { setInput(event.target.value); setHideSuggestions(false); }}
               placeholder={state.phase === "runnerUp" ? "Pa\u00eds finalista..." : "Pa\u00eds campe\u00f3n..."}
               className="w-full rounded-2xl px-4 py-4 font-oswald text-[20px] outline-none"
               style={{ border: "2px solid #d7d7d2", color: "#18181b" }}
@@ -253,7 +254,7 @@ export default function WorldCupChampions() {
                   <button
                     key={country}
                     type="button"
-                    onClick={() => setInput(country)}
+                    onClick={() => { setInput(country); setHideSuggestions(true); }}
                     className="w-full text-left px-4 py-3 text-[14px] font-semibold hover:bg-slate-50"
                     style={{ color: "#18181b" }}
                   >

@@ -19,6 +19,8 @@ const MAX = 4;
 
 const CASES: Case[] = [
   { club: "Valencia", aliases: ["valencia", "valencia cf"], clues: ["Villa", "Silva", "Mata", "Mestalla"], note: "La Valencia de Villa, Silva y Mata era cromo premium." },
+  { club: "Real Madrid", aliases: ["real madrid", "madrid"], clues: ["Cristiano", "Casillas", "Sergio Ramos", "Bernabéu"], note: "El Madrid de Cristiano definió media era BBVA." },
+  { club: "Barcelona", aliases: ["barcelona", "barça", "barca", "fc barcelona"], clues: ["Messi", "Xavi", "Iniesta", "Camp Nou"], note: "El Barça de Guardiola y Luis Enrique marcó una época." },
   { club: "Sevilla", aliases: ["sevilla", "sevilla fc"], clues: ["Kanouté", "Luis Fabiano", "Jesús Navas", "Palop"], note: "El Sevilla europeo marcó una época BBVA." },
   { club: "Villarreal", aliases: ["villarreal"], clues: ["Senna", "Riquelme", "Forlán", "Cazorla"], note: "El Submarino tuvo una colección de talentos inolvidable." },
   { club: "Málaga", aliases: ["malaga", "málaga"], clues: ["Duda", "Isco", "Joaquín", "Caballero"], note: "La Rosaleda vivió noches grandes con Pellegrini." },
@@ -26,8 +28,17 @@ const CASES: Case[] = [
   { club: "Betis", aliases: ["betis", "real betis"], clues: ["Joaquín", "Rubén Castro", "Beñat", "Heliópolis"], note: "Betis BBVA es alegría, zurdas y goles de Rubén Castro." },
   { club: "Atlético de Madrid", aliases: ["atletico", "atlético", "atletico de madrid", "atlético de madrid"], clues: ["Forlán", "Falcao", "Agüero", "Calderón"], note: "Del Kun a Falcao: el Atleti volvió a rugir." },
   { club: "Athletic Club", aliases: ["athletic", "athletic club", "athletic bilbao"], clues: ["Iraola", "Aduriz", "Muniain", "San Mamés"], note: "San Mamés siempre fue territorio de jugadores reconocibles." },
+  { club: "Real Sociedad", aliases: ["real sociedad", "la real", "sociedad"], clues: ["Xabi Prieto", "Griezmann", "Vela", "Anoeta"], note: "La Real de la era BBVA tenía muchísimo talento reconocible." },
+  { club: "Celta de Vigo", aliases: ["celta", "celta de vigo"], clues: ["Iago Aspas", "Nolito", "Orellana", "Balaídos"], note: "Balaídos fue una fábrica de cromos de culto." },
   { club: "Espanyol", aliases: ["espanyol", "rcd espanyol"], clues: ["Tamudo", "Luis García", "Kiko Casilla", "Cornellà"], note: "El Espanyol tiene mucho cromo de culto BBVA." },
   { club: "Racing Santander", aliases: ["racing", "racing santander"], clues: ["Munitis", "Colsa", "Canales", "El Sardinero"], note: "Racing es nostalgia directa para quien vivió esa Liga." },
+  { club: "Zaragoza", aliases: ["zaragoza", "real zaragoza"], clues: ["Aimar", "Milito", "D'Alessandro", "La Romareda"], note: "El Zaragoza de mediados de los 2000 era puro fútbol de sobremesa." },
+  { club: "Mallorca", aliases: ["mallorca", "rcd mallorca"], clues: ["Eto'o", "Aduriz", "Webó", "Son Moix"], note: "Mallorca dejó delanteros y recuerdos muy de Hombres BBVA." },
+  { club: "Osasuna", aliases: ["osasuna"], clues: ["Raúl García", "Pandiani", "Puñal", "El Sadar"], note: "El Sadar siempre fue uno de los campos más reconocibles de aquella Liga." },
+  { club: "Getafe", aliases: ["getafe"], clues: ["Soldado", "Güiza", "Pedro León", "Coliseum"], note: "Getafe tuvo mucho jugador de culto en la era BBVA." },
+  { club: "Levante", aliases: ["levante"], clues: ["Barkero", "Koné", "Keylor Navas", "Ciutat"], note: "El Levante de veteranos fue una de las grandes nostalgias de la época." },
+  { club: "Rayo Vallecano", aliases: ["rayo", "rayo vallecano"], clues: ["Piti", "Trashorras", "Michu", "Vallecas"], note: "Vallecas es sinónimo de fútbol reconocible y valentía." },
+  { club: "Granada", aliases: ["granada"], clues: ["Brahimi", "Mikel Rico", "Siqueira", "Los Cármenes"], note: "Granada reunió varios cromos muy recordables en su regreso a Primera." },
 ];
 
 function fold(value: string) {
@@ -55,7 +66,7 @@ function getClubSuggestions(query: string) {
 }
 
 function getCase() {
-  return CASES[(getDayNumber() * 5 + 2) % CASES.length];
+  return CASES[(getDayNumber() * 7 + 3) % CASES.length];
 }
 
 function rewardPlayer(club: string) {
@@ -71,8 +82,9 @@ export default function ClubOcultoBBVA({ onBack }: { onBack: () => void }) {
   const [done, setDone] = useState(false);
   const [won, setWon] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [hideSuggestions, setHideSuggestions] = useState(false);
   const shownClues = done ? item.clues : item.clues.slice(0, Math.min(item.clues.length, 2 + guesses.length));
-  const suggestions = getClubSuggestions(query);
+  const suggestions = hideSuggestions ? [] : getClubSuggestions(query);
 
   useEffect(() => {
     try {
@@ -147,9 +159,9 @@ export default function ClubOcultoBBVA({ onBack }: { onBack: () => void }) {
           {!done ? (
             <div className="flex flex-col gap-2">
               <div className="relative">
-                <input value={query} onChange={event => setQuery(event.target.value)} onKeyDown={event => {
+                <input value={query} onChange={event => { setQuery(event.target.value); setHideSuggestions(false); }} onKeyDown={event => {
                   if (event.key !== "Enter") return;
-                  if (suggestions.length > 0) setQuery(suggestions[0]);
+                  if (suggestions.length > 0) { setQuery(suggestions[0]); setHideSuggestions(true); }
                   else submit();
                 }}
                   placeholder="Escribe el club" className="w-full px-4 py-3 rounded-xl outline-none text-[14px]"
@@ -158,7 +170,7 @@ export default function ClubOcultoBBVA({ onBack }: { onBack: () => void }) {
                   <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden max-h-72 overflow-y-auto"
                     style={{ background: "white", border: "1px solid rgba(0,0,0,0.12)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
                     {suggestions.map(club => (
-                      <button key={club} onMouseDown={() => setQuery(club)}
+                      <button key={club} onMouseDown={event => { event.preventDefault(); setQuery(club); setHideSuggestions(true); }}
                         className="w-full px-4 py-2.5 text-left border-b last:border-0 font-oswald font-semibold text-[13px]"
                         style={{ borderColor: "rgba(0,0,0,0.06)", color: "#18181b" }}>
                         {club}
