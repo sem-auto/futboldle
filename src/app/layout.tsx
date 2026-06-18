@@ -4,34 +4,22 @@ import { Suspense } from "react";
 import GoogleAnalyticsPageView from "@/components/GoogleAnalyticsPageView";
 import ShareSheetHost from "@/components/ShareSheetHost";
 import AchievementToast from "@/components/AchievementToast";
+import PwaRuntime from "@/components/PwaRuntime";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = "G-Q4DBT40EYL";
 const SITE_URL = "https://futboldle.es";
 const SITE_TITLE = "Futboldle";
-const SITE_DESCRIPTION = "Minijuegos diarios para enfermos de la Liga BBVA.";
+const SITE_DESCRIPTION = "Minijuegos diarios de futbol nostalgia: Wordle, Liga BBVA y Mundiales.";
 const SOCIAL_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "VideoGame",
-  name: "Futboldle",
-  alternateName: ["Wordle futbol", "Minijuegos Liga BBVA", "Hombres BBVA"],
-  url: SITE_URL,
-  applicationCategory: "GameApplication",
-  gamePlatform: "Web",
-  operatingSystem: "Web",
-  inLanguage: "es",
-  description: SITE_DESCRIPTION,
-  genre: ["Futbol", "Trivia", "Word game", "Nostalgia deportiva"],
-  image: SOCIAL_IMAGE_URL,
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "EUR",
-  },
-  keywords:
-    "minijuegos de futbol, minijuegos Liga Espanola, wordle futbol, Liga BBVA, Hombres BBVA, futbol retro, futbol nostalgia, juegos futbol antiguos",
+  "@graph": [
+    { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: "Futboldle", url: SITE_URL, inLanguage: "es", description: SITE_DESCRIPTION },
+    { "@type": "WebApplication", "@id": `${SITE_URL}/#app`, name: "Futboldle", url: SITE_URL, applicationCategory: "GameApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" } },
+    { "@type": "Game", "@id": `${SITE_URL}/#game`, name: "Futboldle", alternateName: ["Wordle futbol", "Minijuegos Liga BBVA", "Hombres BBVA", "Mundialdle"], url: SITE_URL, gamePlatform: "Web", inLanguage: "es", description: SITE_DESCRIPTION, genre: ["Futbol", "Trivia", "Nostalgia deportiva"], image: SOCIAL_IMAGE_URL },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -139,20 +127,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <meta property="og:title" content="Futboldle" />
-        <meta property="og:description" content="Minijuegos diarios para enfermos de la Liga BBVA." />
-        <meta property="og:image" content="https://futboldle.es/og-image.png" />
-        <meta property="og:image:secure_url" content="https://futboldle.es/og-image.png" />
-        <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:url" content="https://futboldle.es" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Futboldle" />
-        <meta name="twitter:description" content="Minijuegos diarios para enfermos de la Liga BBVA." />
-        <meta name="twitter:image" content="https://futboldle.es/og-image.png" />
-        <meta name="twitter:image:alt" content="Futboldle" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="theme-color" content="#0b1410" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -165,6 +139,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <ShareSheetHost />
         <AchievementToast />
+        <PwaRuntime />
       </body>
     </html>
   );

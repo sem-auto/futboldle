@@ -19,6 +19,10 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "cards-100", label: "100 cromos desbloqueados", description: "Esto ya es álbum serio." },
   { id: "rey-bbva", label: "Rey de la BBVA", description: "Has completado varios retos de la era BBVA." },
   { id: "especialista-mundialista", label: "Especialista Mundialista", description: "Mundialdle ya no te viene grande." },
+  { id: "world-cups-10", label: "10 retos mundialistas", description: "Ya conoces el camino al titulo." },
+  { id: "streak-30", label: "30 dias de racha", description: "Un mes completo de nostalgia futbolera." },
+  { id: "cards-50", label: "50 cromos desbloqueados", description: "Medio centenar de recuerdos recuperados." },
+  { id: "leyenda-mundialista", label: "Leyenda Mundialista", description: "Has reunido 25 cromos de Mundiales." },
 ];
 
 function readUnlocked() {
@@ -64,19 +68,34 @@ function readAlbumCount() {
   }
 }
 
+function readWorldCupProgress() {
+  try {
+    const cards = JSON.parse(localStorage.getItem("fbl-worldcup-album-v1") ?? "[]");
+    const streak = JSON.parse(localStorage.getItem("fbl-worldcup-streak-v1") ?? "{}");
+    return { cards: Array.isArray(cards) ? cards.length : 0, played: Number(streak.playedDays) || 0, streak: Number(streak.current) || 0 };
+  } catch {
+    return { cards: 0, played: 0, streak: 0 };
+  }
+}
+
 export function syncAchievements(context: { modeId?: string; won?: boolean } = {}) {
   try {
     const stats = readJson("fbl-stats-v1", { won: 0, streak: 0 });
     const counts = readJson("fbl-game-counts-v1", { wordle: 0, trayectoria: 0, top10: 0, crack: 0 });
-    const albumCount = readAlbumCount();
+    const worldCups = readWorldCupProgress();
+    const albumCount = readAlbumCount() + worldCups.cards;
 
     if (stats.won >= 1) unlockAchievement("first-complete");
     if (context.modeId === "mundialdle" && context.won) unlockAchievement("first-mundialdle");
     if (stats.streak >= 5) unlockAchievement("streak-5");
     if (stats.streak >= 7) unlockAchievement("streak-7");
+    if (Math.max(stats.streak, worldCups.streak) >= 30) unlockAchievement("streak-30");
     if (albumCount >= 25) unlockAchievement("cards-25");
+    if (albumCount >= 50) unlockAchievement("cards-50");
     if (albumCount >= 100) unlockAchievement("cards-100");
     if ((counts.wordle ?? 0) + (counts.trayectoria ?? 0) + (counts.top10 ?? 0) + (counts.crack ?? 0) >= 10) unlockAchievement("rey-bbva");
     if (context.modeId === "mundialdle" && context.won) unlockAchievement("especialista-mundialista");
+    if (worldCups.played >= 10) unlockAchievement("world-cups-10");
+    if (worldCups.cards >= 25) unlockAchievement("leyenda-mundialista");
   } catch {}
 }

@@ -71,6 +71,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.8,
     },
+    { url: `${SITE_URL}/world-cups/wordle`, lastModified: now, changeFrequency: "daily", priority: 0.88 },
+    { url: `${SITE_URL}/world-cups/collection`, lastModified: now, changeFrequency: "daily", priority: 0.75 },
+    { url: `${SITE_URL}/temporadas/liga-bbva`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
+    { url: `${SITE_URL}/temporadas/mundiales`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
     {
       url: `${SITE_URL}/world-cups/champions`,
       lastModified: now,

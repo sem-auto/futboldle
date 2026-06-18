@@ -16,6 +16,7 @@ type AnalyticsEvent =
   | "challenge_failed"
   | "challenge_shared"
   | "album_opened"
+  | "collection_opened"
   | "ad_clicked"
   | "achievement_unlocked"
   | "top10_completed"
@@ -40,9 +41,13 @@ declare global {
 export function trackEvent(name: AnalyticsEvent, payload: AnalyticsPayload = {}) {
   try {
     if (typeof window === "undefined") return;
-    window.gtag?.("event", name, payload);
-    window.va?.(name, payload);
-    window.dispatchEvent(new CustomEvent("fbl-analytics", { detail: { name, payload } }));
+    const enriched = {
+      device: window.innerWidth < 768 ? "mobile" : window.innerWidth < 1024 ? "tablet" : "desktop",
+      ...payload,
+    };
+    window.gtag?.("event", name, enriched);
+    window.va?.(name, enriched);
+    window.dispatchEvent(new CustomEvent("fbl-analytics", { detail: { name, payload: enriched } }));
   } catch {}
 }
 

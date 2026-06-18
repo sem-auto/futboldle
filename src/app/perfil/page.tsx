@@ -6,6 +6,9 @@ import { getFavoritePlayers, getTrophyShowcase } from "@/lib/album";
 import { getProfileSummary } from "@/lib/profile";
 import { importProgressBackup, stringifyProgressBackup } from "@/lib/progressBackup";
 import { shareResult } from "@/lib/share";
+import { getWorldCupAlbum, getWorldCupStreak, type WorldCupStreak } from "@/lib/worldCupCollection";
+import { worldCupPlayers } from "@/data/worldcups";
+import PwaControls from "@/components/PwaControls";
 
 type Summary = ReturnType<typeof getProfileSummary>;
 
@@ -16,6 +19,8 @@ export default function PerfilPage() {
   const [backupText, setBackupText] = useState("");
   const [backupMessage, setBackupMessage] = useState("");
   const [backupError, setBackupError] = useState("");
+  const [worldCupCards, setWorldCupCards] = useState(0);
+  const [worldCupStreak, setWorldCupStreak] = useState<WorldCupStreak>({ current: 0, best: 0, lastDayNumber: 0, playedDays: 0 });
 
   function refreshProfile() {
     const data = getProfileSummary();
@@ -23,6 +28,8 @@ export default function PerfilPage() {
     setSummary(data);
     setFavorites(bbvaPlayers.filter(player => favoriteIds.has(player.id)));
     setTrophyCount(getTrophyShowcase().filter(trophy => trophy.unlocked).length);
+    setWorldCupCards(getWorldCupAlbum().length);
+    setWorldCupStreak(getWorldCupStreak());
   }
 
   useEffect(() => {
@@ -84,6 +91,19 @@ export default function PerfilPage() {
           <button onClick={shareProfile} className="mt-3 font-oswald font-semibold uppercase tracking-wider text-[10px] px-3 py-2 rounded-lg"
             style={{ background: "#18181b", color: "white" }}>Compartir progreso</button>
         </section>
+
+        <section className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,#eef3ff,#fff8e6)", border: "1px solid rgba(23,78,166,0.18)" }}>
+          <div className="flex items-center justify-between gap-3">
+            <div><div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#174ea6" }}>Temporada Mundiales</div><h2 className="font-bebas text-[28px] leading-none">PROGRESO MUNDIALISTA</h2></div>
+            <Link href="/world-cups/collection" className="text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver album</Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+            {[["Racha Mundial", worldCupStreak.current], ["Mejor racha", worldCupStreak.best], ["Dias jugados", worldCupStreak.playedDays], ["Cromos", `${worldCupCards}/${worldCupPlayers.length}`]].map(([label, value]) => <div key={label} className="rounded-xl px-3 py-2 bg-white/70"><div className="text-[8px] uppercase font-semibold tracking-[0.12em]" style={{ color: "#9a9a8a" }}>{label}</div><div className="font-bebas text-[24px] leading-none">{value}</div></div>)}
+          </div>
+          <div className="h-2 rounded-full overflow-hidden mt-3" style={{ background: "rgba(23,78,166,0.10)" }}><div className="h-full" style={{ width: `${Math.round((worldCupCards / worldCupPlayers.length) * 100)}%`, background: "#174ea6" }} /></div>
+        </section>
+
+        <PwaControls />
 
         <section className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
           <div className="font-bebas text-[22px] leading-none mb-1" style={{ color: "#18181b" }}>COPIA DE SEGURIDAD</div>

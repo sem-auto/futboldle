@@ -30,7 +30,7 @@ export default function WorldCupChampionsPage() {
   return (
     <main className="min-h-dvh px-3 py-4" style={{ background: "#f6f2ea" }}>
       <div className="max-w-2xl mx-auto flex flex-col gap-3">
-        <Link href="/world-cups" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>{"\u2190"} Volver</Link>
+        <div className="flex items-center justify-between"><Link href="/world-cups" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>{"\u2190"} Volver</Link><Link href="/world-cups/collection" className="text-[11px] font-semibold" style={{ color: "#174ea6" }}>Colección</Link></div>
         <WorldCupChampions />
       </div>
     </main>

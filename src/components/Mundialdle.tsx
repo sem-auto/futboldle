@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { getDailyMundialdleChallenge, worldCupPlayers } from "@/data/worldcups";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { shareGameResult } from "@/lib/resultShare";
@@ -91,6 +92,9 @@ function countryCode(value: string) {
     Egipto: "EGY",
     Nigeria: "NGA",
     Peru: "PER",
+    Rusia: "RUS",
+    Iran: "IRN",
+    Togo: "TOG",
   };
   return codes[value] ?? "INT";
 }
@@ -138,6 +142,9 @@ function countryFlag(value: string) {
     Egipto: "🇪🇬",
     Nigeria: "🇳🇬",
     Peru: "🇵🇪",
+    Rusia: "🇷🇺",
+    Iran: "🇮🇷",
+    Togo: "🇹🇬",
   };
   return flags[value] ?? "🌍";
 }
@@ -182,6 +189,9 @@ function flagBackground(country: string) {
     Turquia: "radial-gradient(circle at 44% 50%,#fff 0 18%,transparent 19%),radial-gradient(circle at 50% 50%,#e30a17 0 18%,transparent 19%),#e30a17",
     Ucrania: "linear-gradient(180deg,#0057b7 0 50%,#ffd700 50% 100%)",
     Uruguay: "repeating-linear-gradient(180deg,#fff 0 11%,#0038a8 11% 22%)",
+    Rusia: "linear-gradient(180deg,#fff 0 33%,#0039a6 33% 66%,#d52b1e 66% 100%)",
+    Iran: "linear-gradient(180deg,#239f40 0 33%,#fff 33% 66%,#da0000 66% 100%)",
+    Togo: "repeating-linear-gradient(180deg,#006a4e 0 20%,#ffce00 20% 40%)",
   };
   return flags[country] ?? "linear-gradient(135deg,#174ea6,#f8c647)";
 }
@@ -338,6 +348,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
       trackEvent("mundialdle_completed", { challenge: challenge.id, won: correct, attempts: nextGuesses.length });
       if (correct) {
         unlockWorldCupCard(challenge.playerId, challenge.id);
+        syncAchievements({ modeId: "mundialdle", won: true });
         trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "mundialdle", playerId: challenge.playerId, challengeId: challenge.id });
         window.dispatchEvent(new CustomEvent("fbl-card-unlocked", {
           detail: {
@@ -533,6 +544,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
               )}
               <button onClick={share} className="mt-3 w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
                 style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Copiado" : "Compartir resultado"}</button>
+              <Link href="/world-cups/collection" className="block text-center mt-3 text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver colección mundialista</Link>
             </div>
           )}
         </div>

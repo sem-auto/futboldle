@@ -53,8 +53,9 @@ export default function WorldCupsPage() {
           </div>
 
           <div className="p-4 md:p-5 flex flex-col gap-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
               <ActiveModeCard href="/world-cups/mundialdle" eyebrow="Jugable ahora" title="MUNDIALDLE" subtitle="Adivina el jugador mundialista con pistas progresivas." accent="blue" modeId="mundialdle" />
+              <ActiveModeCard href="/world-cups/wordle" eyebrow="Nuevo diario" title="WORDLE MUNDIAL" subtitle="Adivina el apellido sin pistas progresivas." accent="blue" modeId="worldcup-wordle" />
               <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle={"Te damos la sede. Adivina campe\u00f3n y finalista."} accent="gold" modeId="worldcup-champions" />
               <ActiveModeCard href="/world-cups/camino" eyebrow="Nuevo juego" title="CAMINO" subtitle={"Adivina el campe\u00f3n por sus rivales."} accent="gold" modeId="camino-titulo" />
             </div>
@@ -81,6 +82,11 @@ export default function WorldCupsPage() {
             </div>
           </div>
         </section>
+
+        <Link href="/world-cups/collection" className="rounded-2xl px-4 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
+          <div><div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Colección propia</div><div className="font-bebas text-[26px] leading-none">ALBUM MUNDIALISTA</div></div>
+          <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>Ver cromos {"\u2192"}</span>
+        </Link>
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ComingSoonCard title="Cromo Mundial" subtitle="Revela al jugador como un cromo Panini." />

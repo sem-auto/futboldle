@@ -22,6 +22,8 @@ import { shareResult } from "@/lib/share";
 import { getCommunityDifficulty } from "@/lib/communityStats";
 import { seasons } from "@/data/product";
 import { trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
+import { getWorldCupAlbum } from "@/lib/worldCupCollection";
+import { worldCupPlayers } from "@/data/worldcups";
 
 type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "statdle" | "mundialdle" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
 
@@ -690,6 +692,7 @@ function ProfileCompact({ played, won, streak, bestStreak, albumProgress, onAlbu
 export default function HomePage() {
   const [view, setView] = useState<View>("home");
   const [albumProgress, setAlbumProgress] = useState({ unlockedCount: 0, total: 0, percent: 0 });
+  const [worldCupProgress, setWorldCupProgress] = useState({ unlocked: 0, latest: "" });
   const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon, mundialdleDone, mundialdleWon } = useDailyStatus();
   const { stats, refresh } = useStats();
   const goHome = () => setView("home");
@@ -707,6 +710,9 @@ export default function HomePage() {
 
   useEffect(() => {
     setAlbumProgress(getAlbumProgress());
+    const worldCards = getWorldCupAlbum();
+    const latestEntry = [...worldCards].sort((a, b) => b.unlockedAt.localeCompare(a.unlockedAt))[0];
+    setWorldCupProgress({ unlocked: worldCards.length, latest: worldCupPlayers.find(player => player.id === latestEntry?.playerId)?.name ?? "" });
     refresh();
   }, [view, refresh]);
 
@@ -951,6 +957,11 @@ export default function HomePage() {
             </div>
           </button>
         </div>
+
+        <Link href="/progreso" className="rounded-xl px-3 py-2 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.72)", border: "1px solid rgba(0,0,0,0.07)" }}>
+          <div className="flex items-center gap-3 text-[10px] font-semibold"><span style={{ color: "#c8920a" }}>BBVA {albumProgress.unlockedCount}/{albumProgress.total}</span><span style={{ color: "#174ea6" }}>Mundiales {worldCupProgress.unlocked}/{worldCupPlayers.length}</span></div>
+          <div className="text-[9px] truncate" style={{ color: "#9a9a8a" }}>{worldCupProgress.latest ? `Ultimo: ${worldCupProgress.latest}` : "Ver progreso"}</div>
+        </Link>
 
         <MobileAdBanner slot={0} />
 
