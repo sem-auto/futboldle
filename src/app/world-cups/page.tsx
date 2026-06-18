@@ -20,13 +20,13 @@ function ActiveModeCard({ href, eyebrow, title, subtitle, accent, modeId }: { hr
     <Link
       href={href}
       onClick={() => trackModeEntered(modeId, "world-cups", { source: "season_page" })}
-      className="rounded-2xl p-4 transition-transform active:scale-[0.99]"
+      className="rounded-2xl p-4 transition-transform active:scale-[0.99] h-full flex flex-col"
       style={{ background: accent === "gold" ? "#fffaf0" : "#eef3ff", border: `1px solid ${accent === "gold" ? "rgba(200,146,10,0.26)" : "rgba(23,78,166,0.22)"}` }}
     >
       <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: accent === "gold" ? "#c8920a" : "#174ea6" }}>{eyebrow}</div>
       <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>{title}</h2>
       <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>{subtitle}</p>
-      <div className="mt-4 inline-flex rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: accent === "gold" ? "#c8920a" : "#174ea6", color: "white" }}>Jugar {"\u2192"}</div>
+      <div className="mt-auto pt-4"><span className="inline-flex rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: accent === "gold" ? "#c8920a" : "#174ea6", color: "white" }}>Jugar {"\u2192"}</span></div>
     </Link>
   );
 }
@@ -52,16 +52,19 @@ export default function WorldCupsPage() {
             <p className="text-[15px] text-white/80 mt-1">2002-2026 {"\u00b7"} La primera expansi{"\u00f3"}n real de Futboldle.</p>
           </div>
 
-          <div className="p-4 md:p-5 grid grid-cols-1 md:grid-cols-[1.35fr_0.65fr] gap-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="p-4 md:p-5 flex flex-col gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
               <ActiveModeCard href="/world-cups/mundialdle" eyebrow="Jugable ahora" title="MUNDIALDLE" subtitle="Adivina el jugador mundialista con pistas progresivas." accent="blue" modeId="mundialdle" />
-              <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle="Te damos la sede. Adivina campe\u00f3n y finalista." accent="gold" modeId="worldcup-champions" />
-              <ActiveModeCard href="/world-cups/camino" eyebrow="Nuevo juego" title="CAMINO" subtitle="Adivina el campe\u00f3n por sus rivales." accent="gold" modeId="camino-titulo" />
+              <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle={"Te damos la sede. Adivina campe\u00f3n y finalista."} accent="gold" modeId="worldcup-champions" />
+              <ActiveModeCard href="/world-cups/camino" eyebrow="Nuevo juego" title="CAMINO" subtitle={"Adivina el campe\u00f3n por sus rivales."} accent="gold" modeId="camino-titulo" />
             </div>
 
-            <div className="rounded-2xl p-4" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.20)" }}>
-              <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Base inicial</div>
-              <div className="grid grid-cols-3 gap-2 mt-3">
+            <div className="rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.20)" }}>
+              <div>
+                <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Archivo mundialista</div>
+                <div className="text-[12px] mt-0.5" style={{ color: "#6b6b72" }}>Jugadores reconocibles y retos diarios sin datos de relleno.</div>
+              </div>
+              <div className="grid grid-cols-3 gap-5 sm:min-w-[280px]">
                 <div>
                   <div className="font-bebas text-[28px] leading-none" style={{ color: "#18181b" }}>{worldCupPlayers.length}</div>
                   <div className="text-[10px]" style={{ color: "#9a9a8a" }}>jugadores</div>
@@ -81,7 +84,7 @@ export default function WorldCupsPage() {
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ComingSoonCard title="Cromo Mundial" subtitle="Revela al jugador como un cromo Panini." />
-          <ComingSoonCard title="Grupos M\u00edticos" subtitle="Recuerda fases de grupos hist\u00f3ricas." />
+          <ComingSoonCard title={"Grupos M\u00edticos"} subtitle={"Recuerda fases de grupos hist\u00f3ricas."} />
           <ComingSoonCard title="Finales" subtitle="Momentos y goleadores de finales." />
         </section>
       </div>

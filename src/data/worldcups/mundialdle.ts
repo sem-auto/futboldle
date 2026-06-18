@@ -1,3 +1,5 @@
+import { worldCupPlayers } from "./players";
+
 export type MundialdleClueTone = "gold" | "blue" | "green" | "red" | "neutral";
 
 export type MundialdleChallenge = {
@@ -14,7 +16,7 @@ export type MundialdleChallenge = {
   }[];
 };
 
-export const mundialdleChallenges: MundialdleChallenge[] = [
+const featuredMundialdleChallenges: MundialdleChallenge[] = [
   { id: "villa-2010", playerId: "david-villa", worldCup: 2010, source: "FIFA / estadisticas del Mundial 2010", funFact: "David Villa fue el maximo goleador de Espana en el Mundial 2010.", clues: [
     { icon: "", label: "Mundial", value: "Mundial 2010", tone: "gold" },
     { icon: "", label: "Goles", value: "5 goles", tone: "green" },
@@ -335,6 +337,39 @@ export const mundialdleChallenges: MundialdleChallenge[] = [
     { icon: "", label: "Club", value: "Corinthians", tone: "neutral" },
     { icon: "", label: "Pista", value: "Portero historico", tone: "green" },
   ] },
+];
+
+const featuredPlayerIds = new Set(featuredMundialdleChallenges.map(challenge => challenge.playerId));
+
+const rosterMundialdleChallenges: MundialdleChallenge[] = worldCupPlayers
+  .filter(player => !featuredPlayerIds.has(player.id))
+  .map(player => {
+    const club = player.clubsByWorldCup?.find(item => item.year === player.mainWorldCup)?.club
+      ?? player.clubsByWorldCup?.[0]?.club
+      ?? "Club no disponible";
+    const clues: MundialdleChallenge["clues"] = [
+      { icon: "", label: "Mundial", value: `Mundial ${player.mainWorldCup}`, tone: "gold" },
+      { icon: "", label: "Rol", value: player.worldCupRole, tone: "gold" },
+      { icon: "", label: "Seleccion", value: player.nationality, tone: "red" },
+      { icon: "", label: "Posicion", value: player.position, tone: "blue" },
+    ];
+    if (typeof player.worldCupGoals === "number") {
+      clues.push({ icon: "", label: "Goles", value: `${player.worldCupGoals} goles`, tone: "green" });
+    }
+    clues.push({ icon: "", label: "Club", value: club, tone: "neutral" });
+
+    return {
+      id: `${player.id}-${player.mainWorldCup}`,
+      playerId: player.id,
+      worldCup: player.mainWorldCup,
+      source: `FIFA / Mundial ${player.mainWorldCup}`,
+      clues,
+    };
+  });
+
+export const mundialdleChallenges: MundialdleChallenge[] = [
+  ...featuredMundialdleChallenges,
+  ...rosterMundialdleChallenges,
 ];
 
 export function getDailyMundialdleChallenge(dayNumber: number) {

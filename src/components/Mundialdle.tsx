@@ -7,6 +7,7 @@ import { shareGameResult } from "@/lib/resultShare";
 import { FUTBOLDLE_URL } from "@/lib/share";
 import { syncAchievements } from "@/lib/achievements";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
+import { getWorldCupStreak, recordWorldCupDay, unlockWorldCupCard, type WorldCupStreak } from "@/lib/worldCupCollection";
 
 const MAX_ATTEMPTS = 6;
 
@@ -141,6 +142,68 @@ function countryFlag(value: string) {
   return flags[value] ?? "🌍";
 }
 
+function flagBackground(country: string) {
+  const flags: Record<string, string> = {
+    Alemania: "linear-gradient(180deg,#000 0 33%,#dd0000 33% 66%,#ffce00 66% 100%)",
+    Argentina: "linear-gradient(180deg,#75aadb 0 33%,#fff 33% 66%,#75aadb 66% 100%)",
+    Australia: "linear-gradient(135deg,#012169 0 62%,#e5f0ff 62% 66%,#e4002b 66% 100%)",
+    Belgica: "linear-gradient(90deg,#000 0 33%,#ffd90c 33% 66%,#ef3340 66% 100%)",
+    Brasil: "radial-gradient(circle at 50% 50%,#1b4fb6 0 18%,#ffdf00 19% 42%,transparent 43%),#009b3a",
+    Camerun: "linear-gradient(90deg,#007a5e 0 33%,#ce1126 33% 66%,#fcd116 66% 100%)",
+    Chile: "linear-gradient(180deg,#fff 0 50%,#d52b1e 50% 100%)",
+    Colombia: "linear-gradient(180deg,#fcd116 0 50%,#003893 50% 75%,#ce1126 75% 100%)",
+    CostaRica: "linear-gradient(180deg,#002b7f 0 18%,#fff 18% 32%,#ce1126 32% 68%,#fff 68% 82%,#002b7f 82% 100%)",
+    Croacia: "linear-gradient(180deg,#f00 0 33%,#fff 33% 66%,#171796 66% 100%)",
+    Dinamarca: "linear-gradient(90deg,transparent 0 34%,#fff 34% 44%,transparent 44%),linear-gradient(180deg,#c60c30 0 42%,#fff 42% 58%,#c60c30 58%)",
+    Ecuador: "linear-gradient(180deg,#fcd116 0 50%,#003893 50% 75%,#ce1126 75% 100%)",
+    Egipto: "linear-gradient(180deg,#ce1126 0 33%,#fff 33% 66%,#000 66% 100%)",
+    Espana: "linear-gradient(180deg,#aa151b 0 25%,#f1bf00 25% 75%,#aa151b 75% 100%)",
+    "Estados Unidos": "repeating-linear-gradient(180deg,#b22234 0 7%,#fff 7% 14%)",
+    Francia: "linear-gradient(90deg,#0055a4 0 33%,#fff 33% 66%,#ef4135 66% 100%)",
+    Gales: "linear-gradient(180deg,#fff 0 50%,#00a650 50% 100%)",
+    Ghana: "linear-gradient(180deg,#ce1126 0 33%,#fcd116 33% 66%,#006b3f 66% 100%)",
+    Holanda: "linear-gradient(180deg,#ae1c28 0 33%,#fff 33% 66%,#21468b 66% 100%)",
+    Inglaterra: "linear-gradient(90deg,transparent 0 43%,#c8102e 43% 57%,transparent 57%),linear-gradient(180deg,#fff 0 43%,#c8102e 43% 57%,#fff 57%)",
+    Italia: "linear-gradient(90deg,#009246 0 33%,#fff 33% 66%,#ce2b37 66% 100%)",
+    Japon: "radial-gradient(circle at 50% 50%,#bc002d 0 28%,transparent 29%),#fff",
+    Marruecos: "#c1272d",
+    Mexico: "linear-gradient(90deg,#006847 0 33%,#fff 33% 66%,#ce1126 66% 100%)",
+    Nigeria: "linear-gradient(90deg,#008751 0 33%,#fff 33% 66%,#008751 66% 100%)",
+    Paraguay: "linear-gradient(180deg,#d52b1e 0 33%,#fff 33% 66%,#0038a8 66% 100%)",
+    Peru: "linear-gradient(90deg,#d91023 0 33%,#fff 33% 66%,#d91023 66% 100%)",
+    Polonia: "linear-gradient(180deg,#fff 0 50%,#dc143c 50% 100%)",
+    Portugal: "linear-gradient(90deg,#006600 0 42%,#ff0000 42% 100%)",
+    RepublicaCheca: "linear-gradient(135deg,#11457e 0 38%,transparent 39%),linear-gradient(180deg,#fff 0 50%,#d7141a 50% 100%)",
+    "Corea del Sur": "radial-gradient(circle at 50% 50%,#cd2e3a 0 18%,#0047a0 19% 34%,transparent 35%),#fff",
+    Senegal: "linear-gradient(90deg,#00853f 0 33%,#fdef42 33% 66%,#e31b23 66% 100%)",
+    Serbia: "linear-gradient(180deg,#c6363c 0 33%,#0c4076 33% 66%,#fff 66% 100%)",
+    Suecia: "linear-gradient(90deg,transparent 0 30%,#fecc00 30% 42%,transparent 42%),linear-gradient(180deg,#006aa7 0 42%,#fecc00 42% 58%,#006aa7 58%)",
+    Suiza: "linear-gradient(90deg,transparent 0 42%,#fff 42% 58%,transparent 58%),linear-gradient(180deg,#d52b1e 0 38%,#fff 38% 62%,#d52b1e 62%)",
+    Turquia: "radial-gradient(circle at 44% 50%,#fff 0 18%,transparent 19%),radial-gradient(circle at 50% 50%,#e30a17 0 18%,transparent 19%),#e30a17",
+    Ucrania: "linear-gradient(180deg,#0057b7 0 50%,#ffd700 50% 100%)",
+    Uruguay: "repeating-linear-gradient(180deg,#fff 0 11%,#0038a8 11% 22%)",
+  };
+  return flags[country] ?? "linear-gradient(135deg,#174ea6,#f8c647)";
+}
+
+function FlagMark({ country, compact = false }: { country: string; compact?: boolean }) {
+  return (
+    <span
+      aria-label={country}
+      title={country}
+      className="inline-block shrink-0"
+      style={{
+        width: compact ? 24 : 32,
+        height: compact ? 16 : 22,
+        borderRadius: 5,
+        background: flagBackground(country),
+        border: "1px solid rgba(0,0,0,0.18)",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.16)",
+      }}
+    />
+  );
+}
+
 function worldCupDisplay(value: string) {
   if (value.includes("2002")) return "Corea/Japón 2002";
   if (value.includes("2006")) return "Alemania 2006";
@@ -161,7 +224,6 @@ function positionCode(value: string) {
 
 function clueBadge(label: string, value: string) {
   if (label === "Mundial") return "🏆";
-  if (label === "Seleccion") return countryFlag(value);
   if (label === "Club") return "🏟";
   if (label === "Posicion" && value === "Portero") return "🧤";
   if (label === "Posicion" && value === "Defensa") return "🛡";
@@ -190,7 +252,6 @@ function badgeVisual(label: string, value: string) {
 
 function clueValue(label: string, value: string) {
   if (label === "Mundial") return worldCupDisplay(value);
-  if (label === "Seleccion") return `${countryFlag(value)} ${value}`;
   if (label === "Goles") return value;
   return value;
 }
@@ -215,6 +276,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
   const [copied, setCopied] = useState(false);
   const [hideSuggestions, setHideSuggestions] = useState(false);
   const [startedAt] = useState(() => Date.now());
+  const [worldCupStreak, setWorldCupStreak] = useState<WorldCupStreak>({ current: 0, best: 0, lastDayNumber: 0, playedDays: 0 });
 
   const suggestions = useMemo(() => hideSuggestions ? [] : getSuggestions(query), [hideSuggestions, query]);
   const revealedCount = Math.min(challenge.clues.length, Math.max(1, guesses.length + 1));
@@ -225,6 +287,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
     trackChallengeStarted("mundialdle", challenge.id, { seasonId: "world-cups", worldCup: challenge.worldCup, modeId: "mundialdle" });
     trackEvent("game_started", { game: "mundialdle", season: "world-cups", challenge: challenge.id });
     trackEvent("mundialdle_started", { challenge: challenge.id, worldCup: challenge.worldCup });
+    setWorldCupStreak(getWorldCupStreak());
 
     try {
       const raw = localStorage.getItem(storageKey);
@@ -266,6 +329,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
     persist(nextGuesses, correct, isOver);
 
     if (isOver) {
+      setWorldCupStreak(recordWorldCupDay(getDayNumber()));
       const timeSpent = Math.round((Date.now() - startedAt) / 1000);
       trackChallengeCompleted("mundialdle", challenge.id, { seasonId: "world-cups", modeId: "mundialdle", won: correct, attempts: nextGuesses.length, timeSpent, shared: false });
       if (!correct) trackChallengeFailed("mundialdle", challenge.id, { seasonId: "world-cups", attempts: nextGuesses.length });
@@ -273,6 +337,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
       trackEvent("game_completed", { game: "mundialdle", season: "world-cups", challenge: challenge.id, won: correct, attempts: nextGuesses.length });
       trackEvent("mundialdle_completed", { challenge: challenge.id, won: correct, attempts: nextGuesses.length });
       if (correct) {
+        unlockWorldCupCard(challenge.playerId, challenge.id);
         trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "mundialdle", playerId: challenge.playerId, challengeId: challenge.id });
         window.dispatchEvent(new CustomEvent("fbl-card-unlocked", {
           detail: {
@@ -344,6 +409,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
             <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>🏆 Mundial</span>
             <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>🌍 Selección</span>
             <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>🏟 Club</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "rgba(248,198,71,0.22)", color: "#ffe89c" }}>Racha Mundial {worldCupStreak.current}</span>
           </div>
         </div>
 
@@ -363,7 +429,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                   style={{ background: visible ? `linear-gradient(135deg,${style.background},#ffffff)` : "#f3efe8", border: `1px solid ${visible ? style.border : "rgba(0,0,0,0.06)"}`, boxShadow: visible ? "0 2px 10px rgba(0,0,0,0.05)" : "none" }}>
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[10px] font-black tracking-tight"
                     style={{ background: visible ? badge.background : "#ddd7ca", color: visible ? badge.color : "white", border: `1px solid ${visible ? badge.border : "rgba(0,0,0,0.06)"}`, boxShadow: visible ? "0 1px 6px rgba(0,0,0,0.10)" : "none" }}>
-                    {visible ? clueBadge(clue.label, clue.value) : index + 1}
+                    {visible ? (clue.label === "Seleccion" ? <FlagMark country={clue.value} compact /> : clueBadge(clue.label, clue.value)) : index + 1}
                   </div>
                   <div className="flex-1">
                     <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#9a9a8a" }}>{clue.label}</div>
@@ -395,8 +461,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                       className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-gray-50"
                       style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
                       <span className="inline-flex items-center gap-2 font-semibold">
-                        <span className="inline-flex items-center justify-center rounded-md text-[9px] font-black px-1.5 py-0.5"
-                          style={{ background: "#0f172a", color: "white" }}>{item.flag || countryFlag(item.nationality)}</span>
+                        <FlagMark country={item.nationality} compact />
                         {item.name}
                       </span>
                       <span className="block text-[10px]" style={{ color: "#9a9a8a" }}>{item.nationality} {"\u00b7"} {item.position}</span>
@@ -427,24 +492,29 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
           )}
 
           {gameOver && (
-            <div className="rounded-xl p-4" style={{ background: won ? "#f0faf2" : "#fff5f5", border: `1px solid ${won ? "rgba(30,107,46,0.22)" : "rgba(184,28,20,0.18)"}` }}>
+            <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: won ? "linear-gradient(135deg,#f0faf2 0%,#fff8e6 55%,#eef3ff 100%)" : "#fff5f5", border: `1px solid ${won ? "rgba(200,146,10,0.36)" : "rgba(184,28,20,0.18)"}`, boxShadow: won ? "0 10px 28px rgba(23,78,166,0.10)" : "none" }}>
+              {won && <div className="absolute -right-16 -top-24 h-64 w-20 rotate-[28deg] opacity-40" style={{ background: "linear-gradient(90deg,transparent,white,transparent)" }} />}
               <div className="flex items-center gap-3">
                 <div className="w-20 h-24 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden"
                   style={{ background: "linear-gradient(145deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.32)", boxShadow: "0 6px 18px rgba(0,0,0,0.12)" }}>
                   <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: "#d6a20f" }} />
                   <div className="text-center">
-                    <div className="mx-auto rounded-md text-[22px] font-black px-2 py-1 inline-flex"
-                      style={{ background: "#0f172a", color: "white" }}>{player.flag || countryFlag(player.nationality)}</div>
+                    <div className="mx-auto inline-flex">
+                      <FlagMark country={player.nationality} />
+                    </div>
                     <div className="font-bebas text-[34px] leading-none mt-1" style={{ color: "#18181b" }}>{player.name.slice(0, 1)}</div>
                     <div className="text-[7px] font-semibold uppercase tracking-[0.12em] mt-1" style={{ color: "#8a6200" }}>Cromo</div>
                   </div>
                 </div>
                 <div className="min-w-0">
                   <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? "🏆 Leyenda mundialista desbloqueada" : "Era"}</div>
-                  <div className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>{player.flag || countryFlag(player.nationality)} {player.name}</div>
+                  <div className="flex items-center gap-2">
+                    <FlagMark country={player.nationality} />
+                    <div className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>{player.name}</div>
+                  </div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>STAR {rarityLabel(player.iconicLevel)}</span>
-                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}>{player.flag || countryFlag(player.nationality)} {player.nationality}</span>
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}><FlagMark country={player.nationality} compact /> {player.nationality}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#18181b" }}>{positionCode(player.position)} {player.position}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>WC Mundial {challenge.worldCup}</span>
                   </div>
@@ -453,6 +523,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                       📖 Otro cromo para tu colección.
                     </div>
                   )}
+                  <div className="mt-1 text-[10px]" style={{ color: "#6b6b72" }}>Racha Mundial: {worldCupStreak.current} días · Mejor: {worldCupStreak.best}</div>
                 </div>
               </div>
               {challenge.funFact && (
