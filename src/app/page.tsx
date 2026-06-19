@@ -958,6 +958,12 @@ export default function HomePage() {
           </button>
         </div>
 
+        <Link href="/world-cups" onClick={() => trackSeasonEntered("world-cups", { source: "home_featured" })} className="rounded-2xl px-4 py-3 flex items-center justify-between gap-4 overflow-hidden relative" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white", boxShadow: "0 6px 18px rgba(23,78,166,0.18)" }}>
+          <div className="relative z-10"><div className="text-[8px] uppercase font-semibold tracking-[0.2em] text-white/65">Temporada Mundiales</div><div className="font-bebas text-[27px] leading-none mt-1">4 RETOS MUNDIALISTAS</div><div className="text-[10px] text-white/75 mt-1">Mundialdle, Wordle, Campeones y Camino al Título</div></div>
+          <div className="relative z-10 rounded-full px-3 py-2 text-[10px] font-semibold whitespace-nowrap" style={{ background: "#f8c647", color: "#18181b" }}>Entrar {"\u2192"}</div>
+          <div className="absolute right-24 -top-8 font-bebas text-[100px] leading-none text-white/5">WC</div>
+        </Link>
+
         <Link href="/progreso" className="rounded-xl px-3 py-2 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.72)", border: "1px solid rgba(0,0,0,0.07)" }}>
           <div className="flex items-center gap-3 text-[10px] font-semibold"><span style={{ color: "#c8920a" }}>BBVA {albumProgress.unlockedCount}/{albumProgress.total}</span><span style={{ color: "#174ea6" }}>Mundiales {worldCupProgress.unlocked}/{worldCupPlayers.length}</span></div>
           <div className="text-[9px] truncate" style={{ color: "#9a9a8a" }}>{worldCupProgress.latest ? `Ultimo: ${worldCupProgress.latest}` : "Ver progreso"}</div>

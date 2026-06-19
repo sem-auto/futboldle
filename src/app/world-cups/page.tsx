@@ -53,7 +53,7 @@ export default function WorldCupsPage() {
           </div>
 
           <div className="p-4 md:p-5 flex flex-col gap-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
               <ActiveModeCard href="/world-cups/mundialdle" eyebrow="Jugable ahora" title="MUNDIALDLE" subtitle="Adivina el jugador mundialista con pistas progresivas." accent="blue" modeId="mundialdle" />
               <ActiveModeCard href="/world-cups/wordle" eyebrow="Nuevo diario" title="WORDLE MUNDIAL" subtitle="Adivina el apellido sin pistas progresivas." accent="blue" modeId="worldcup-wordle" />
               <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle={"Te damos la sede. Adivina campe\u00f3n y finalista."} accent="gold" modeId="worldcup-champions" />
