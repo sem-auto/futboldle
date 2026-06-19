@@ -49,9 +49,9 @@ function rarityMeta(level: string) {
   return { label: "Comun", color: "#1e6b2e", background: "linear-gradient(145deg,#eaf8ed,#ffffff,#cdebd4)" };
 }
 
-export default function WorldCupWordle() {
+export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtraIndex?: number }) {
   const dayNumber = getDayNumber();
-  const [extraIndex, setExtraIndex] = useState(0);
+  const extraIndex = initialExtraIndex;
   const player = wordlePool[(dayNumber * 17 + 7 + extraIndex * 31) % wordlePool.length];
   const answer = useMemo(() => playerAnswer(player.name).split(""), [player.name]);
   const storageKey = `fbl-worldcup-wordle-${getDayKey()}-${extraIndex === 0 ? "daily" : `extra-${extraIndex}`}`;
@@ -148,6 +148,11 @@ export default function WorldCupWordle() {
     shareGameResult(text, { modeId: "worldcup-wordle", challengeId: `wc-wordle-${dayNumber}`, seasonId: "world-cups", won, attempts: rowIndex, title: "Wordle Mundial", onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); } });
   }
 
+  function playAnother() {
+    const nextExtra = extraIndex + 1;
+    window.location.assign(`/world-cups/wordle?extra=${nextExtra}`);
+  }
+
   const colors: Record<CellState, { background: string; color: string; border: string }> = {
     correct: { background: "#1e6b2e", color: "white", border: "#1e6b2e" },
     partial: { background: "#c8920a", color: "white", border: "#c8920a" },
@@ -186,7 +191,7 @@ export default function WorldCupWordle() {
           <div className="font-bebas text-[38px] leading-none mt-3">{player.name}</div>
           <div className="flex flex-wrap justify-center gap-1.5 mt-2"><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75" style={{ color: rarity.color }}>{rarity.label}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">{player.position}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">Mundial {player.mainWorldCup}</span></div>
           <button onClick={share} className="w-full mt-3 py-3 rounded-xl font-oswald font-semibold uppercase text-[12px]" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir sin revelar"}</button>
-          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={() => setExtraIndex(value => value + 1)} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link></div></div>
+          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={playAnother} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link></div></div>
         </div>}
       </div>
     </section>

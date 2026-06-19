@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   openGraph: { title: "Wordle Mundial - Futboldle", description: "Adivina el mundialista del día.", url: "https://futboldle.es/world-cups/wordle", images: ["https://futboldle.es/og-image.png"] },
 };
 
-export default function WorldCupWordlePage() {
-  return <main className="min-h-dvh px-3 py-4" style={{ background: "#f6f2ea" }}><div className="max-w-xl mx-auto flex flex-col gap-3"><Link href="/world-cups" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>{"\u2190"} Mundiales</Link><WorldCupWordle /></div></main>;
+export default async function WorldCupWordlePage({ searchParams }: { searchParams: Promise<{ extra?: string }> }) {
+  const params = await searchParams;
+  const parsedExtra = Number.parseInt(params.extra ?? "0", 10);
+  const extraIndex = Number.isFinite(parsedExtra) ? Math.max(0, Math.min(parsedExtra, 999)) : 0;
+  return <main className="min-h-dvh px-3 py-4" style={{ background: "#f6f2ea" }}><div className="max-w-xl mx-auto flex flex-col gap-3"><Link href="/world-cups" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>{"\u2190"} Mundiales</Link><WorldCupWordle key={extraIndex} initialExtraIndex={extraIndex} /></div></main>;
 }
