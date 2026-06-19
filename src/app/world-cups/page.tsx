@@ -83,7 +83,7 @@ export default function WorldCupsPage() {
           </div>
         </section>
 
-        <Link href="/world-cups/collection" className="rounded-2xl px-4 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
+        <Link href="/world-cups/album" className="rounded-2xl px-4 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
           <div><div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Colección propia</div><div className="font-bebas text-[26px] leading-none">ALBUM MUNDIALISTA</div></div>
           <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>Ver cromos {"\u2192"}</span>
         </Link>

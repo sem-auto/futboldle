@@ -95,7 +95,7 @@ export default function PerfilPage() {
         <section className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,#eef3ff,#fff8e6)", border: "1px solid rgba(23,78,166,0.18)" }}>
           <div className="flex items-center justify-between gap-3">
             <div><div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#174ea6" }}>Temporada Mundiales</div><h2 className="font-bebas text-[28px] leading-none">PROGRESO MUNDIALISTA</h2></div>
-            <Link href="/world-cups/collection" className="text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver album</Link>
+            <Link href="/world-cups/album" className="text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver album</Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
             {[["Racha Mundial", worldCupStreak.current], ["Mejor racha", worldCupStreak.best], ["Dias jugados", worldCupStreak.playedDays], ["Cromos", `${worldCupCards}/${worldCupPlayers.length}`]].map(([label, value]) => <div key={label} className="rounded-xl px-3 py-2 bg-white/70"><div className="text-[8px] uppercase font-semibold tracking-[0.12em]" style={{ color: "#9a9a8a" }}>{label}</div><div className="font-bebas text-[24px] leading-none">{value}</div></div>)}

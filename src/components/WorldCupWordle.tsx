@@ -7,7 +7,7 @@ import { getDayKey, getDayNumber } from "@/lib/daily";
 import { normalize } from "@/lib/normalize";
 import { shareGameResult } from "@/lib/resultShare";
 import { FUTBOLDLE_URL } from "@/lib/share";
-import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackModeEntered } from "@/lib/analytics";
+import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered } from "@/lib/analytics";
 import { recordWorldCupDay, unlockWorldCupCard } from "@/lib/worldCupCollection";
 import { syncAchievements } from "@/lib/achievements";
 
@@ -42,6 +42,13 @@ function evaluate(guess: string[], answer: string[]) {
   return states;
 }
 
+function rarityMeta(level: string) {
+  if (level === "icono") return { label: "Legendario", color: "#c8920a", background: "linear-gradient(145deg,#fff3bd,#fffdf5,#e8b82e)" };
+  if (level === "legendario") return { label: "Epico", color: "#6d28d9", background: "linear-gradient(145deg,#f3e8ff,#ffffff,#ddd6fe)" };
+  if (level === "core") return { label: "Raro", color: "#174ea6", background: "linear-gradient(145deg,#e8f0ff,#ffffff,#c8dcff)" };
+  return { label: "Comun", color: "#1e6b2e", background: "linear-gradient(145deg,#eaf8ed,#ffffff,#cdebd4)" };
+}
+
 export default function WorldCupWordle() {
   const dayNumber = getDayNumber();
   const [extraIndex, setExtraIndex] = useState(0);
@@ -56,6 +63,16 @@ export default function WorldCupWordle() {
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [startedAt] = useState(() => Date.now());
+  const keyboardStates = useMemo(() => {
+    const priority: Record<CellState, number> = { empty: 0, wrong: 1, partial: 2, correct: 3 };
+    const result: Record<string, CellState> = {};
+    rows.filter(row => row.submitted).forEach(row => row.letters.forEach((letter, index) => {
+      const state = row.states[index] ?? "wrong";
+      if (!result[letter] || priority[state] > priority[result[letter]]) result[letter] = state;
+    }));
+    return result;
+  }, [rows]);
+  const rarity = rarityMeta(player.iconicLevel);
 
   useEffect(() => {
     trackModeEntered("worldcup-wordle", "world-cups", { challengeId: `wc-wordle-${dayNumber}` });
@@ -96,7 +113,10 @@ export default function WorldCupWordle() {
     persist(nextRows, nextIndex, correct, over);
     if (over) {
       recordWorldCupDay(dayNumber);
-      if (correct) unlockWorldCupCard(player.id, `wc-wordle-${dayNumber}`);
+      if (correct) {
+        const unlocked = unlockWorldCupCard(player.id, `wc-wordle-${dayNumber}`);
+        if (unlocked) trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "worldcup-wordle", playerId: player.id });
+      }
       syncAchievements({ modeId: "worldcup-wordle", won: correct });
       const payload = { seasonId: "world-cups", attempts: nextIndex, won: correct, timeSpent: Math.round((Date.now() - startedAt) / 1000) };
       trackChallengeCompleted("worldcup-wordle", `wc-wordle-${dayNumber}`, payload);
@@ -155,13 +175,18 @@ export default function WorldCupWordle() {
           )})}
         </div>
         {message && <div className="text-center text-[11px] font-semibold" style={{ color: "#b81c14" }}>{message}</div>}
-        {!gameOver && <div className="flex flex-col gap-1.5">{KEYS.map((line, index) => <div key={index} className="flex justify-center gap-1">{line.map(key => <button key={key} onClick={() => press(key)} className="h-10 min-w-0 rounded-md font-semibold text-[11px] px-2" style={{ flex: key === "ENTER" ? 1.5 : 1, background: "#e9edf4", color: "#18181b" }}>{key}</button>)}</div>)}</div>}
-        {gameOver && <div className="rounded-2xl p-4 text-center" style={{ background: won ? "#f0faf2" : "#fff5f5", border: "1px solid rgba(0,0,0,0.08)" }}>
-          <div className="text-[9px] uppercase font-semibold tracking-[0.18em]" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? "Cromo mundialista desbloqueado" : "El jugador era"}</div>
-          <div className="font-bebas text-[38px] leading-none mt-1">{player.name}</div>
-          <div className="text-[11px] mt-1" style={{ color: "#6b6b72" }}>{player.nationality} · Mundial {player.mainWorldCup}</div>
+        {!gameOver && <div className="flex flex-col gap-1.5">{KEYS.map((line, index) => <div key={index} className="flex justify-center gap-1">{line.map(key => {
+          const state = keyboardStates[key] ?? "empty";
+          const neutral = key === "ENTER" || key === "⌫";
+          return <button key={key} onClick={() => press(key)} className="h-10 min-w-0 rounded-md font-semibold text-[11px] px-2 transition-colors" style={{ flex: key === "ENTER" ? 1.5 : 1, background: neutral ? "#dbe2ec" : state === "empty" ? "#e9edf4" : colors[state].background, color: neutral || state === "empty" ? "#18181b" : "white", border: state !== "empty" && !neutral ? `1px solid ${colors[state].border}` : "1px solid transparent" }}>{key}</button>})}</div>)}</div>}
+        {gameOver && <div className="rounded-2xl p-4 text-center relative overflow-hidden" style={{ background: won ? rarity.background : "#fff5f5", border: `2px solid ${won ? rarity.color : "rgba(184,28,20,0.18)"}`, boxShadow: won ? `0 10px 28px ${rarity.color}25` : "none" }}>
+          {won && <div className="absolute -right-12 -top-20 h-56 w-16 rotate-[28deg] opacity-50" style={{ background: "linear-gradient(90deg,transparent,white,transparent)" }} />}
+          <div className="relative z-10"><div className="text-[9px] uppercase font-semibold tracking-[0.18em]" style={{ color: won ? rarity.color : "#b81c14" }}>{won ? "Nuevo cromo mundialista" : "El jugador era"}</div>
+          <div className="mx-auto mt-3 w-24 h-28 rounded-xl flex flex-col items-center justify-center" style={{ background: "rgba(255,255,255,0.72)", border: `1px solid ${won ? rarity.color : "rgba(0,0,0,0.10)"}` }}><div className="text-[10px] font-semibold" style={{ color: rarity.color }}>{player.nationality}</div><div className="font-bebas text-[46px] leading-none mt-1">{player.name.slice(0, 1)}</div><div className="text-[8px] uppercase font-semibold mt-1" style={{ color: rarity.color }}>{won ? rarity.label : "Solucion"}</div></div>
+          <div className="font-bebas text-[38px] leading-none mt-3">{player.name}</div>
+          <div className="flex flex-wrap justify-center gap-1.5 mt-2"><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75" style={{ color: rarity.color }}>{rarity.label}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">{player.position}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">Mundial {player.mainWorldCup}</span></div>
           <button onClick={share} className="w-full mt-3 py-3 rounded-xl font-oswald font-semibold uppercase text-[12px]" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir sin revelar"}</button>
-          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={() => setExtraIndex(value => value + 1)} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/collection" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "#fff8e6", color: "#8a6200" }}>Ver colección</Link></div>
+          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={() => setExtraIndex(value => value + 1)} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link></div></div>
         </div>}
       </div>
     </section>

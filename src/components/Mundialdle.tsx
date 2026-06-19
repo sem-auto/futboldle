@@ -544,7 +544,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
               )}
               <button onClick={share} className="mt-3 w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
                 style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Copiado" : "Compartir resultado"}</button>
-              <Link href="/world-cups/collection" className="block text-center mt-3 text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver colección mundialista</Link>
+              <Link href="/world-cups/album" className="block text-center mt-3 text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver colección mundialista</Link>
             </div>
           )}
         </div>

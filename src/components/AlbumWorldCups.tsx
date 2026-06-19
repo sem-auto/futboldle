@@ -6,10 +6,17 @@ import { getWorldCupAlbum, getWorldCupStreak, type WorldCupAlbumEntry, type Worl
 import { trackEvent } from "@/lib/analytics";
 
 function rarityLabel(level: string) {
-  if (level === "icono") return "Icono";
-  if (level === "legendario") return "Legendario";
-  if (level === "core") return "Estrella";
-  return "Culto";
+  if (level === "icono") return "Legendario";
+  if (level === "legendario") return "Epico";
+  if (level === "core") return "Raro";
+  return "Comun";
+}
+
+function rarityStyle(level: string) {
+  if (level === "icono") return { color: "#9a6b00", border: "#d6a20f", background: "linear-gradient(145deg,#fff2af,#ffffff,#e8b82e)" };
+  if (level === "legendario") return { color: "#6d28d9", border: "#8b5cf6", background: "linear-gradient(145deg,#f3e8ff,#ffffff,#ddd6fe)" };
+  if (level === "core") return { color: "#174ea6", border: "#3b82f6", background: "linear-gradient(145deg,#e8f0ff,#ffffff,#c8dcff)" };
+  return { color: "#1e6b2e", border: "#55a96a", background: "linear-gradient(145deg,#eaf8ed,#ffffff,#cdebd4)" };
 }
 
 export default function AlbumWorldCups() {
@@ -37,8 +44,11 @@ export default function AlbumWorldCups() {
     return worldCupPlayers.map(player => ({ player, entry: byId.get(player.id) }));
   }, [entries]);
   const unlockedCount = cards.filter(card => card.entry).length;
+  const unlockedCards = cards.filter(card => card.entry);
   const filteredCards = cards.filter(card => filter === "all" || (filter === "unlocked" ? card.entry : !card.entry));
   const percent = Math.round((unlockedCount / worldCupPlayers.length) * 100);
+  const rarityCounts = ["culto", "core", "legendario", "icono"].map(level => ({ level, count: unlockedCards.filter(card => card.player.iconicLevel === level).length }));
+  const latestCards = [...unlockedCards].sort((a, b) => (b.entry?.unlockedAt ?? "").localeCompare(a.entry?.unlockedAt ?? "")).slice(0, 4);
 
   return (
     <section className="flex flex-col gap-4">
@@ -52,8 +62,13 @@ export default function AlbumWorldCups() {
             <div className="rounded-xl p-3 bg-white/10"><div className="font-bebas text-[26px] leading-none">{streak.current}</div><div className="text-[9px] text-white/70">racha mundial</div></div>
           </div>
           <div className="h-2 rounded-full bg-white/15 overflow-hidden mt-3"><div className="h-full rounded-full" style={{ width: `${percent}%`, background: "#f8c647" }} /></div>
+          <div className="grid grid-cols-4 gap-1.5 mt-3">
+            {rarityCounts.map(item => <div key={item.level} className="rounded-lg px-2 py-1.5 bg-white/10"><div className="text-[7px] uppercase font-semibold text-white/65">{rarityLabel(item.level)}</div><div className="font-bebas text-[18px] leading-none">{item.count}</div></div>)}
+          </div>
         </div>
       </div>
+
+      {latestCards.length > 0 && <div className="rounded-2xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}><div className="text-[9px] uppercase font-semibold tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>Ultimos desbloqueados</div><div className="flex gap-2 overflow-x-auto pb-1">{latestCards.map(({ player }) => { const style = rarityStyle(player.iconicLevel); return <div key={player.id} className="min-w-[130px] rounded-xl px-3 py-2" style={{ background: style.background, border: `1px solid ${style.border}` }}><div className="text-[8px] uppercase font-semibold" style={{ color: style.color }}>{rarityLabel(player.iconicLevel)}</div><div className="font-bebas text-[20px] leading-none mt-1">{player.name}</div><div className="text-[9px] mt-1" style={{ color: "#6b6b72" }}>{player.nationality}</div></div>})}</div></div>}
 
       <div className="grid grid-cols-3 gap-2 rounded-xl p-1" style={{ background: "rgba(0,0,0,0.05)" }}>
         {(["all", "unlocked", "locked"] as const).map(value => (
@@ -65,16 +80,18 @@ export default function AlbumWorldCups() {
 
       {filteredCards.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {filteredCards.map(({ player, entry }) => (
-            <article key={player.id} className="rounded-2xl p-3 relative overflow-hidden min-h-[150px]" style={{ background: entry ? "linear-gradient(145deg,#fff8e6,#eef3ff)" : "#ece8df", border: entry ? "2px solid #d6a20f" : "1px solid rgba(0,0,0,0.08)", boxShadow: entry ? "0 8px 18px rgba(0,0,0,0.10)" : "none" }}>
-              <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: entry ? "#d6a20f" : "#c9c2b7" }} />
-              <div className="text-[9px] font-semibold uppercase tracking-[0.12em] mt-1" style={{ color: entry ? "#8a6200" : "#999" }}>{entry ? rarityLabel(player.iconicLevel) : "Cromo oculto"}</div>
+          {filteredCards.map(({ player, entry }) => {
+            const style = rarityStyle(player.iconicLevel);
+            return (
+            <article key={player.id} className="rounded-2xl p-3 relative overflow-hidden min-h-[150px]" style={{ background: entry ? style.background : "#ece8df", border: entry ? `2px solid ${style.border}` : "1px solid rgba(0,0,0,0.08)", boxShadow: entry ? `0 8px 18px rgba(0,0,0,0.10), 0 0 14px ${style.border}25` : "none" }}>
+              <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: entry ? style.border : "#c9c2b7" }} />
+              <div className="text-[9px] font-semibold uppercase tracking-[0.12em] mt-1" style={{ color: entry ? style.color : "#999" }}>{entry ? rarityLabel(player.iconicLevel) : "Cromo oculto"}</div>
               <div className="font-bebas text-[25px] leading-none mt-4" style={{ color: entry ? "#18181b" : "#aaa" }}>{entry ? player.name : "?????"}</div>
               <div className="text-[11px] mt-2" style={{ color: entry ? "#174ea6" : "#aaa" }}>{entry ? player.nationality : "Selección oculta"}</div>
               <div className="text-[10px]" style={{ color: entry ? "#6b6b72" : "#aaa" }}>{entry ? `${player.position} · Mundial ${player.mainWorldCup}` : "Completa retos de Mundiales"}</div>
               {entry && <div className="text-[8px] mt-3" style={{ color: "#9a9a8a" }}>Desbloqueado {new Date(entry.unlockedAt).toLocaleDateString("es-ES")}</div>}
             </article>
-          ))}
+          )})}
         </div>
       )}
     </section>
