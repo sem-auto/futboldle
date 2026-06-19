@@ -9,6 +9,7 @@ import PlayerSearch from "@/components/PlayerSearch";
 import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { CAREER_AUDIT } from "@/data/trayectoriaAudit";
 import { getCommunityDifficulty } from "@/lib/communityStats";
+import DataReportButton from "@/components/DataReportButton";
 
 const MAX = 5;
 const STORE_KEY = () => `fbl-tray-v2-${getDayKey()}`;
@@ -309,6 +310,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
               style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>
               {copied ? "✓ Copiado" : "Compartir resultado"}
             </button>
+            <div className="mt-3 text-right"><DataReportButton modeId="trayectoria-bbva" challengeId={`tray-${getDayKey()}-${player.id}`} /></div>
           </div>
         </div>
       )}

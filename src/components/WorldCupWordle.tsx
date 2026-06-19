@@ -10,6 +10,7 @@ import { FUTBOLDLE_URL } from "@/lib/share";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered } from "@/lib/analytics";
 import { recordWorldCupDay, unlockWorldCupCard } from "@/lib/worldCupCollection";
 import { syncAchievements } from "@/lib/achievements";
+import DataReportButton from "@/components/DataReportButton";
 
 type CellState = "correct" | "partial" | "wrong" | "empty";
 type Row = { letters: string[]; states: CellState[]; submitted: boolean };
@@ -191,7 +192,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
           <div className="font-bebas text-[38px] leading-none mt-3">{player.name}</div>
           <div className="flex flex-wrap justify-center gap-1.5 mt-2"><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75" style={{ color: rarity.color }}>{rarity.label}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">{player.position}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">Mundial {player.mainWorldCup}</span></div>
           <button onClick={share} className="w-full mt-3 py-3 rounded-xl font-oswald font-semibold uppercase text-[12px]" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir sin revelar"}</button>
-          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={playAnother} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link></div></div>
+          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={playAnother} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link></div><div className="mt-3 text-right"><DataReportButton modeId="worldcup-wordle" challengeId={`wc-wordle-${dayNumber}-${extraIndex}`} /></div></div>
         </div>}
       </div>
     </section>

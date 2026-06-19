@@ -58,6 +58,7 @@ export default function WorldCupsPage() {
               <ActiveModeCard href="/world-cups/wordle" eyebrow="Nuevo diario" title="WORDLE MUNDIAL" subtitle="Adivina el apellido sin pistas progresivas." accent="blue" modeId="worldcup-wordle" />
               <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle={"Te damos la sede. Adivina campe\u00f3n y finalista."} accent="gold" modeId="worldcup-champions" />
               <ActiveModeCard href="/world-cups/camino" eyebrow="Nuevo juego" title="CAMINO" subtitle={"Adivina el campe\u00f3n por sus rivales."} accent="gold" modeId="camino-titulo" />
+              <ActiveModeCard href="/world-cups/final" eyebrow="Nuevo diario" title="FINAL MUNDIAL" subtitle="Reconoce la final y elige el ano correcto." accent="gold" modeId="final-mundial" />
             </div>
 
             <div className="rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.20)" }}>

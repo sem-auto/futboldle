@@ -10,6 +10,7 @@ import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 import { getCommunityDifficulty } from "@/lib/communityStats";
+import DataReportButton from "@/components/DataReportButton";
 
 function norm(s: string) {
   return s.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, "");
@@ -435,6 +436,7 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
               style={{ background: copied ? "#1e6b2e" : "#1a4fa0", color: "white" }}>
               {copied ? "✓ Copiado" : "Compartir resultado"}
             </button>
+            <div className="mt-3 text-right"><DataReportButton modeId="top10-bbva" challengeId={challenge.id} /></div>
             {challenge.extendedAnswers && (
               <button
                 onClick={() => {

@@ -23,7 +23,8 @@ type AnalyticsEvent =
   | "card_unlocked"
   | "trophy_unlocked"
   | "album_visit"
-  | "showcase_visit";
+  | "showcase_visit"
+  | "data_issue_reported";
 
 type AnalyticsPayload = Record<string, string | number | boolean | null | undefined>;
 
@@ -47,6 +48,13 @@ export function trackEvent(name: AnalyticsEvent, payload: AnalyticsPayload = {})
     };
     window.gtag?.("event", name, enriched);
     window.va?.(name, enriched);
+    try {
+      const key = "fbl-analytics-log-v1";
+      const parsed = JSON.parse(localStorage.getItem(key) ?? "[]");
+      const log = Array.isArray(parsed) ? parsed : [];
+      log.push({ name, payload: enriched, at: new Date().toISOString() });
+      localStorage.setItem(key, JSON.stringify(log.slice(-500)));
+    } catch {}
     window.dispatchEvent(new CustomEvent("fbl-analytics", { detail: { name, payload: enriched } }));
   } catch {}
 }

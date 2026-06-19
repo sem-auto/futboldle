@@ -959,7 +959,7 @@ export default function HomePage() {
         </div>
 
         <Link href="/world-cups" onClick={() => trackSeasonEntered("world-cups", { source: "home_featured" })} className="rounded-2xl px-4 py-3 flex items-center justify-between gap-4 overflow-hidden relative" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white", boxShadow: "0 6px 18px rgba(23,78,166,0.18)" }}>
-          <div className="relative z-10"><div className="text-[8px] uppercase font-semibold tracking-[0.2em] text-white/65">Temporada Mundiales</div><div className="font-bebas text-[27px] leading-none mt-1">4 RETOS MUNDIALISTAS</div><div className="text-[10px] text-white/75 mt-1">Mundialdle, Wordle, Campeones y Camino al Título</div></div>
+          <div className="relative z-10"><div className="text-[8px] uppercase font-semibold tracking-[0.2em] text-white/65">Temporada Mundiales</div><div className="font-bebas text-[27px] leading-none mt-1">5 RETOS MUNDIALISTAS</div><div className="text-[10px] text-white/75 mt-1">Mundialdle, Wordle, Campeones, Camino y Final Mundial</div></div>
           <div className="relative z-10 rounded-full px-3 py-2 text-[10px] font-semibold whitespace-nowrap" style={{ background: "#f8c647", color: "#18181b" }}>Entrar {"\u2192"}</div>
           <div className="absolute right-24 -top-8 font-bebas text-[100px] leading-none text-white/5">WC</div>
         </Link>

@@ -49,6 +49,16 @@ export default function AlbumWorldCups() {
   const percent = Math.round((unlockedCount / worldCupPlayers.length) * 100);
   const rarityCounts = ["culto", "core", "legendario", "icono"].map(level => ({ level, count: unlockedCards.filter(card => card.player.iconicLevel === level).length }));
   const latestCards = [...unlockedCards].sort((a, b) => (b.entry?.unlockedAt ?? "").localeCompare(a.entry?.unlockedAt ?? "")).slice(0, 4);
+  const miniCollections = [
+    { name: "Espana 2010", country: "Espana", year: 2010, color: "#c8920a" },
+    { name: "Italia 2006", country: "Italia", year: 2006, color: "#1e6b2e" },
+    { name: "Alemania 2014", country: "Alemania", year: 2014, color: "#18181b" },
+    { name: "Argentina 2022", country: "Argentina", year: 2022, color: "#174ea6" },
+    { name: "Brasil 2002", country: "Brasil", year: 2002, color: "#e2ad00" },
+  ].map(collection => {
+    const members = cards.filter(card => card.player.nationality === collection.country && card.player.worldCups.includes(collection.year));
+    return { ...collection, total: members.length, unlocked: members.filter(member => member.entry).length };
+  }).filter(collection => collection.total > 0);
 
   return (
     <section className="flex flex-col gap-4">
@@ -69,6 +79,8 @@ export default function AlbumWorldCups() {
       </div>
 
       {latestCards.length > 0 && <div className="rounded-2xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}><div className="text-[9px] uppercase font-semibold tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>Ultimos desbloqueados</div><div className="flex gap-2 overflow-x-auto pb-1">{latestCards.map(({ player }) => { const style = rarityStyle(player.iconicLevel); return <div key={player.id} className="min-w-[130px] rounded-xl px-3 py-2" style={{ background: style.background, border: `1px solid ${style.border}` }}><div className="text-[8px] uppercase font-semibold" style={{ color: style.color }}>{rarityLabel(player.iconicLevel)}</div><div className="font-bebas text-[20px] leading-none mt-1">{player.name}</div><div className="text-[9px] mt-1" style={{ color: "#6b6b72" }}>{player.nationality}</div></div>})}</div></div>}
+
+      <div className="rounded-2xl p-4" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}><div className="text-[9px] uppercase font-semibold tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Colecciones de campeones</div><h3 className="font-bebas text-[27px] leading-none mt-1">COMPLETA UNA GENERACION</h3><div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">{miniCollections.map(collection => { const progress = Math.round(collection.unlocked / collection.total * 100); return <div key={collection.name} className="rounded-xl px-3 py-2" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}><div className="flex items-center justify-between"><span className="text-[11px] font-semibold">{collection.name}</span><span className="text-[10px]" style={{ color: collection.color }}>{collection.unlocked}/{collection.total}</span></div><div className="h-1.5 rounded-full overflow-hidden mt-2" style={{ background: "rgba(0,0,0,0.07)" }}><div className="h-full rounded-full" style={{ width: `${progress}%`, background: collection.color }} /></div>{progress === 100 && <div className="text-[9px] font-semibold mt-1" style={{ color: "#1e6b2e" }}>Coleccion completada</div>}</div>})}</div></div>
 
       <div className="grid grid-cols-3 gap-2 rounded-xl p-1" style={{ background: "rgba(0,0,0,0.05)" }}>
         {(["all", "unlocked", "locked"] as const).map(value => (
