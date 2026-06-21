@@ -8,7 +8,7 @@ import { loadGameCounts, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import { useStats } from "@/lib/useStats";
 import { buildWordleShare, shareGameResult } from "@/lib/resultShare";
-import { getCommunityDifficulty } from "@/lib/communityStats";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX = 6;
 const KB  = [
@@ -296,6 +296,8 @@ export default function WordleBBVA({onBack}:Props) {
     });
   }
 
+  const community = useCommunityDifficulty("wordle", `wordle-${getDayKey()}`);
+
   if(!loaded) return (
     <div className="flex items-center justify-center py-28">
       <span className="font-display text-4xl anim-pulse" style={{color:"var(--gold)"}}>FUTBOLDLE</span>
@@ -313,7 +315,6 @@ export default function WordleBBVA({onBack}:Props) {
   const modeLabel = mode==="daily"
     ? `RETO DEL DÍA · #${getDayNumber()}`
     : `EXTRA #${extraIdx}`;
-  const community = getCommunityDifficulty("wordle", `${getDayKey()}-${player.id}`);
 
   // Is daily already completed (loaded from storage)?
   const dailyDone = !!dayState?.daily;

@@ -23,6 +23,7 @@ export default function AlbumWorldCups() {
   const [entries, setEntries] = useState<WorldCupAlbumEntry[]>([]);
   const [streak, setStreak] = useState<WorldCupStreak>({ current: 0, best: 0, lastDayNumber: 0, playedDays: 0 });
   const [filter, setFilter] = useState<"all" | "unlocked" | "locked">("all");
+  const [rewardedCollections, setRewardedCollections] = useState<string[]>([]);
 
   useEffect(() => {
     const refresh = () => {
@@ -60,6 +61,26 @@ export default function AlbumWorldCups() {
     return { ...collection, total: members.length, unlocked: members.filter(member => member.entry).length };
   }).filter(collection => collection.total > 0);
 
+  useEffect(() => {
+    const key = "fbl-worldcup-collection-rewards-v1";
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key) ?? "[]");
+      const rewarded = Array.isArray(parsed) ? parsed.filter(value => typeof value === "string") : [];
+      const newlyCompleted = miniCollections.filter(collection => collection.unlocked === collection.total && !rewarded.includes(collection.name));
+      const next = [...rewarded, ...newlyCompleted.map(collection => collection.name)];
+      if (newlyCompleted.length) {
+        localStorage.setItem(key, JSON.stringify(next));
+        for (const collection of newlyCompleted) {
+          const achievement = { id: `worldcup-collection-${collection.year}`, label: `Coleccion ${collection.name}`, description: "Has reunido a toda una generacion mundialista." };
+          window.dispatchEvent(new CustomEvent("fbl-achievement-unlocked", { detail: achievement }));
+          trackEvent("achievement_unlocked", { achievementId: achievement.id, label: achievement.label, seasonId: "world-cups" });
+        }
+      }
+      setRewardedCollections(next);
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entries]);
+
   return (
     <section className="flex flex-col gap-4">
       <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
@@ -75,6 +96,7 @@ export default function AlbumWorldCups() {
           <div className="grid grid-cols-4 gap-1.5 mt-3">
             {rarityCounts.map(item => <div key={item.level} className="rounded-lg px-2 py-1.5 bg-white/10"><div className="text-[7px] uppercase font-semibold text-white/65">{rarityLabel(item.level)}</div><div className="font-bebas text-[18px] leading-none">{item.count}</div></div>)}
           </div>
+          <div className="text-[9px] text-white/70 mt-2">Insignias de selecciones: {rewardedCollections.length}/{miniCollections.length}</div>
         </div>
       </div>
 

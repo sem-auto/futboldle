@@ -9,7 +9,7 @@ import { recordGameCompletion, recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
-import { getCommunityDifficulty } from "@/lib/communityStats";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 import DataReportButton from "@/components/DataReportButton";
 
 function norm(s: string) {
@@ -193,7 +193,7 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
   const wrongCount = allGuesses.length - guessedAnswers.length;
   const pct = Math.round((guessedAnswers.length / challenge.answers.length) * 100);
   const done = finished;
-  const community = getCommunityDifficulty("top10", challenge.id);
+  const community = useCommunityDifficulty("top10", challenge.id);
   const wrongFlashPlayer = wrongFlash ? bbvaPlayers.find(p => norm(p.displayName) === norm(wrongFlash) || norm(p.fullName) === norm(wrongFlash)) : null;
 
   // Which hints are visible for "current unsolved item"

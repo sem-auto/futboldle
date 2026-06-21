@@ -19,7 +19,9 @@ import { getDayNumber, getDayKey } from "@/lib/daily";
 import { useStats } from "@/lib/useStats";
 import { getAlbumProgress } from "@/lib/album";
 import { shareResult } from "@/lib/share";
-import { getCommunityDifficulty } from "@/lib/communityStats";
+import { useCommunityDifficulty } from "@/lib/communityStats";
+import { getDailyTop10 } from "@/data/top10Challenges";
+import { getDailyStatdleChallenge } from "@/data/statdleChallenges";
 import { seasons } from "@/data/product";
 import { trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 import { getWorldCupAlbum } from "@/lib/worldCupCollection";
@@ -697,11 +699,11 @@ export default function HomePage() {
   const { stats, refresh } = useStats();
   const goHome = () => setView("home");
   const hasShareableResult = wordleDone || trayDone || top10Done || crackDone || statdleDone || mundialdleDone;
-  const wordleDifficulty = getCommunityDifficulty("wordle", `${getDayKey()}-home`);
-  const trayDifficulty = getCommunityDifficulty("trayectoria", `${getDayKey()}-home`);
-  const top10Difficulty = getCommunityDifficulty("top10", `${getDayKey()}-home`);
-  const crackDifficulty = getCommunityDifficulty("crack", `${getDayKey()}-home`);
-  const statdleDifficulty = getCommunityDifficulty("statdle", `${getDayKey()}-home`);
+  const wordleDifficulty = useCommunityDifficulty("wordle", `wordle-${getDayKey()}`);
+  const trayDifficulty = useCommunityDifficulty("trayectoria", `trayectoria-${getDayKey()}`);
+  const top10Difficulty = useCommunityDifficulty("top10", getDailyTop10().id);
+  const crackDifficulty = useCommunityDifficulty("crack", `crack-${getDayKey()}`);
+  const statdleDifficulty = useCommunityDifficulty("statdle", getDailyStatdleChallenge(getDayNumber()).id);
 
   function openMode(nextView: View, modeId: string, seasonId = "bbva") {
     trackModeEntered(modeId, seasonId, { source: "home" });

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { submitDataReport } from "@/lib/communityApi";
 
 const REPORTS_KEY = "fbl-data-reports-v1";
 const OPTIONS = ["Solucion incorrecta", "Pista incorrecta", "Estadistica incorrecta", "Nombre o texto roto", "Otro problema"];
@@ -18,6 +19,7 @@ export default function DataReportButton({ modeId, challengeId, label = "Reporta
       localStorage.setItem(REPORTS_KEY, JSON.stringify([...reports, entry].slice(-100)));
     } catch {}
     trackEvent("data_issue_reported", entry);
+    void submitDataReport(entry);
     setSent(true);
     setTimeout(() => { setSent(false); setOpen(false); }, 1400);
   }

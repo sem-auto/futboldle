@@ -1,4 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { getDayNumber } from "./daily";
+import { fetchCommunityStats } from "./communityApi";
 
 type GameKey = "wordle" | "trayectoria" | "top10" | "crack" | "statdle";
 
@@ -26,4 +30,19 @@ export function getCommunityDifficulty(game: GameKey, seed = String(getDayNumber
     : null;
   const label = completion <= 30 ? "Difícil" : completion <= 55 ? "Media" : "Fácil";
   return { completion, attempts, label };
+}
+
+export function useCommunityDifficulty(game: GameKey, challengeId: string) {
+  const [difficulty, setDifficulty] = useState(() => ({ ...getCommunityDifficulty(game, challengeId), sample: 0, real: false }));
+  useEffect(() => {
+    let active = true;
+    setDifficulty({ ...getCommunityDifficulty(game, challengeId), sample: 0, real: false });
+    fetchCommunityStats(game, challengeId).then(stats => {
+      if (!active || !stats || stats.plays < 5) return;
+      const completion = Math.round(stats.completion);
+      setDifficulty({ completion, attempts: stats.averageAttempts, label: completion <= 30 ? "Dificil" : completion <= 55 ? "Media" : "Facil", sample: stats.plays, real: true });
+    });
+    return () => { active = false; };
+  }, [challengeId, game]);
+  return difficulty;
 }

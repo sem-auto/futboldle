@@ -2,7 +2,7 @@
 
 import { getDayNumber } from "./daily";
 import { FUTBOLDLE_URL, shareResult } from "./share";
-import { trackChallengeShared } from "./analytics";
+import { trackChallengeShared, trackEvent } from "./analytics";
 
 type ShareCommon = {
   modeId: string;
@@ -16,9 +16,12 @@ type ShareCommon = {
 };
 
 export function shareGameResult(text: string, common: ShareCommon) {
-  const normalized = text
+  const normalizedBase = text
     .replace(/https?:\/\/futboldle\.(com|es)/g, FUTBOLDLE_URL)
     .replace(/https:\/\/futboldle-liard\.vercel\.app/g, FUTBOLDLE_URL);
+  const normalized = normalizedBase.includes("¿Puedes superarme?")
+    ? normalizedBase
+    : normalizedBase.replace(FUTBOLDLE_URL, `¿Puedes superarme?\n${FUTBOLDLE_URL}`);
 
   trackChallengeShared(common.modeId, common.challengeId ?? `day-${getDayNumber()}`, {
     seasonId: common.seasonId,
@@ -28,6 +31,7 @@ export function shareGameResult(text: string, common: ShareCommon) {
     dayNumber: getDayNumber(),
     shared: true,
   });
+  trackEvent("share_clicked", { modeId: common.modeId, challengeId: common.challengeId, seasonId: common.seasonId });
 
   shareResult(normalized, common.onCopied, common.title ?? "Futboldle");
 }

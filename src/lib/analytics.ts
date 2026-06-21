@@ -1,3 +1,5 @@
+import { submitCommunityResult } from "./communityApi";
+
 type AnalyticsEvent =
   | "game_started"
   | "game_completed"
@@ -24,7 +26,8 @@ type AnalyticsEvent =
   | "trophy_unlocked"
   | "album_visit"
   | "showcase_visit"
-  | "data_issue_reported";
+  | "data_issue_reported"
+  | "share_clicked";
 
 type AnalyticsPayload = Record<string, string | number | boolean | null | undefined>;
 
@@ -42,7 +45,7 @@ declare global {
 export function trackEvent(name: AnalyticsEvent, payload: AnalyticsPayload = {}) {
   try {
     if (typeof window === "undefined") return;
-    const enriched = {
+    const enriched: AnalyticsPayload = {
       device: window.innerWidth < 768 ? "mobile" : window.innerWidth < 1024 ? "tablet" : "desktop",
       ...payload,
     };
@@ -56,6 +59,12 @@ export function trackEvent(name: AnalyticsEvent, payload: AnalyticsPayload = {})
       localStorage.setItem(key, JSON.stringify(log.slice(-500)));
     } catch {}
     window.dispatchEvent(new CustomEvent("fbl-analytics", { detail: { name, payload: enriched } }));
+    if (name === "challenge_completed" || name === "challenge_failed" || name === "game_completed") {
+      const rawModeId = String(enriched.modeId ?? enriched.game ?? "unknown");
+      const modeId = rawModeId === "statdle-bbva" ? "statdle" : rawModeId;
+      const challengeId = String(enriched.challengeId ?? enriched.challenge ?? `${modeId}-${new Date().toISOString().slice(0, 10)}`);
+      void submitCommunityResult({ modeId, challengeId, seasonId: String(enriched.seasonId ?? enriched.season ?? "bbva"), won: Boolean(enriched.won), attempts: Number(enriched.attempts) || undefined, timeSpent: Number(enriched.timeSpent) || undefined });
+    }
   } catch {}
 }
 

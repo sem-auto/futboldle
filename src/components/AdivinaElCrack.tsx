@@ -7,7 +7,7 @@ import { recordGameResult } from "@/lib/profile";
 import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
-import { getCommunityDifficulty } from "@/lib/communityStats";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX = 5;
 const STORE_KEY = () => `fbl-crack-${getDayKey()}`;
@@ -133,7 +133,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
     revealed: h.revealed || (gameOver && i <= 4),
   }));
   const revealedCount = visibleHints.filter(h => h.revealed).length;
-  const community = getCommunityDifficulty("crack", `${getDayKey()}-${player.id}`);
+  const community = useCommunityDifficulty("crack", `crack-${getDayKey()}`);
 
   async function share() {
     const rows = Array.from({ length: MAX }, (_, index) => {

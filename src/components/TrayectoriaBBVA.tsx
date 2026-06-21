@@ -8,7 +8,7 @@ import { trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { CAREER_AUDIT } from "@/data/trayectoriaAudit";
-import { getCommunityDifficulty } from "@/lib/communityStats";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 import DataReportButton from "@/components/DataReportButton";
 
 const MAX = 5;
@@ -155,7 +155,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   const clues = getAuditedCluesV2(player, attempt);
   const canonicalCareer = CAREER_AUDIT[player.id]?.clubs ?? player.clubs;
   const visibleCareer = canonicalCareer;
-  const community = getCommunityDifficulty("trayectoria", `${getDayKey()}-${player.id}`);
+  const community = useCommunityDifficulty("trayectoria", `trayectoria-${getDayKey()}`);
 
   async function share() {
     const marks = Array.from({ length: MAX }, (_, index) => {

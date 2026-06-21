@@ -286,6 +286,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
   const [gameOver, setGameOver] = useState(false);
   const [copied, setCopied] = useState(false);
   const [hideSuggestions, setHideSuggestions] = useState(false);
+  const [showFinishedDetails, setShowFinishedDetails] = useState(false);
   const [startedAt] = useState(() => Date.now());
   const [worldCupStreak, setWorldCupStreak] = useState<WorldCupStreak>({ current: 0, best: 0, lastDayNumber: 0, playedDays: 0 });
 
@@ -426,7 +427,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
         </div>
 
         <div className="p-4 flex flex-col gap-3">
-          <div className="rounded-xl px-3 py-2" style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.20)" }}>
+          {(!gameOver || showFinishedDetails) && <><div className="rounded-xl px-3 py-2" style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.20)" }}>
             <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#174ea6" }}>Temporada</div>
             <div className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>Mundiales 2002-2026</div>
           </div>
@@ -453,6 +454,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
               );
             })}
           </div>
+          </>}
 
           {!gameOver && (
             <div className="relative">
@@ -484,7 +486,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
             </div>
           )}
 
-          <div className="flex items-center justify-between text-[11px]" style={{ color: "#9a9a8a" }}>
+          {(!gameOver || showFinishedDetails) && <><div className="flex items-center justify-between text-[11px]" style={{ color: "#9a9a8a" }}>
             <span>{guesses.length}/{MAX_ATTEMPTS} intentos</span>
             <span>Fuente: {challenge.source}</span>
           </div>
@@ -502,6 +504,9 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
               </div>
             </div>
           )}
+          </>}
+
+          {gameOver && <button onClick={() => setShowFinishedDetails(value => !value)} className="self-center text-[10px] font-semibold px-3 py-1.5 rounded-full" style={{ background: "#f3efe8", color: "#6b6b72" }}>{showFinishedDetails ? "Ocultar pistas e intentos" : `Ver pistas e intentos (${guesses.length})`}</button>}
 
           {gameOver && (
             <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: won ? "linear-gradient(135deg,#f0faf2 0%,#fff8e6 55%,#eef3ff 100%)" : "#fff5f5", border: `1px solid ${won ? "rgba(200,146,10,0.36)" : "rgba(184,28,20,0.18)"}`, boxShadow: won ? "0 10px 28px rgba(23,78,166,0.10)" : "none" }}>
@@ -546,9 +551,9 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
               <button onClick={share} className="mt-3 w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
                 style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Copiado" : "Compartir resultado"}</button>
               <Link href="/world-cups/album" className="block text-center mt-3 text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver colección mundialista</Link>
-              <div className="mt-3 text-right"><DataReportButton modeId="mundialdle" challengeId={challenge.id} /></div>
             </div>
           )}
+          {gameOver && <div className="rounded-xl px-3 py-2 flex items-center justify-between gap-3" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}><span className="text-[10px]" style={{ color: "#6b6b72" }}>¿Ves un error en una pista, club o dato?</span><DataReportButton modeId="mundialdle" challengeId={challenge.id} label="Avisarnos" /></div>}
         </div>
       </section>
     </div>
