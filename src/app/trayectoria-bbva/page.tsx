@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import SeoGameLanding from "@/components/SeoGameLanding";
 
 const SITE_URL = "https://futboldle.es";
-const title = "Trayectoria BBVA | Adivina el jugador por sus clubes - Futboldle";
-const description = "Adivina futbolistas de la Liga BBVA por su trayectoria, clubes, posicion y nacionalidad.";
+const title = "Trayectoria BBVA | Adivina el jugador por su carrera";
+const description = "Sigue las pistas de su trayectoria y descubre qué futbolista de la Liga BBVA es.";
 
 export const metadata: Metadata = {
   title,
@@ -14,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function TrayectoriaBBVALanding() {
-  return <SeoGameLanding eyebrow="Minijuego Liga BBVA" title="Trayectoria BBVA" description={description} bullets={["Pistas progresivas por clubes.", "Hombres BBVA y futbol nostalgia.", "Ideal para recordar plantillas clasicas."]} />;
+  return <SeoGameLanding eyebrow="Minijuego Liga BBVA" title="Trayectoria BBVA" description={description} bullets={["Pistas progresivas por clubes.", "Hombres BBVA y fútbol nostalgia.", "Ideal para recordar plantillas clásicas."]} />;
 }

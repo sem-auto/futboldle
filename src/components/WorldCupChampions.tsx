@@ -18,6 +18,7 @@ import {
 import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 import CommunityStatsPanel from "@/components/CommunityStatsPanel";
 import { useCommunityDifficulty } from "@/lib/communityStats";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 type Mode = "normal" | "hard";
 type Phase = "champion" | "runnerUp" | "done";
@@ -77,12 +78,15 @@ export default function WorldCupChampions() {
   const [feedback, setFeedback] = useState("");
   const [copied, setCopied] = useState(false);
   const [hideSuggestions, setHideSuggestions] = useState(false);
+  const [startedAt] = useState(() => Date.now());
   const community = useCommunityDifficulty(MODE_ID, String(challenge.year));
   const suggestions = useMemo(() => hideSuggestions ? [] : getCountrySuggestions(input), [hideSuggestions, input]);
   const currentTarget = state.phase === "runnerUp" ? challenge.runnerUp : challenge.champion;
   const currentLabel = state.phase === "runnerUp" ? "finalista" : "campeón";
   const completed = state.won || state.failed;
   const revealYear = completed || state.attempts.length > 0 || state.championSolved;
+
+  useChallengeLifecycle({ modeId: MODE_ID, challengeId: String(challenge.year), seasonId: SEASON_ID, completed, attempts: state.attempts.length, startedAt });
 
   useEffect(() => {
     trackModeEntered(MODE_ID, SEASON_ID, { source: "game_page" });
@@ -111,6 +115,7 @@ export default function WorldCupChampions() {
       dayNumber,
       won,
       attempts: nextState.attempts.length,
+      timeSpent: Math.round((Date.now() - startedAt) / 1000),
       difficulty: mode,
     };
     if (won) trackChallengeCompleted(MODE_ID, String(challenge.year), payload);

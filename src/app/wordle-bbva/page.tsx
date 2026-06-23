@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import SeoGameLanding from "@/components/SeoGameLanding";
 
 const SITE_URL = "https://futboldle.es";
-const title = "Wordle BBVA | Wordle futbol Liga BBVA - Futboldle";
-const description = "Juega a Wordle BBVA, el wordle de futbol para adivinar apellidos de jugadores de la Liga BBVA 2005-2016.";
+const title = "Wordle BBVA | Adivina al Hombre BBVA del día";
+const description = "Adivina al futbolista oculto de la Liga BBVA 2005-2016. Un nuevo reto cada día.";
 
 export const metadata: Metadata = {
   title,

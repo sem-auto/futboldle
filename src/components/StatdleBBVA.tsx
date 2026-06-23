@@ -10,6 +10,7 @@ import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered } from "@/lib/analytics";
 import CommunityStatsPanel from "@/components/CommunityStatsPanel";
 import { useCommunityDifficulty } from "@/lib/communityStats";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 const MAX_ATTEMPTS = 6;
 
@@ -55,9 +56,12 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
   const [won, setWon] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [startedAt] = useState(() => Date.now());
   const suggestions = useMemo(() => suggestionsFor(query), [query]);
   const revealedCount = Math.min(challenge.clues.length, Math.max(1, guesses.length + 1));
   const community = useCommunityDifficulty("statdle", challenge.id);
+
+  useChallengeLifecycle({ modeId: "statdle", challengeId: challenge.id, seasonId: "bbva", completed: gameOver, attempts: guesses.length, startedAt });
 
   useEffect(() => {
     trackModeEntered("statdle-bbva", "bbva", { challenge: challenge.id });
@@ -106,9 +110,9 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
     if (isOver) {
       recordGameResult("statdle", `${getDayKey()}-${challenge.id}`, correct);
       if (correct) {
-        trackChallengeCompleted("statdle-bbva", challenge.id, { seasonId: "bbva", won: true, attempts: nextGuesses.length });
+        trackChallengeCompleted("statdle-bbva", challenge.id, { seasonId: "bbva", won: true, attempts: nextGuesses.length, timeSpent: Math.round((Date.now() - startedAt) / 1000) });
       } else {
-        trackChallengeFailed("statdle-bbva", challenge.id, { seasonId: "bbva", attempts: nextGuesses.length });
+        trackChallengeFailed("statdle-bbva", challenge.id, { seasonId: "bbva", attempts: nextGuesses.length, timeSpent: Math.round((Date.now() - startedAt) / 1000) });
       }
       trackEvent("mode_completed", { mode: "statdle", season: "bbva", won: correct, attempts: nextGuesses.length });
       trackEvent("statdle_completed", { challenge: challenge.id, won: correct, attempts: nextGuesses.length });

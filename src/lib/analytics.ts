@@ -16,6 +16,7 @@ type AnalyticsEvent =
   | "challenge_started"
   | "challenge_completed"
   | "challenge_failed"
+  | "challenge_abandoned"
   | "challenge_shared"
   | "album_opened"
   | "collection_opened"
@@ -59,9 +60,9 @@ export function trackEvent(name: AnalyticsEvent, payload: AnalyticsPayload = {})
       localStorage.setItem(key, JSON.stringify(log.slice(-500)));
     } catch {}
     window.dispatchEvent(new CustomEvent("fbl-analytics", { detail: { name, payload: enriched } }));
-    if (name === "challenge_started" || name === "challenge_shared" || name === "mode_entered" || name === "season_entered" || name === "share_clicked") {
+    if (name === "challenge_started" || name === "challenge_abandoned" || name === "challenge_shared" || name === "mode_entered" || name === "season_entered" || name === "share_clicked") {
       const rawModeId = String(enriched.modeId ?? enriched.game ?? enriched.mode ?? "unknown");
-      const modeId = rawModeId === "statdle-bbva" ? "statdle" : rawModeId;
+      const modeId = normalizeModeId(rawModeId);
       void submitCommunityEvent({
         eventName: name,
         modeId,
@@ -69,13 +70,27 @@ export function trackEvent(name: AnalyticsEvent, payload: AnalyticsPayload = {})
         seasonId: enriched.seasonId ? String(enriched.seasonId) : enriched.season ? String(enriched.season) : undefined,
       });
     }
-    if (name === "challenge_completed" || name === "challenge_failed" || name === "game_completed") {
+    if (name === "challenge_completed" || name === "challenge_failed" || name === "challenge_abandoned" || name === "game_completed") {
       const rawModeId = String(enriched.modeId ?? enriched.game ?? "unknown");
-      const modeId = rawModeId === "statdle-bbva" ? "statdle" : rawModeId;
+      const modeId = normalizeModeId(rawModeId);
       const challengeId = String(enriched.challengeId ?? enriched.challenge ?? `${modeId}-${new Date().toISOString().slice(0, 10)}`);
       void submitCommunityResult({ modeId, challengeId, seasonId: String(enriched.seasonId ?? enriched.season ?? "bbva"), won: Boolean(enriched.won), attempts: Number(enriched.attempts) || undefined, timeSpent: Number(enriched.timeSpent) || undefined });
     }
   } catch {}
+}
+
+function normalizeModeId(modeId: string) {
+  const map: Record<string, string> = {
+    "wordle-bbva": "wordle",
+    "trayectoria-bbva": "trayectoria",
+    "top10-bbva": "top10",
+    "statdle-bbva": "statdle",
+    "adivina-el-crack": "crack",
+    "cromo-oculto": "crack",
+    "campeones": "worldcup-champions",
+    "campeones-del-mundo": "worldcup-champions",
+  };
+  return map[modeId] ?? modeId;
 }
 
 export function trackWordleCompleted(payload: AnalyticsPayload = {}) {
@@ -116,6 +131,10 @@ export function trackChallengeCompleted(modeId: string, challengeId: string, pay
 
 export function trackChallengeFailed(modeId: string, challengeId: string, payload: AnalyticsPayload = {}) {
   trackEvent("challenge_failed", { modeId, challengeId, won: false, ...payload });
+}
+
+export function trackChallengeAbandoned(modeId: string, challengeId: string, payload: AnalyticsPayload = {}) {
+  trackEvent("challenge_abandoned", { modeId, challengeId, won: false, ...payload });
 }
 
 export function trackChallengeShared(modeId: string, challengeId: string, payload: AnalyticsPayload = {}) {

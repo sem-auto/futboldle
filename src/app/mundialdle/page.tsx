@@ -3,8 +3,8 @@ import Link from "next/link";
 import Mundialdle from "@/components/Mundialdle";
 
 const SITE_URL = "https://futboldle.es";
-const title = "Mundialdle | Adivina el jugador mundialista - Futboldle";
-const description = "Juega a Mundialdle: adivina jugadores de los Mundiales con pistas progresivas de seleccion, club, posicion, goles y rol.";
+const title = "Mundialdle | Adivina el jugador mundialista";
+const description = "Descubre al jugador oculto utilizando pistas sobre mundiales, selecciones y clubes.";
 
 export const metadata: Metadata = {
   title,
@@ -65,13 +65,13 @@ export default function MundialdleLandingPage() {
           <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#174ea6" }}>Minijuego diario de Mundiales</div>
           <h1 className="font-bebas text-[40px] leading-none mt-1" style={{ color: "#18181b" }}>Mundialdle</h1>
           <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>
-            Adivina el jugador mundialista con pistas de seleccion, posicion, club, rol y Mundial.
+            Adivina el jugador mundialista con pistas de selección, posición, club, rol y Mundial.
           </p>
         </section>
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {[
-            ["Selecciones", "Espana, Alemania, Argentina, Brasil, Italia, Francia y mas."],
-            ["Pistas claras", "Mundial, rol, goles, seleccion, posicion y club del momento."],
+            ["Selecciones", "España, Alemania, Argentina, Brasil, Italia, Francia y más."],
+            ["Pistas claras", "Mundial, rol, goles, selección, posición y club del momento."],
             ["Nostalgia", "Jugadores reconocibles de 2002 a 2026, sin relleno oscuro."],
           ].map(([heading, copy]) => (
             <article key={heading} className="rounded-2xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.07)" }}>

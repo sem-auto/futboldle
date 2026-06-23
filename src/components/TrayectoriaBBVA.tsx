@@ -4,12 +4,13 @@ import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayNumber, getDayKey } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
-import { trackEvent } from "@/lib/analytics";
+import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { CAREER_AUDIT } from "@/data/trayectoriaAudit";
 import { useCommunityDifficulty } from "@/lib/communityStats";
 import DataReportButton from "@/components/DataReportButton";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 const MAX = 5;
 const STORE_KEY = () => `fbl-tray-v2-${getDayKey()}`;
@@ -110,6 +111,10 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
   const [query,       setQuery]       = useState("");
   const [copied,      setCopied]      = useState(false);
   const [loaded,      setLoaded]      = useState(false);
+  const [startedAt] = useState(() => Date.now());
+  const challengeId = `trayectoria-${getDayKey()}`;
+
+  useChallengeLifecycle({ modeId: "trayectoria", challengeId, seasonId: "bbva", completed: gameOver, attempts: guesses.length, startedAt });
 
   useEffect(() => {
     const saved = loadSaved();
@@ -122,8 +127,9 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
       if (saved.gameOver) setShowResult(true);
     }
     trackEvent("game_started", { game: "trayectoria" });
+    trackChallengeStarted("trayectoria", challengeId, { seasonId: "bbva", modeId: "trayectoria" });
     setLoaded(true);
-  }, [player.id]);
+  }, [challengeId, player.id]);
 
   const guess = useCallback((p: Player) => {
     setQuery("");
@@ -140,7 +146,12 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
       unlockPlayer(player.id, "Trayectoria BBVA");
     }
     if (isOver) recordGameResult("trayectoria", getDayKey(), correct);
-    if (isOver) trackEvent("game_completed", { game: "trayectoria", won: correct, attempts: newGuesses.length });
+    if (isOver) {
+      const payload = { seasonId: "bbva", modeId: "trayectoria", won: correct, attempts: newGuesses.length, timeSpent: Math.round((Date.now() - startedAt) / 1000) };
+      trackEvent("game_completed", { game: "trayectoria", won: correct, attempts: newGuesses.length });
+      trackChallengeCompleted("trayectoria", challengeId, payload);
+      if (!correct) trackChallengeFailed("trayectoria", challengeId, payload);
+    }
     if (isOver) setGameOver(true);
 
     saveTray({
@@ -150,7 +161,7 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
 
     if (!isOver) setAttempt(newAttempt);
     if (isOver) setTimeout(() => setShowResult(true), 350);
-  }, [guesses, usedIds, attempt, player.id]);
+  }, [attempt, challengeId, guesses, player.id, startedAt, usedIds]);
 
   const clues = getAuditedCluesV2(player, attempt);
   const canonicalCareer = CAREER_AUDIT[player.id]?.clubs ?? player.clubs;

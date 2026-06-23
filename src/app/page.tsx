@@ -175,12 +175,20 @@ function GamePill({ done, won }: { done: boolean; won?: boolean }) {
 type DifficultyInfo = { label: string; completion: number; attempts?: number | null; sample?: number; real?: boolean };
 
 function DifficultyLine({ label, completion, color, attempts, sample, real }: DifficultyInfo & { color: string }) {
+  if (!real) {
+    return (
+      <div className="mt-2 text-[9px] font-semibold px-2 py-1 rounded-lg text-center" style={{ background: `${color}10`, color }}>
+        Estadísticas en construcción
+      </div>
+    );
+  }
+
   return (
     <div className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[9px] font-semibold">
       <span className="px-2 py-0.5 rounded-full" style={{ background: `${color}12`, color }}>{label}</span>
       <span style={{ color: "#9a9a8a" }}>{completion}% lo completan</span>
-      {real && sample ? <span style={{ color: "#9a9a8a" }}>{sample} partidas</span> : <span style={{ color: "#c1b7a5" }}>estimado</span>}
-      {real && attempts ? <span style={{ color: "#9a9a8a" }}>{attempts} intentos</span> : null}
+      {sample ? <span style={{ color: "#9a9a8a" }}>{sample} partidas</span> : null}
+      {attempts ? <span style={{ color: "#9a9a8a" }}>{attempts} intentos</span> : null}
     </div>
   );
 }

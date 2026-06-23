@@ -5,10 +5,11 @@ import { normalize } from "@/lib/normalize";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { loadGameCounts, recordGameResult } from "@/lib/profile";
-import { trackEvent } from "@/lib/analytics";
+import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent } from "@/lib/analytics";
 import { useStats } from "@/lib/useStats";
 import { buildWordleShare, shareGameResult } from "@/lib/resultShare";
 import { useCommunityDifficulty } from "@/lib/communityStats";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 const MAX = 6;
 const KB  = [
@@ -135,7 +136,18 @@ export default function WordleBBVA({onBack}:Props) {
   const [loaded,    setLoaded]    = useState(false);
   const [compactMobile, setCompactMobile] = useState(false);
   const [wordlesCompleted, setWordlesCompleted] = useState(0);
+  const [startedAt] = useState(() => Date.now());
   const { stats, refresh } = useStats();
+  const challengeId = mode === "daily" ? `wordle-${getDayKey()}` : `wordle-${getDayKey()}-extra-${extraIdx}`;
+
+  useChallengeLifecycle({
+    modeId: "wordle",
+    challengeId,
+    seasonId: "bbva",
+    completed: gameOver,
+    attempts: curRow,
+    startedAt,
+  });
 
   useEffect(() => {
     setWordlesCompleted(loadGameCounts().wordle);
@@ -174,6 +186,7 @@ export default function WordleBBVA({onBack}:Props) {
     setExtraIdx(0);
     startGame(dailyPlayer, ds.daily);
     trackEvent("game_started", { game: "wordle", mode: "daily" });
+    trackChallengeStarted("wordle", `wordle-${getDayKey()}`, { seasonId: "bbva", modeId: "wordle" });
     setLoaded(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
@@ -210,6 +223,8 @@ export default function WordleBBVA({onBack}:Props) {
         refresh();
       }
       trackEvent("game_completed", { game: "wordle", mode, won: w });
+      trackChallengeCompleted("wordle", challengeId, { seasonId: "bbva", modeId: "wordle", won: w, attempts: next, timeSpent: Math.round((Date.now() - startedAt) / 1000) });
+      if (!w) trackChallengeFailed("wordle", challengeId, { seasonId: "bbva", attempts: next, timeSpent: Math.round((Date.now() - startedAt) / 1000) });
       const result:GameResult={
         letters: newRows.filter(r=>r.submitted).map(r=>r.letters),
         states:  newRows.filter(r=>r.submitted).map(r=>r.states),

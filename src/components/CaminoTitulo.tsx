@@ -8,6 +8,7 @@ import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackModeEntered } from "@/lib/analytics";
 import CommunityStatsPanel from "@/components/CommunityStatsPanel";
 import { useCommunityDifficulty } from "@/lib/communityStats";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 const MODE_ID = "camino-titulo";
 const SEASON_ID = "world-cups";
@@ -27,10 +28,13 @@ export default function CaminoTitulo() {
   const [failed, setFailed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [hideSuggestions, setHideSuggestions] = useState(false);
+  const [startedAt] = useState(() => Date.now());
   const community = useCommunityDifficulty(MODE_ID, run.id);
   const completed = won || failed;
   const revealedCount = completed ? run.rivals.length : Math.min(run.rivals.length, 3 + guesses.length);
   const suggestions = useMemo(() => hideSuggestions ? [] : getCountrySuggestions(query), [hideSuggestions, query]);
+
+  useChallengeLifecycle({ modeId: MODE_ID, challengeId: run.id, seasonId: SEASON_ID, completed, attempts: guesses.length, startedAt });
 
   useEffect(() => {
     trackModeEntered(MODE_ID, SEASON_ID, { source: "game_page" });
@@ -65,8 +69,8 @@ export default function CaminoTitulo() {
     setFailed(nextFailed);
     persist(nextGuesses, ok, nextFailed);
 
-    if (ok) trackChallengeCompleted(MODE_ID, run.id, { seasonId: SEASON_ID, modeId: MODE_ID, won: true, attempts: nextGuesses.length, dayNumber });
-    if (nextFailed) trackChallengeFailed(MODE_ID, run.id, { seasonId: SEASON_ID, modeId: MODE_ID, won: false, attempts: nextGuesses.length, dayNumber });
+    if (ok) trackChallengeCompleted(MODE_ID, run.id, { seasonId: SEASON_ID, modeId: MODE_ID, won: true, attempts: nextGuesses.length, dayNumber, timeSpent: Math.round((Date.now() - startedAt) / 1000) });
+    if (nextFailed) trackChallengeFailed(MODE_ID, run.id, { seasonId: SEASON_ID, modeId: MODE_ID, won: false, attempts: nextGuesses.length, dayNumber, timeSpent: Math.round((Date.now() - startedAt) / 1000) });
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {

@@ -107,6 +107,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.45,
     },
     {
+      url: `${SITE_URL}/que-son-los-hombres-bbva`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.78,
+    },
+    {
+      url: `${SITE_URL}/100-hombres-bbva`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.76,
+    },
+    {
+      url: `${SITE_URL}/jugadores-liga-bbva-2005-2016`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.74,
+    },
+    {
+      url: `${SITE_URL}/wordle-futbol`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.76,
+    },
+    {
       url: `${SITE_URL}/guias`,
       lastModified: now,
       changeFrequency: "weekly",

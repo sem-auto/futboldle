@@ -13,6 +13,7 @@ import { syncAchievements } from "@/lib/achievements";
 import DataReportButton from "@/components/DataReportButton";
 import CommunityStatsPanel from "@/components/CommunityStatsPanel";
 import { useCommunityDifficulty } from "@/lib/communityStats";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 type CellState = "correct" | "partial" | "wrong" | "empty";
 type Row = { letters: string[]; states: CellState[]; submitted: boolean };
@@ -68,6 +69,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
   const [copied, setCopied] = useState(false);
   const [startedAt] = useState(() => Date.now());
   const community = useCommunityDifficulty("worldcup-wordle", challengeId);
+  useChallengeLifecycle({ modeId: "worldcup-wordle", challengeId, seasonId: "world-cups", completed: gameOver, attempts: rowIndex, startedAt });
   const keyboardStates = useMemo(() => {
     const priority: Record<CellState, number> = { empty: 0, wrong: 1, partial: 2, correct: 3 };
     const result: Record<string, CellState> = {};

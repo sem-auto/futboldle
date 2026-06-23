@@ -9,16 +9,47 @@ import "./globals.css";
 
 const GA_MEASUREMENT_ID = "G-Q4DBT40EYL";
 const SITE_URL = "https://futboldle.es";
-const SITE_TITLE = "Futboldle";
-const SITE_DESCRIPTION = "Minijuegos diarios de futbol nostalgia: Wordle, Liga BBVA y Mundiales.";
+const SITE_TITLE = "Futboldle | Juegos diarios de fútbol, Liga BBVA y Mundiales";
+const SITE_DESCRIPTION = "Juega gratis a los mejores juegos diarios de fútbol. Wordle BBVA, Mundialdle, Top10 históricos, trayectorias, cromos y retos mundialistas.";
 const SOCIAL_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: "Futboldle", url: SITE_URL, inLanguage: "es", description: SITE_DESCRIPTION },
-    { "@type": "WebApplication", "@id": `${SITE_URL}/#app`, name: "Futboldle", url: SITE_URL, applicationCategory: "GameApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" } },
-    { "@type": "Game", "@id": `${SITE_URL}/#game`, name: "Futboldle", alternateName: ["Wordle futbol", "Minijuegos Liga BBVA", "Hombres BBVA", "Mundialdle"], url: SITE_URL, gamePlatform: "Web", inLanguage: "es", description: SITE_DESCRIPTION, genre: ["Futbol", "Trivia", "Nostalgia deportiva"], image: SOCIAL_IMAGE_URL },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "Futboldle",
+      url: SITE_URL,
+      inLanguage: "es",
+      description: SITE_DESCRIPTION,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${SITE_URL}/blog?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "WebApplication",
+      "@id": `${SITE_URL}/#app`,
+      name: "Futboldle",
+      url: SITE_URL,
+      applicationCategory: "GameApplication",
+      operatingSystem: "Web",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+    },
+    {
+      "@type": "Game",
+      "@id": `${SITE_URL}/#game`,
+      name: "Futboldle",
+      alternateName: ["Wordle fútbol", "Minijuegos Liga BBVA", "Hombres BBVA", "Mundialdle"],
+      url: SITE_URL,
+      gamePlatform: "Web",
+      inLanguage: "es",
+      description: SITE_DESCRIPTION,
+      genre: ["Fútbol", "Trivia", "Nostalgia deportiva"],
+      image: SOCIAL_IMAGE_URL,
+    },
   ],
 };
 
@@ -26,7 +57,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
-    template: "%s | Futboldle",
+    template: "%s",
   },
   description: SITE_DESCRIPTION,
   applicationName: "Futboldle",
@@ -37,27 +68,29 @@ export const metadata: Metadata = {
   category: "games",
   keywords: [
     "Futboldle",
-    "minijuegos de futbol",
-    "minijuegos Liga Espanola",
-    "juegos de futbol",
-    "juegos futbol online",
-    "wordle futbol",
-    "wordle de futbol",
+    "minijuegos de fútbol",
+    "minijuegos Liga Española",
+    "juegos de fútbol",
+    "juegos fútbol online",
+    "wordle fútbol",
+    "wordle de fútbol",
     "Liga BBVA",
     "Hombres BBVA",
     "hombres bbva juego",
     "minijuegos hombres bbva",
-    "juego futbol antiguo",
-    "futbol retro",
-    "futbol nostalgia",
-    "futbol antiguo",
+    "juego fútbol antiguo",
+    "fútbol retro",
+    "fútbol nostalgia",
+    "fútbol antiguo",
     "juego Liga BBVA",
     "juegos Liga BBVA",
-    "trivia futbol",
+    "trivia fútbol",
     "adivinar futbolistas",
     "adivina el jugador",
     "LaLiga nostalgia",
     "adivina futbolista",
+    "Mundialdle",
+    "wordle mundial",
   ],
   alternates: {
     canonical: SITE_URL,
@@ -92,7 +125,7 @@ export const metadata: Metadata = {
         url: SOCIAL_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: "Futboldle - minijuegos diarios para enfermos de la Liga BBVA",
+        alt: "Futboldle - juegos diarios de fútbol nostalgia",
       },
     ],
   },
@@ -108,10 +141,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <head>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        />
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];

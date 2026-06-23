@@ -3,8 +3,8 @@ import Link from "next/link";
 import Mundialdle from "@/components/Mundialdle";
 
 const SITE_URL = "https://futboldle.es";
-const title = "Mundialdle | Adivina el jugador mundialista - Futboldle";
-const description = "Adivina jugadores hist\u00f3ricos de los Mundiales con pistas progresivas de selecci\u00f3n, club, posici\u00f3n, rol y goles.";
+const title = "Mundialdle | Adivina el jugador mundialista";
+const description = "Descubre al jugador oculto utilizando pistas sobre mundiales, selecciones y clubes.";
 
 export const metadata: Metadata = {
   title,

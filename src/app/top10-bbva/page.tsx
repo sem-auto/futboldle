@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import SeoGameLanding from "@/components/SeoGameLanding";
 
 const SITE_URL = "https://futboldle.es";
-const title = "Top10 BBVA | Rankings de Liga BBVA 2005-2016 - Futboldle";
-const description = "Completa Top10 historicos de la Liga BBVA: goleadores, asistentes, porterias a cero y rankings de futbol nostalgia.";
+const title = "Top10 BBVA | Completa las listas históricas";
+const description = "Demuestra cuánto recuerdas de la Liga BBVA completando rankings históricos de jugadores.";
 
 export const metadata: Metadata = {
   title,
@@ -14,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function Top10BBVALanding() {
-  return <SeoGameLanding eyebrow="Rankings Liga BBVA" title="Top10 BBVA" description={description} bullets={["Rankings historicos verificados.", "Posiciones y estadisticas visibles.", "Reto dificil para enfermos de la BBVA."]} />;
+  return <SeoGameLanding eyebrow="Rankings Liga BBVA" title="Top10 BBVA" description={description} bullets={["Rankings históricos verificados.", "Posiciones y estadísticas visibles.", "Reto difícil para enfermos de la BBVA."]} />;
 }

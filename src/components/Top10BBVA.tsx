@@ -6,11 +6,12 @@ import type { Top10Answer, Top10Challenge } from "@/data/top10Challenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameCompletion, recordGameResult } from "@/lib/profile";
-import { trackEvent } from "@/lib/analytics";
+import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 import { useCommunityDifficulty } from "@/lib/communityStats";
 import DataReportButton from "@/components/DataReportButton";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 function norm(s: string) {
   return s.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, "");
@@ -82,6 +83,9 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   const [showDirectory,  setShowDirectory]  = useState(false);
   const [completedTops,  setCompletedTops]  = useState<string[]>([]);
   const [showFullTop,    setShowFullTop]    = useState(false);
+  const [startedAt] = useState(() => Date.now());
+
+  useChallengeLifecycle({ modeId: "top10", challengeId: challenge.id, seasonId: "bbva", completed: finished || surrendered, attempts: allGuesses.length, startedAt });
 
   useEffect(() => {
     const saved = loadSaved(challenge.id);
@@ -102,6 +106,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
 
   useEffect(() => {
     trackEvent("game_started", { game: "top10", challenge: challenge.id });
+    trackChallengeStarted("top10", challenge.id, { seasonId: "bbva", modeId: "top10" });
   }, [challenge.id]);
 
   const handleGuess = useCallback((displayName: string, answer: string) => {
@@ -167,6 +172,7 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
     setFinished(true);
     try { localStorage.setItem(`fbl-top10-done-${getDayKey()}`, "lost"); } catch {}
     recordGameResult("top10", `${getDayKey()}-${challenge.id}`, false);
+    trackChallengeFailed("top10", challenge.id, { seasonId: "bbva", modeId: "top10", won: false, attempts: allGuesses.length, timeSpent: Math.round((Date.now() - startedAt) / 1000) });
     persist({ challengeId: challenge.id, guessedAnswers, allGuesses, finished: true, surrendered: true, hintsUsed });
   }
 
@@ -177,6 +183,7 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
       recordGameResult("top10", `${getDayKey()}-${challenge.id}`, true);
       trackEvent("game_completed", { game: "top10", challenge: challenge.id, total: challenge.answers.length });
       trackEvent("top10_completed", { challenge: challenge.id, category: challenge.category, total: challenge.answers.length });
+      trackChallengeCompleted("top10", challenge.id, { seasonId: "bbva", modeId: "top10", won: true, attempts: allGuesses.length, timeSpent: Math.round((Date.now() - startedAt) / 1000) });
       try {
         const raw = localStorage.getItem("fbl-top-completed-v1");
         const parsed = raw ? JSON.parse(raw) : [];
@@ -188,7 +195,7 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
         }
       } catch {}
     }
-  }, [finished, surrendered, challenge.id, challenge.answers.length]);
+  }, [allGuesses.length, challenge.answers.length, challenge.category, challenge.id, finished, startedAt, surrendered]);
 
   const wrongCount = allGuesses.length - guessedAnswers.length;
   const pct = Math.round((guessedAnswers.length / challenge.answers.length) * 100);

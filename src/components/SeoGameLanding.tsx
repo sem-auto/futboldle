@@ -25,17 +25,17 @@ export default function SeoGameLanding({ eyebrow, title, description, bullets }:
           </div>
           <div className="px-4 pb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
             <section className="rounded-2xl p-4" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
-              <h2 className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>Como se juega</h2>
+              <h2 className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>Cómo se juega</h2>
               <p className="text-[12px] leading-relaxed mt-2" style={{ color: "#5f5f66" }}>
-                Entra cada dia, resuelve el reto y comparte el resultado. Futboldle mezcla wordle de futbol, rankings,
+                Entra cada día, resuelve el reto y comparte el resultado. Futboldle mezcla wordle de fútbol, rankings,
                 trayectorias y cromos con nostalgia de la Liga BBVA y Mundiales.
               </p>
             </section>
             <section className="rounded-2xl p-4" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
-              <h2 className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>Por que engancha</h2>
+              <h2 className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>Por qué engancha</h2>
               <p className="text-[12px] leading-relaxed mt-2" style={{ color: "#5f5f66" }}>
-                Partidas rapidas, jugadores reconocibles, resultados compartibles y cromos desbloqueables. La idea es
-                jugar, recordar un nombre y volver manana.
+                Partidas rápidas, jugadores reconocibles, resultados compartibles y cromos desbloqueables. La idea es
+                jugar, recordar un nombre y volver mañana.
               </p>
             </section>
           </div>
@@ -43,7 +43,7 @@ export default function SeoGameLanding({ eyebrow, title, description, bullets }:
             {[
               ["Liga BBVA", "/liga-bbva"],
               ["Mundialdle", "/mundialdle"],
-              ["Album", "/album"],
+              ["Álbum", "/album"],
               ["Tops", "/tops"],
             ].map(([label, href]) => (
               <Link key={href} href={href} className="text-[11px] font-semibold px-3 py-2 rounded-xl"

@@ -12,6 +12,7 @@ import { getWorldCupStreak, recordWorldCupDay, unlockWorldCupCard, type WorldCup
 import DataReportButton from "@/components/DataReportButton";
 import CommunityStatsPanel from "@/components/CommunityStatsPanel";
 import { useCommunityDifficulty } from "@/lib/communityStats";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 const MAX_ATTEMPTS = 6;
 
@@ -292,6 +293,8 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
   const [startedAt] = useState(() => Date.now());
   const [worldCupStreak, setWorldCupStreak] = useState<WorldCupStreak>({ current: 0, best: 0, lastDayNumber: 0, playedDays: 0 });
   const community = useCommunityDifficulty("mundialdle", challenge.id);
+
+  useChallengeLifecycle({ modeId: "mundialdle", challengeId: challenge.id, seasonId: "world-cups", completed: gameOver, attempts: guesses.length, startedAt });
 
   const suggestions = useMemo(() => hideSuggestions ? [] : getSuggestions(query), [hideSuggestions, query]);
   const revealedCount = Math.min(challenge.clues.length, Math.max(1, guesses.length + 1));

@@ -4,10 +4,11 @@ import { bbvaPlayers } from "@/data/bbvaPlayers";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
-import { trackEvent } from "@/lib/analytics";
+import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
 import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { useCommunityDifficulty } from "@/lib/communityStats";
+import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 const MAX = 5;
 const STORE_KEY = () => `fbl-crack-${getDayKey()}`;
@@ -80,6 +81,10 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
   const [query,       setQuery]       = useState("");
   const [copied,      setCopied]      = useState(false);
   const [loaded,      setLoaded]      = useState(false);
+  const [startedAt] = useState(() => Date.now());
+  const challengeId = `crack-${getDayKey()}`;
+
+  useChallengeLifecycle({ modeId: "crack", challengeId, seasonId: "bbva", completed: gameOver, attempts: guesses.length, startedAt });
 
   useEffect(() => {
     const saved = loadSaved();
@@ -92,8 +97,9 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
       if (saved.gameOver) setShowResult(true);
     }
     trackEvent("game_started", { game: "crack" });
+    trackChallengeStarted("crack", challengeId, { seasonId: "bbva", modeId: "crack" });
     setLoaded(true);
-  }, [player.id]);
+  }, [challengeId, player.id]);
 
   const guess = useCallback((p: Player) => {
     setQuery("");
@@ -110,7 +116,12 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
       unlockPlayer(player.id, "Adivina el Crack");
     }
     if (isOver) recordGameResult("crack", getDayKey(), correct);
-    if (isOver) trackEvent("game_completed", { game: "crack", won: correct, attempts: newGuesses.length });
+    if (isOver) {
+      const payload = { seasonId: "bbva", modeId: "crack", won: correct, attempts: newGuesses.length, timeSpent: Math.round((Date.now() - startedAt) / 1000) };
+      trackEvent("game_completed", { game: "crack", won: correct, attempts: newGuesses.length });
+      trackChallengeCompleted("crack", challengeId, payload);
+      if (!correct) trackChallengeFailed("crack", challengeId, payload);
+    }
     if (isOver) setGameOver(true);
 
     saveCrack({
@@ -124,7 +135,7 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
 
     if (!isOver) setAttempt(newAttempt);
     if (isOver) setTimeout(() => setShowResult(true), 350);
-  }, [guesses, usedIds, attempt, player.id]);
+  }, [attempt, challengeId, guesses, player.id, startedAt, usedIds]);
 
   const hints = getHints(player, attempt);
   // On game over, reveal the hint pista too
