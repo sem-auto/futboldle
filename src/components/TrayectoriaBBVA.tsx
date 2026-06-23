@@ -217,10 +217,11 @@ export default function TrayectoriaBBVA({ onBack }: { onBack: () => void }) {
           <div className="font-oswald font-semibold text-[12px]" style={{ color: "#1e6b2e" }}>{community.completion}%</div>
         </div>
         <div>
-          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>Media</div>
-          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#c8920a" }}>{community.attempts} intentos</div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#bbb" }}>{community.real ? "Partidas" : "Media"}</div>
+          <div className="font-oswald font-semibold text-[12px]" style={{ color: "#c8920a" }}>{community.real ? community.sample : `${community.attempts} intentos`}</div>
         </div>
       </div>
+      {community.real && community.attempts ? <div className="text-center text-[10px] font-semibold" style={{ color: "#8a8170" }}>Intentos medios: {community.attempts}</div> : null}
 
       {/* Clue cards — revealed progressively */}
       <div className="grid grid-cols-1 gap-1.5 md:gap-2">

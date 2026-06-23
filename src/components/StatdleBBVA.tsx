@@ -8,6 +8,8 @@ import { unlockPlayer } from "@/lib/album";
 import { recordGameResult } from "@/lib/profile";
 import { buildProgressiveShare, shareGameResult } from "@/lib/resultShare";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered } from "@/lib/analytics";
+import CommunityStatsPanel from "@/components/CommunityStatsPanel";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX_ATTEMPTS = 6;
 
@@ -55,6 +57,7 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
   const [copied, setCopied] = useState(false);
   const suggestions = useMemo(() => suggestionsFor(query), [query]);
   const revealedCount = Math.min(challenge.clues.length, Math.max(1, guesses.length + 1));
+  const community = useCommunityDifficulty("statdle", challenge.id);
 
   useEffect(() => {
     trackModeEntered("statdle-bbva", "bbva", { challenge: challenge.id });
@@ -150,6 +153,7 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className="p-4 flex flex-col gap-3">
+          <CommunityStatsPanel stats={community} tone="#c8920a" />
           <div className="rounded-xl px-3 py-2" style={{ background: "#fffbf5", border: "1px solid rgba(200,146,10,0.22)" }}>
             <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Temporada</div>
             <div className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>{challenge.season}</div>
@@ -234,4 +238,3 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
     </div>
   );
 }
-

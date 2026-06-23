@@ -277,10 +277,11 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
               <div className="font-oswald font-semibold text-[12px] text-white">{community.label}</div>
             </div>
             <div className="rounded-lg px-2 py-1.5" style={{ background: "rgba(255,255,255,0.14)" }}>
-              <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-white/60">Lo completan</div>
-              <div className="font-oswald font-semibold text-[12px] text-white">Solo el {community.completion}%</div>
+              <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-white/60">{community.real ? "Partidas" : "Lo completan"}</div>
+              <div className="font-oswald font-semibold text-[12px] text-white">{community.real ? community.sample : `Solo el ${community.completion}%`}</div>
             </div>
           </div>
+          {community.real ? <div className="text-white/60 text-[10px] mt-2">{community.completion}% lo completan</div> : null}
         </div>
         <div className="px-5 pb-3">
           <div className="flex items-center justify-between mb-1">

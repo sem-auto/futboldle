@@ -16,6 +16,8 @@ import {
   trackModeEntered,
 } from "@/lib/analytics";
 import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
+import CommunityStatsPanel from "@/components/CommunityStatsPanel";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 
 type Mode = "normal" | "hard";
 type Phase = "champion" | "runnerUp" | "done";
@@ -75,6 +77,7 @@ export default function WorldCupChampions() {
   const [feedback, setFeedback] = useState("");
   const [copied, setCopied] = useState(false);
   const [hideSuggestions, setHideSuggestions] = useState(false);
+  const community = useCommunityDifficulty(MODE_ID, String(challenge.year));
   const suggestions = useMemo(() => hideSuggestions ? [] : getCountrySuggestions(input), [hideSuggestions, input]);
   const currentTarget = state.phase === "runnerUp" ? challenge.runnerUp : challenge.champion;
   const currentLabel = state.phase === "runnerUp" ? "finalista" : "campeón";
@@ -214,6 +217,7 @@ export default function WorldCupChampions() {
       </div>
 
       <div className="p-4 md:p-5 flex flex-col gap-4">
+        <CommunityStatsPanel stats={community} tone="#c8920a" />
         <div className="rounded-2xl p-5 text-center" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.24)" }}>
           <div className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#c8920a" }}>Sede</div>
           <div className="font-bebas text-[50px] md:text-[58px] leading-none mt-1" style={{ color: "#18181b" }}>{challenge.host}</div>

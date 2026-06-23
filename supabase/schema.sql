@@ -19,12 +19,41 @@ create table if not exists public.data_reports (
   mode_id text not null,
   challenge_id text not null,
   issue text not null,
+  message text,
+  status text not null default 'pending' check (status in ('pending', 'reviewed', 'fixed', 'rejected')),
   path text,
+  reviewed_at timestamptz,
   created_at timestamptz not null default now()
+);
+
+alter table public.data_reports add column if not exists message text;
+alter table public.data_reports add column if not exists status text not null default 'pending';
+alter table public.data_reports add column if not exists reviewed_at timestamptz;
+
+create table if not exists public.community_events (
+  id uuid primary key default gen_random_uuid(),
+  install_id text not null,
+  event_name text not null,
+  mode_id text not null,
+  challenge_id text,
+  season_id text not null default 'bbva',
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.challenge_audit_status (
+  id uuid primary key default gen_random_uuid(),
+  mode_id text not null,
+  challenge_id text not null,
+  status text not null default 'active' check (status in ('active', 'needs_review', 'disabled')),
+  note text,
+  updated_at timestamptz not null default now(),
+  unique (mode_id, challenge_id)
 );
 
 alter table public.community_results enable row level security;
 alter table public.data_reports enable row level security;
+alter table public.community_events enable row level security;
+alter table public.challenge_audit_status enable row level security;
 
 create or replace function public.get_challenge_stats(p_mode_id text, p_challenge_id text)
 returns table (plays bigint, wins bigint, completion numeric, average_attempts numeric)

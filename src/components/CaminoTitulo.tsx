@@ -6,6 +6,8 @@ import { getCountrySuggestions, getDailyTitleRun } from "@/data/worldcups";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackModeEntered } from "@/lib/analytics";
+import CommunityStatsPanel from "@/components/CommunityStatsPanel";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 
 const MODE_ID = "camino-titulo";
 const SEASON_ID = "world-cups";
@@ -25,6 +27,7 @@ export default function CaminoTitulo() {
   const [failed, setFailed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [hideSuggestions, setHideSuggestions] = useState(false);
+  const community = useCommunityDifficulty(MODE_ID, run.id);
   const completed = won || failed;
   const revealedCount = completed ? run.rivals.length : Math.min(run.rivals.length, 3 + guesses.length);
   const suggestions = useMemo(() => hideSuggestions ? [] : getCountrySuggestions(query), [hideSuggestions, query]);
@@ -97,6 +100,7 @@ export default function CaminoTitulo() {
       </div>
 
       <div className="p-4 md:p-5 flex flex-col gap-4">
+        <CommunityStatsPanel stats={community} tone="#174ea6" />
         <div className="rounded-2xl p-4" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.24)" }}>
           <div className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#c8920a" }}>Sede</div>
           <div className="font-bebas text-[42px] leading-none" style={{ color: "#18181b" }}>{run.host}</div>

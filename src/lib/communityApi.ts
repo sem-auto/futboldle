@@ -14,6 +14,13 @@ export type CommunityStats = {
   averageAttempts: number | null;
 };
 
+export type CommunityEventInput = {
+  eventName: string;
+  modeId?: string;
+  challengeId?: string;
+  seasonId?: string;
+};
+
 function getInstallId() {
   const key = "fbl-install-id-v1";
   try {
@@ -47,6 +54,17 @@ export async function fetchCommunityStats(modeId: string, challengeId: string): 
   } catch {
     return null;
   }
+}
+
+export async function submitCommunityEvent(event: CommunityEventInput) {
+  try {
+    await fetch("/api/events", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ ...event, installId: getInstallId() }),
+      keepalive: true,
+    });
+  } catch {}
 }
 
 export async function submitDataReport(report: Record<string, string>) {

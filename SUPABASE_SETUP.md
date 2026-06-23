@@ -1,6 +1,6 @@
-# Activar estadisticas globales y reportes
+# Activar estadísticas globales y reportes
 
-La web funciona sin Supabase. Estos pasos activan los porcentajes reales y centralizan los reportes enviados por los usuarios.
+La web funciona sin Supabase. Estos pasos activan los porcentajes reales, los eventos de inicio/compartido y la centralización de reportes.
 
 1. Crea un proyecto gratuito en Supabase.
 2. Abre `SQL Editor`, copia el contenido de `supabase/schema.sql` y ejecútalo.
@@ -13,3 +13,8 @@ La web funciona sin Supabase. Estos pasos activan los porcentajes reales y centr
 La clave `service_role` solo se usa en rutas del servidor y nunca se envía al navegador.
 
 Los porcentajes reales aparecen cuando un reto acumula al menos cinco partidas. Hasta entonces se mantiene el valor estimado existente.
+
+Panel útil:
+
+- `/admin/community`: estadísticas reales por modo, abandonos estimados, retos difíciles y reportes pendientes.
+- `/admin/analytics`: comprobación local de eventos del navegador.

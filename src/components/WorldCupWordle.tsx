@@ -11,6 +11,8 @@ import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, t
 import { recordWorldCupDay, unlockWorldCupCard } from "@/lib/worldCupCollection";
 import { syncAchievements } from "@/lib/achievements";
 import DataReportButton from "@/components/DataReportButton";
+import CommunityStatsPanel from "@/components/CommunityStatsPanel";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 
 type CellState = "correct" | "partial" | "wrong" | "empty";
 type Row = { letters: string[]; states: CellState[]; submitted: boolean };
@@ -54,6 +56,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
   const dayNumber = getDayNumber();
   const extraIndex = initialExtraIndex;
   const player = wordlePool[(dayNumber * 17 + 7 + extraIndex * 31) % wordlePool.length];
+  const challengeId = extraIndex === 0 ? `wc-wordle-${dayNumber}` : `wc-wordle-${dayNumber}-extra-${extraIndex}`;
   const answer = useMemo(() => playerAnswer(player.name).split(""), [player.name]);
   const storageKey = `fbl-worldcup-wordle-${getDayKey()}-${extraIndex === 0 ? "daily" : `extra-${extraIndex}`}`;
   const [rows, setRows] = useState<Row[]>(() => Array.from({ length: MAX_ATTEMPTS }, () => emptyRow(answer.length)));
@@ -64,6 +67,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [startedAt] = useState(() => Date.now());
+  const community = useCommunityDifficulty("worldcup-wordle", challengeId);
   const keyboardStates = useMemo(() => {
     const priority: Record<CellState, number> = { empty: 0, wrong: 1, partial: 2, correct: 3 };
     const result: Record<string, CellState> = {};
@@ -76,8 +80,8 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
   const rarity = rarityMeta(player.iconicLevel);
 
   useEffect(() => {
-    trackModeEntered("worldcup-wordle", "world-cups", { challengeId: `wc-wordle-${dayNumber}` });
-    trackChallengeStarted("worldcup-wordle", `wc-wordle-${dayNumber}`, { seasonId: "world-cups" });
+    trackModeEntered("worldcup-wordle", "world-cups", { challengeId });
+    trackChallengeStarted("worldcup-wordle", challengeId, { seasonId: "world-cups" });
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null");
       if (saved && Array.isArray(saved.rows)) {
@@ -94,7 +98,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
     } catch {}
     setCurrentGuess("");
     setMessage("");
-  }, [answer.length, dayNumber, storageKey]);
+  }, [answer.length, challengeId, dayNumber, storageKey]);
 
   const persist = useCallback((nextRows: Row[], nextIndex: number, nextWon: boolean, nextOver: boolean) => {
     try { localStorage.setItem(storageKey, JSON.stringify({ rows: nextRows, rowIndex: nextIndex, won: nextWon, gameOver: nextOver })); } catch {}
@@ -115,15 +119,15 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
     if (over) {
       recordWorldCupDay(dayNumber);
       if (correct) {
-        const unlocked = unlockWorldCupCard(player.id, `wc-wordle-${dayNumber}`);
+        const unlocked = unlockWorldCupCard(player.id, challengeId);
         if (unlocked) trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "worldcup-wordle", playerId: player.id });
       }
       syncAchievements({ modeId: "worldcup-wordle", won: correct });
       const payload = { seasonId: "world-cups", attempts: nextIndex, won: correct, timeSpent: Math.round((Date.now() - startedAt) / 1000) };
-      trackChallengeCompleted("worldcup-wordle", `wc-wordle-${dayNumber}`, payload);
-      if (!correct) trackChallengeFailed("worldcup-wordle", `wc-wordle-${dayNumber}`, payload);
+      trackChallengeCompleted("worldcup-wordle", challengeId, payload);
+      if (!correct) trackChallengeFailed("worldcup-wordle", challengeId, payload);
     }
-  }, [answer, currentGuess, dayNumber, gameOver, persist, player.id, rowIndex, rows, startedAt]);
+  }, [answer, challengeId, currentGuess, dayNumber, gameOver, persist, player.id, rowIndex, rows, startedAt]);
 
   const press = useCallback((key: string) => {
     if (gameOver) return;
@@ -146,7 +150,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
   function share() {
     const symbols = rows.filter(row => row.submitted).map(row => row.states.map(state => state === "correct" ? "🟩" : state === "partial" ? "🟨" : "⬛").join(""));
     const text = [`🏆 Wordle Mundial #${dayNumber}`, ...symbols, won ? `Resuelto en ${rowIndex} intentos` : "Hoy no salió", `🌍 ${FUTBOLDLE_URL}`].join("\n");
-    shareGameResult(text, { modeId: "worldcup-wordle", challengeId: `wc-wordle-${dayNumber}`, seasonId: "world-cups", won, attempts: rowIndex, title: "Wordle Mundial", onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); } });
+    shareGameResult(text, { modeId: "worldcup-wordle", challengeId, seasonId: "world-cups", won, attempts: rowIndex, title: "Wordle Mundial", onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); } });
   }
 
   function playAnother() {
@@ -169,6 +173,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
         <p className="text-[12px] text-white/75 mt-1">Adivina el apellido del mundialista.</p>
       </header>
       <div className="p-4 flex flex-col gap-4">
+        <CommunityStatsPanel stats={community} tone="#174ea6" />
         <div className="flex flex-col gap-1.5 items-center">
           {rows.map((row, index) => {
             const visibleLetters = row.submitted ? row.letters : index === rowIndex ? [...currentGuess.split(""), ...Array(Math.max(0, answer.length - currentGuess.length)).fill("")] : row.letters;
@@ -192,7 +197,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
           <div className="font-bebas text-[38px] leading-none mt-3">{player.name}</div>
           <div className="flex flex-wrap justify-center gap-1.5 mt-2"><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75" style={{ color: rarity.color }}>{rarity.label}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">{player.position}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">Mundial {player.mainWorldCup}</span></div>
           <button onClick={share} className="w-full mt-3 py-3 rounded-xl font-oswald font-semibold uppercase text-[12px]" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir sin revelar"}</button>
-          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={playAnother} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link></div><div className="mt-3 text-right"><DataReportButton modeId="worldcup-wordle" challengeId={`wc-wordle-${dayNumber}-${extraIndex}`} /></div></div>
+          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={playAnother} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link></div><div className="mt-3 text-right"><DataReportButton modeId="worldcup-wordle" challengeId={challengeId} /></div></div>
         </div>}
       </div>
     </section>

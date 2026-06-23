@@ -25,7 +25,7 @@ import { getDailyStatdleChallenge } from "@/data/statdleChallenges";
 import { seasons } from "@/data/product";
 import { trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 import { getWorldCupAlbum } from "@/lib/worldCupCollection";
-import { worldCupPlayers } from "@/data/worldcups";
+import { getDailyMundialdleChallenge, worldCupPlayers } from "@/data/worldcups";
 
 type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "statdle" | "mundialdle" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
 
@@ -172,17 +172,21 @@ function GamePill({ done, won }: { done: boolean; won?: boolean }) {
 }
 
 /* ─── WORDLE card ─── */
-function DifficultyLine({ label, completion, color }: { label: string; completion: number; color: string }) {
+type DifficultyInfo = { label: string; completion: number; attempts?: number | null; sample?: number; real?: boolean };
+
+function DifficultyLine({ label, completion, color, attempts, sample, real }: DifficultyInfo & { color: string }) {
   return (
-    <div className="mt-2 flex items-center justify-between gap-2 text-[9px] font-semibold">
+    <div className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[9px] font-semibold">
       <span className="px-2 py-0.5 rounded-full" style={{ background: `${color}12`, color }}>{label}</span>
       <span style={{ color: "#9a9a8a" }}>{completion}% lo completan</span>
+      {real && sample ? <span style={{ color: "#9a9a8a" }}>{sample} partidas</span> : <span style={{ color: "#c1b7a5" }}>estimado</span>}
+      {real && attempts ? <span style={{ color: "#9a9a8a" }}>{attempts} intentos</span> : null}
     </div>
   );
 }
 
 /* ─── WORDLE card ─── */
-function WordleCard({ onClick, done, won, extras, difficulty }: { onClick: () => void; done: boolean; won: boolean; extras: number; difficulty: { label: string; completion: number } }) {
+function WordleCard({ onClick, done, won, extras, difficulty }: { onClick: () => void; done: boolean; won: boolean; extras: number; difficulty: DifficultyInfo }) {
   // Mini wordle board: 3 rows x 6 cols
   const board = [
     [{l:"F",s:"ok"},{l:"A",s:"no"},{l:"L",s:"amb"},{l:"C",s:"no"},{l:"A",s:"no"},{l:"O",s:"ok"}],
@@ -260,14 +264,14 @@ function WordleCard({ onClick, done, won, extras, difficulty }: { onClick: () =>
         <div className="font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#c8920a" }}>
           {done ? (extras > 0 ? `Extra #${extras + 1} →` : "Ver extras →") : "JUGAR →"}
         </div>
-        <DifficultyLine label={difficulty.label} completion={difficulty.completion} color="#c8920a" />
+        <DifficultyLine {...difficulty} color="#c8920a" />
       </div>
     </button>
   );
 }
 
 /* ─── TRAYECTORIA card ─── */
-function TrayCard({ onClick, done, won, difficulty }: { onClick: () => void; done: boolean; won: boolean; difficulty: { label: string; completion: number } }) {
+function TrayCard({ onClick, done, won, difficulty }: { onClick: () => void; done: boolean; won: boolean; difficulty: DifficultyInfo }) {
   return (
     <button onClick={onClick}
       className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
@@ -314,13 +318,13 @@ function TrayCard({ onClick, done, won, difficulty }: { onClick: () => void; don
         <div className="font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#1e6b2e" }}>
           {done ? "Ver resultado →" : "JUGAR →"}
         </div>
-        <DifficultyLine label={difficulty.label} completion={difficulty.completion} color="#1e6b2e" />
+        <DifficultyLine {...difficulty} color="#1e6b2e" />
       </div>
     </button>
   );
 }
 
-function StatdleCard({ onClick, done, won, difficulty }: { onClick: () => void; done: boolean; won: boolean; difficulty: { label: string; completion: number } }) {
+function StatdleCard({ onClick, done, won, difficulty }: { onClick: () => void; done: boolean; won: boolean; difficulty: DifficultyInfo }) {
   return (
     <button onClick={onClick}
       className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
@@ -347,13 +351,13 @@ function StatdleCard({ onClick, done, won, difficulty }: { onClick: () => void; 
         <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1 mb-0.5" style={{ color: "#18181b" }}>STATDLE BBVA</div>
         <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Adivina por estadísticas</div>
         <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#18181b" }}>{done ? "VER RESULTADO →" : "JUGAR →"}</div>
-        <DifficultyLine label={difficulty.label} completion={difficulty.completion} color="#18181b" />
+        <DifficultyLine {...difficulty} color="#18181b" />
       </div>
     </button>
   );
 }
 
-function MundialdleHomeCard({ onClick, done, won }: { onClick: () => void; done: boolean; won: boolean }) {
+function MundialdleHomeCard({ onClick, done, won, difficulty }: { onClick: () => void; done: boolean; won: boolean; difficulty: DifficultyInfo }) {
   return (
     <button onClick={onClick}
       className="w-full h-full min-h-[160px] sm:min-h-[190px] text-left rounded-2xl overflow-hidden game-card"
@@ -375,6 +379,7 @@ function MundialdleHomeCard({ onClick, done, won }: { onClick: () => void; done:
           ))}
         </div>
         <div className="mt-3 font-oswald font-semibold uppercase tracking-wider text-[10px] text-white">{done ? "VER RESULTADO →" : "JUGAR →"}</div>
+        <DifficultyLine {...difficulty} color="#facc15" />
       </div>
     </button>
   );
@@ -704,6 +709,7 @@ export default function HomePage() {
   const top10Difficulty = useCommunityDifficulty("top10", getDailyTop10().id);
   const crackDifficulty = useCommunityDifficulty("crack", `crack-${getDayKey()}`);
   const statdleDifficulty = useCommunityDifficulty("statdle", getDailyStatdleChallenge(getDayNumber()).id);
+  const mundialdleDifficulty = useCommunityDifficulty("mundialdle", getDailyMundialdleChallenge(getDayNumber()).id);
 
   function openMode(nextView: View, modeId: string, seasonId = "bbva") {
     trackModeEntered(modeId, seasonId, { source: "home" });
@@ -933,11 +939,11 @@ export default function HomePage() {
               <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>TOP 10 BBVA</div>
               <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Completa las listas históricas</div>
               <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#1a4fa0" }}>{top10Done ? "VER RESULTADO →" : "JUGAR →"}</div>
-              <DifficultyLine label={top10Difficulty.label} completion={top10Difficulty.completion} color="#1a4fa0" />
+              <DifficultyLine {...top10Difficulty} color="#1a4fa0" />
             </div>
           </button>
           <StatdleCard onClick={() => openMode("statdle", "statdle-bbva")} done={statdleDone} won={statdleWon} difficulty={statdleDifficulty} />
-          <MundialdleHomeCard onClick={() => openMode("mundialdle", "mundialdle", "world-cups")} done={mundialdleDone} won={mundialdleWon} />
+          <MundialdleHomeCard onClick={() => openMode("mundialdle", "mundialdle", "world-cups")} done={mundialdleDone} won={mundialdleWon} difficulty={mundialdleDifficulty} />
           <button onClick={() => openMode("crack", "cromo-oculto")}
             className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
             style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(124,58,237,0.20)", display: "flex", flexDirection: "column" }}>
@@ -955,7 +961,7 @@ export default function HomePage() {
               <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>CROMO OCULTO</div>
               <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Revela el jugador por pistas</div>
               <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#7c3aed" }}>{crackDone ? "VER RESULTADO →" : "JUGAR →"}</div>
-              <DifficultyLine label={crackDifficulty.label} completion={crackDifficulty.completion} color="#7c3aed" />
+              <DifficultyLine {...crackDifficulty} color="#7c3aed" />
             </div>
           </button>
         </div>

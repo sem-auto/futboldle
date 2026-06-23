@@ -4,7 +4,17 @@ import { useEffect, useState } from "react";
 import { getDayNumber } from "./daily";
 import { fetchCommunityStats } from "./communityApi";
 
-type GameKey = "wordle" | "trayectoria" | "top10" | "crack" | "statdle";
+type GameKey =
+  | "wordle"
+  | "trayectoria"
+  | "top10"
+  | "crack"
+  | "statdle"
+  | "mundialdle"
+  | "worldcup-wordle"
+  | "worldcup-champions"
+  | "camino-titulo"
+  | "final-mundial";
 
 const BASE: Record<GameKey, { completion: number; attempts?: number }> = {
   wordle: { completion: 54, attempts: 4.4 },
@@ -12,7 +22,18 @@ const BASE: Record<GameKey, { completion: number; attempts?: number }> = {
   top10: { completion: 28 },
   crack: { completion: 45, attempts: 3.6 },
   statdle: { completion: 52, attempts: 4.1 },
+  mundialdle: { completion: 46, attempts: 3.8 },
+  "worldcup-wordle": { completion: 51, attempts: 4.2 },
+  "worldcup-champions": { completion: 58, attempts: 2.6 },
+  "camino-titulo": { completion: 42, attempts: 2.8 },
+  "final-mundial": { completion: 62, attempts: 1.9 },
 };
+
+export function getDifficultyLabel(completion: number) {
+  if (completion >= 60) return "Fácil";
+  if (completion >= 35) return "Media";
+  return "Difícil";
+}
 
 function stableOffset(seed: string, range: number) {
   let hash = 0;
@@ -28,21 +49,28 @@ export function getCommunityDifficulty(game: GameKey, seed = String(getDayNumber
   const attempts = base.attempts
     ? Math.max(2.4, Math.min(5.4, Number((base.attempts + stableOffset(`${seed}-${game}-attempts`, 5) / 10).toFixed(1))))
     : null;
-  const label = completion <= 30 ? "Difícil" : completion <= 55 ? "Media" : "Fácil";
-  return { completion, attempts, label };
+  return { completion, attempts, label: getDifficultyLabel(completion) };
 }
 
 export function useCommunityDifficulty(game: GameKey, challengeId: string) {
   const [difficulty, setDifficulty] = useState(() => ({ ...getCommunityDifficulty(game, challengeId), sample: 0, real: false }));
+
   useEffect(() => {
     let active = true;
     setDifficulty({ ...getCommunityDifficulty(game, challengeId), sample: 0, real: false });
     fetchCommunityStats(game, challengeId).then(stats => {
       if (!active || !stats || stats.plays < 5) return;
       const completion = Math.round(stats.completion);
-      setDifficulty({ completion, attempts: stats.averageAttempts, label: completion <= 30 ? "Dificil" : completion <= 55 ? "Media" : "Facil", sample: stats.plays, real: true });
+      setDifficulty({
+        completion,
+        attempts: stats.averageAttempts,
+        label: getDifficultyLabel(completion),
+        sample: stats.plays,
+        real: true,
+      });
     });
     return () => { active = false; };
   }, [challengeId, game]);
+
   return difficulty;
 }

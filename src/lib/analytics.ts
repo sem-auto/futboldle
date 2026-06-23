@@ -1,4 +1,4 @@
-import { submitCommunityResult } from "./communityApi";
+import { submitCommunityEvent, submitCommunityResult } from "./communityApi";
 
 type AnalyticsEvent =
   | "game_started"
@@ -59,6 +59,16 @@ export function trackEvent(name: AnalyticsEvent, payload: AnalyticsPayload = {})
       localStorage.setItem(key, JSON.stringify(log.slice(-500)));
     } catch {}
     window.dispatchEvent(new CustomEvent("fbl-analytics", { detail: { name, payload: enriched } }));
+    if (name === "challenge_started" || name === "challenge_shared" || name === "mode_entered" || name === "season_entered" || name === "share_clicked") {
+      const rawModeId = String(enriched.modeId ?? enriched.game ?? enriched.mode ?? "unknown");
+      const modeId = rawModeId === "statdle-bbva" ? "statdle" : rawModeId;
+      void submitCommunityEvent({
+        eventName: name,
+        modeId,
+        challengeId: enriched.challengeId ? String(enriched.challengeId) : undefined,
+        seasonId: enriched.seasonId ? String(enriched.seasonId) : enriched.season ? String(enriched.season) : undefined,
+      });
+    }
     if (name === "challenge_completed" || name === "challenge_failed" || name === "game_completed") {
       const rawModeId = String(enriched.modeId ?? enriched.game ?? "unknown");
       const modeId = rawModeId === "statdle-bbva" ? "statdle" : rawModeId;

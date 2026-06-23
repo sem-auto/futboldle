@@ -40,7 +40,7 @@ export function buildWordleShare(rows: string[], attempts: number, won: boolean)
   return [
     `Wordle BBVA #${getDayNumber()}`,
     rows.join(""),
-    won ? `Lo resolv\u00ed en ${attempts} intento${attempts === 1 ? "" : "s"}.` : "No lo resolv\u00ed hoy.",
+    won ? `Lo resolví en ${attempts} intento${attempts === 1 ? "" : "s"}.` : "No lo resolví hoy.",
     FUTBOLDLE_URL,
   ].join("\n");
 }
@@ -49,7 +49,7 @@ export function buildProgressiveShare(title: string, marks: string, attempts: nu
   return [
     `${prefix}${title} #${getDayNumber()}`,
     marks,
-    won ? `Lo resolv\u00ed en ${attempts} ${unit}.` : "No lo resolv\u00ed hoy.",
+    won ? `Lo resolví en ${attempts} ${unit}.` : "No lo resolví hoy.",
     FUTBOLDLE_URL,
   ].filter(Boolean).join("\n");
 }

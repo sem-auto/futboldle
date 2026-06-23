@@ -10,6 +10,8 @@ import { syncAchievements } from "@/lib/achievements";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent, trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 import { getWorldCupStreak, recordWorldCupDay, unlockWorldCupCard, type WorldCupStreak } from "@/lib/worldCupCollection";
 import DataReportButton from "@/components/DataReportButton";
+import CommunityStatsPanel from "@/components/CommunityStatsPanel";
+import { useCommunityDifficulty } from "@/lib/communityStats";
 
 const MAX_ATTEMPTS = 6;
 
@@ -289,6 +291,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
   const [showFinishedDetails, setShowFinishedDetails] = useState(false);
   const [startedAt] = useState(() => Date.now());
   const [worldCupStreak, setWorldCupStreak] = useState<WorldCupStreak>({ current: 0, best: 0, lastDayNumber: 0, playedDays: 0 });
+  const community = useCommunityDifficulty("mundialdle", challenge.id);
 
   const suggestions = useMemo(() => hideSuggestions ? [] : getSuggestions(query), [hideSuggestions, query]);
   const revealedCount = Math.min(challenge.clues.length, Math.max(1, guesses.length + 1));
@@ -427,6 +430,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
         </div>
 
         <div className="p-4 flex flex-col gap-3">
+          <CommunityStatsPanel stats={community} tone="#174ea6" />
           {(!gameOver || showFinishedDetails) && <><div className="rounded-xl px-3 py-2" style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.20)" }}>
             <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#174ea6" }}>Temporada</div>
             <div className="font-bebas text-[26px] leading-none" style={{ color: "#18181b" }}>Mundiales 2002-2026</div>
