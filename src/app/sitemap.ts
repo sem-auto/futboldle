@@ -5,6 +5,7 @@ const SITE_URL = "https://futboldle.es";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+  const publishedRankings = seoRankings.filter(ranking => ranking.status === "published" && ranking.challenge);
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
@@ -205,7 +206,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...seoSelections.map(selection => ({ url: `${SITE_URL}/seleccion/${selection.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
     ...seoNationalities.map(nationality => ({ url: `${SITE_URL}/nacionalidad/${nationality.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 })),
     ...seoPositions.map(position => ({ url: `${SITE_URL}/posicion/${position.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 })),
-    ...seoRankings.map(ranking => ({ url: `${SITE_URL}/rankings/${ranking.slug}`, lastModified: now, changeFrequency: ranking.status === "published" ? "weekly" as const : "monthly" as const, priority: ranking.status === "published" ? 0.64 : 0.36 })),
-    ...seoRankings.map(ranking => ({ url: `${SITE_URL}/ranking/${ranking.slug}`, lastModified: now, changeFrequency: ranking.status === "published" ? "weekly" as const : "monthly" as const, priority: ranking.status === "published" ? 0.66 : 0.34 })),
+    ...publishedRankings.map(ranking => ({ url: `${SITE_URL}/rankings/${ranking.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.64 })),
+    ...publishedRankings.map(ranking => ({ url: `${SITE_URL}/ranking/${ranking.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.66 })),
   ];
 }

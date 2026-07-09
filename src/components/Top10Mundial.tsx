@@ -25,6 +25,11 @@ function score(player: WorldCupPlayer, query: string) {
   return 99;
 }
 
+function safeHint(value: string) {
+  if (!value || /por auditar|undefined|null|^-$/i.test(value)) return "Pista oculta";
+  return value;
+}
+
 export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
   const challenge = getDailyWorldCupTop10(getDayNumber());
   const storageKey = `fbl-wc-top10-${getDayKey()}-${challenge.id}`;
@@ -151,26 +156,26 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
   const pct = Math.round((guessed.length / challenge.answers.length) * 100);
 
   return (
-    <section className="rounded-3xl overflow-hidden" style={{ background: "white", boxShadow: "0 12px 34px rgba(0,0,0,0.08)" }}>
-      <header className="px-5 py-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
-        <div className="absolute right-5 top-0 font-bebas text-[100px] leading-none text-white/10">10</div>
-        <button onClick={onBack} className="relative z-10 text-[11px] font-semibold text-white/70 mb-4">← Volver</button>
+    <section className="mx-auto max-w-3xl rounded-[28px] overflow-hidden" style={{ background: "white", boxShadow: "0 14px 34px rgba(0,0,0,0.09)" }}>
+      <header className="px-5 py-5 md:px-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
+        <div className="absolute right-4 -top-5 font-bebas text-[110px] leading-none text-white/10">10</div>
+        {onBack ? <button onClick={onBack} className="relative z-10 text-[11px] font-semibold text-white/70 mb-4">← Volver</button> : null}
         <div className="relative z-10 text-[9px] uppercase font-semibold tracking-[0.22em] text-white/70">Mundiales · #{getDayNumber()}</div>
-        <h1 className="relative z-10 font-bebas text-[46px] leading-none mt-1">TOP10 MUNDIAL</h1>
+        <h1 className="relative z-10 font-bebas text-[46px] md:text-[58px] leading-none mt-1">Top10 Mundial</h1>
         <p className="relative z-10 text-[12px] text-white/75 mt-1">{challenge.subtitle}</p>
       </header>
 
-      <div className="p-4 flex flex-col gap-4">
+      <div className="p-4 md:p-5 flex flex-col gap-4">
         <div className="rounded-2xl p-4" style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.18)" }}>
-          <div className="text-[8px] uppercase font-semibold tracking-[0.18em]" style={{ color: "#174ea6" }}>Reto verificado</div>
-          <h2 className="font-bebas text-[32px] leading-none mt-1" style={{ color: "#18181b" }}>{challenge.title}</h2>
+          <div className="text-[8px] uppercase font-semibold tracking-[0.18em]" style={{ color: "#174ea6" }}>Reto diario verificado</div>
+          <h2 className="font-bebas text-[30px] md:text-[36px] leading-none mt-1" style={{ color: "#18181b" }}>{challenge.title}</h2>
           <p className="text-[11px] mt-2" style={{ color: "#5f5f66" }}>{challenge.period} · {challenge.criterion}</p>
           <div className="flex items-center justify-between mt-4 text-[11px]" style={{ color: "#6b6b72" }}>
             <span>{guessed.length}/10 encontrados</span>
             <span>{pct}%</span>
           </div>
           <div className="h-2 rounded-full overflow-hidden mt-1" style={{ background: "rgba(23,78,166,0.14)" }}>
-            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "#43d477" }} />
+            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: "#43d477" }} />
           </div>
         </div>
 
@@ -178,11 +183,11 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
           {challenge.answers.map((answer, index) => {
             const revealed = guessed.includes(answer.playerId) || finished;
             return (
-              <div key={answer.playerId} className="rounded-xl px-3 py-2 flex items-center gap-3" style={{ background: revealed ? "#eef3ff" : "#f8f5f0", border: `1px solid ${revealed ? "rgba(23,78,166,0.18)" : "rgba(0,0,0,0.06)"}` }}>
+              <div key={`${answer.playerId}-${index}`} className="rounded-xl px-3 py-2.5 flex items-center gap-3" style={{ background: revealed ? "#eef3ff" : "#fbfaf7", border: `1px solid ${revealed ? "rgba(23,78,166,0.18)" : "rgba(0,0,0,0.07)"}` }}>
                 <div className="w-9 h-9 rounded-full flex items-center justify-center font-bebas text-[20px]" style={{ background: revealed ? "#174ea6" : "#e6e0d6", color: revealed ? "white" : "#9a9a8a" }}>{index + 1}</div>
                 <div className="min-w-0 flex-1">
                   <div className="font-oswald font-semibold text-[15px]" style={{ color: revealed ? "#18181b" : "#9a9a8a" }}>{revealed ? `${answer.flag} ${answer.name}` : "?????"}</div>
-                  <div className="text-[10px]" style={{ color: "#8a8a80" }}>{revealed ? answer.label : `${answer.nationality} · ${answer.position}`}</div>
+                  <div className="text-[10px]" style={{ color: "#8a8a80" }}>{revealed ? answer.label : `${safeHint(answer.nationality)} · ${safeHint(answer.position)}`}</div>
                 </div>
                 {revealed ? <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>✓</span> : null}
               </div>

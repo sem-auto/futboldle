@@ -36,7 +36,7 @@ export function titleFromSlug(slug: string) {
 }
 
 export function playerSlug(player: { fullName?: string; displayName?: string; name?: string }) {
-  return slugify(player.fullName ?? player.displayName ?? player.name ?? "");
+  return slugify(player.displayName ?? player.name ?? player.fullName ?? "");
 }
 
 export function clubSlug(club: string) {
@@ -110,7 +110,10 @@ export const seoClubs = uniqueBy(
 );
 
 export const seoSelections = uniqueBy(
-  worldCupPlayers.map(player => cleanText(player.nationality)).filter(Boolean).map(selection => {
+  worldCupPlayers
+    .map(player => cleanText(player.nationality))
+    .filter(selection => Boolean(selection) && slugify(selection) !== "por-auditar")
+    .map(selection => {
     const players = worldCupPlayers.filter(player => cleanText(player.nationality) === selection);
     return {
       slug: slugify(selection),
@@ -122,7 +125,10 @@ export const seoSelections = uniqueBy(
 );
 
 export const seoNationalities = uniqueBy(
-  seoPlayers.map(player => player.nationality).filter(Boolean).map(nationality => {
+  seoPlayers
+    .map(player => player.nationality)
+    .filter(nationality => Boolean(nationality) && slugify(nationality) !== "por-auditar")
+    .map(nationality => {
     const players = seoPlayers.filter(player => player.nationality === nationality);
     return {
       slug: slugify(nationality),
@@ -218,7 +224,7 @@ export const seoRankings: RankingSeo[] = rankingIntents.map(intent => {
   const challenge = findChallengeForIntent(intent.match);
   return {
     slug: intent.slug,
-    title: intent.title,
+    title: cleanText(intent.title),
     intent: intent.match.join(", "),
     status: challenge ? "published" : "pending",
     challenge,
@@ -248,4 +254,3 @@ export const seoGamePages = [
     keywords: ["minijuegos fútbol", "juegos fútbol online", "wordle fútbol"],
   },
 ];
-

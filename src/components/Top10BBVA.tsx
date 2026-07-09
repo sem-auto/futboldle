@@ -1,7 +1,7 @@
 ﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 import { bbvaPlayers } from "@/data/bbvaPlayers";
-import { activeTop10Challenges, getDailyTop10 } from "@/data/top10Challenges";
+import { getDailyTop10 } from "@/data/top10Challenges";
 import type { Top10Answer, Top10Challenge } from "@/data/top10Challenges";
 import { getDayKey, getDayNumber } from "@/lib/daily";
 import { unlockPlayer } from "@/lib/album";
@@ -67,8 +67,6 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   const [query,          setQuery]          = useState("");
   const [copied,         setCopied]         = useState(false);
   const [loaded,         setLoaded]         = useState(false);
-  const [showDirectory,  setShowDirectory]  = useState(false);
-  const [completedTops,  setCompletedTops]  = useState<string[]>([]);
   const [showFullTop,    setShowFullTop]    = useState(false);
   const [startedAt] = useState(() => Date.now());
 
@@ -83,11 +81,6 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
       setSurrendered(saved.surrendered);
       setHintsUsed(saved.hintsUsed);
     }
-    try {
-      const raw = localStorage.getItem("fbl-top-completed-v1");
-      const parsed = raw ? JSON.parse(raw) : [];
-      setCompletedTops(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : []);
-    } catch {}
     setLoaded(true);
   }, [challenge.id]);
 
@@ -179,7 +172,6 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
         if (!ids.includes(challenge.id)) {
           const next = [...ids, challenge.id];
           localStorage.setItem("fbl-top-completed-v1", JSON.stringify(next));
-          setCompletedTops(next);
         }
       } catch {}
     }
@@ -228,31 +220,6 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
       <button onClick={onBack} className="self-start flex items-center gap-1.5 text-[11px] font-semibold opacity-60 hover:opacity-100 transition-opacity" style={{ color: "#3a3a3f" }}>
         ← Volver
       </button>
-
-      <button onClick={() => setShowDirectory(v => !v)} className="self-start font-oswald font-semibold uppercase tracking-wider text-[10px] px-3 py-1.5 rounded-lg"
-        style={{ background: "white", border: "1px solid rgba(26,79,160,0.18)", color: "#1a4fa0" }}>
-        Tops históricos
-      </button>
-
-      {showDirectory && (
-        <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
-          <div className="font-bebas text-[22px] leading-none mb-2" style={{ color: "#18181b" }}>TOPS HISTÓRICOS</div>
-          <div className="flex flex-col gap-1">
-            {activeTop10Challenges.map(top => {
-              const completed = completedTops.includes(top.id);
-              const active = top.id === challenge.id;
-              return (
-                <div key={top.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: active ? "#eff4ff" : "#f8f5f0" }}>
-                  <span className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{top.title}</span>
-                  <span className="text-[10px] font-semibold" style={{ color: completed ? "#1e6b2e" : active ? "#c8920a" : "#9a9a8a" }}>
-                    {completed ? "✓ Completado" : active ? "🟡 En progreso" : "🔒 Bloqueado"}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Header */}
       <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg,#1a3a80 0%,#2260c8 100%)", boxShadow: "0 4px 20px rgba(26,79,160,0.30)" }}>

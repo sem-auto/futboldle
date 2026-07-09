@@ -1,17 +1,26 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import SeoEntityPage from "@/components/SeoEntityPage";
-import { canonical, OG_IMAGE, seoClubs, seoPlayers, seoRankings } from "@/lib/seoIndex";
+import { canonical, OG_IMAGE, seoClubs, seoPlayers, seoRankings, slugify } from "@/lib/seoIndex";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
-  return seoPlayers.map(player => ({ slug: player.slug }));
+  const slugs = new Set<string>();
+  for (const player of seoPlayers) {
+    slugs.add(player.slug);
+    slugs.add(slugify(player.name));
+  }
+  return Array.from(slugs).map(slug => ({ slug }));
+}
+
+function findPlayerBySlug(slug: string) {
+  return seoPlayers.find(item => item.slug === slug || slugify(item.name) === slug);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const player = seoPlayers.find(item => item.slug === slug);
+  const player = findPlayerBySlug(slug);
   if (!player) return {};
   const title = `${player.name} | Biografia, clubes y juegos - Futboldle`;
   const description = `${player.name}: clubes, posicion, nacionalidad, cromos, juegos donde aparece y archivo de futbol nostalgia.`;
@@ -27,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PlayerPage({ params }: Props) {
   const { slug } = await params;
-  const player = seoPlayers.find(item => item.slug === slug);
+  const player = findPlayerBySlug(slug);
   if (!player) notFound();
 
   const clubLinks = player.clubs

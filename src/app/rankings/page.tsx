@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { seoRankings } from "@/lib/seoIndex";
+import { cleanText, seoRankings } from "@/lib/seoIndex";
+import { worldCupTop10Challenges } from "@/data/worldcups/top10";
 
 const SITE_URL = "https://futboldle.es";
 const title = "Rankings de fútbol nostalgia - Futboldle";
-const description = "Rankings de Liga BBVA, Mundiales, goleadores históricos y futbolistas míticos para jugar y descubrir en Futboldle.";
+const description = "Rankings publicados de Liga BBVA y Mundiales: goleadores, asistentes, partidos, porterías y listas históricas para jugar en Futboldle.";
 
 export const metadata: Metadata = {
   title,
@@ -14,14 +15,18 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description, images: [`${SITE_URL}/og-image.png`] },
 };
 
-function RankingCard({ href, title, detail, tone = "#174ea6", mark = "10" }: { href: string; title: string; detail: string; tone?: string; mark?: string }) {
+function RankingCard({ href, title, detail, source, tone = "#174ea6", mark = "10" }: { href: string; title: string; detail: string; source?: string; tone?: string; mark?: string }) {
   return (
-    <Link href={href} className="fbl-card rounded-2xl p-4 min-h-[150px] flex flex-col justify-between" style={{ background: "white", border: `1px solid ${tone}2e` }}>
+    <Link href={href} className="fbl-card rounded-2xl p-4 min-h-[158px] flex flex-col justify-between" style={{ background: "white", border: `1px solid ${tone}2e` }}>
       <span className="fbl-visual-mark">{mark}</span>
       <div className="relative z-10">
-        <div className="grid h-10 w-10 place-items-center rounded-xl font-bebas text-[22px]" style={{ background: `${tone}14`, color: tone, border: `1px solid ${tone}25` }}>{mark}</div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="grid h-10 w-10 place-items-center rounded-xl font-bebas text-[22px]" style={{ background: `${tone}14`, color: tone, border: `1px solid ${tone}25` }}>{mark}</div>
+          <span className="rounded-full px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ background: `${tone}12`, color: tone }}>Verificado</span>
+        </div>
         <h2 className="font-bebas text-[30px] leading-none mt-3" style={{ color: "#18181b" }}>{title}</h2>
         <p className="text-[12px] mt-1" style={{ color: "#66646a" }}>{detail}</p>
+        {source ? <p className="text-[10px] mt-2" style={{ color: "#9a9a8a" }}>Fuente: {source}</p> : null}
       </div>
       <span className="relative z-10 mt-4 text-[12px] font-semibold" style={{ color: tone }}>Abrir ranking →</span>
     </Link>
@@ -29,10 +34,24 @@ function RankingCard({ href, title, detail, tone = "#174ea6", mark = "10" }: { h
 }
 
 export default function RankingsPage() {
-  const published = seoRankings.filter(ranking => ranking.status === "published");
-  const bbva = published.filter(ranking => /bbva|liga|valencia|sevilla|villarreal|athletic|atletico|madrid|barcelona/i.test(ranking.slug)).slice(0, 8);
-  const popular = published.slice(0, 6);
-  const latest = published.slice(-6).reverse();
+  const published = seoRankings.filter(ranking => ranking.status === "published" && ranking.challenge);
+  const bbva = published.slice(0, 12);
+  const world = worldCupTop10Challenges.filter(challenge => challenge.status === "active").slice(0, 12);
+  const popular = [...bbva.slice(0, 4).map(ranking => ({
+    href: `/rankings/${ranking.slug}`,
+    title: ranking.title,
+    detail: cleanText(ranking.description),
+    source: ranking.challenge?.sourceName,
+    tone: "#b81c14",
+    mark: "BB",
+  })), ...world.slice(0, 2).map(challenge => ({
+    href: "/world-cups/top10",
+    title: challenge.title,
+    detail: `${challenge.period} · ${challenge.criterion}`,
+    source: challenge.sourceName,
+    tone: "#174ea6",
+    mark: "WC",
+  }))];
 
   return (
     <main className="min-h-dvh px-3 py-5" style={{ background: "#f6f2ea" }}>
@@ -45,7 +64,7 @@ export default function RankingsPage() {
             <div className="text-[10px] uppercase tracking-[0.28em] font-semibold text-white/70">Archivo Futboldle</div>
             <h1 className="font-bebas text-[62px] md:text-[92px] leading-none mt-2">Rankings</h1>
             <p className="text-[15px] md:text-[18px] text-white/82 mt-3 max-w-2xl">
-              Listas históricas para jugar, discutir y recordar: goleadores, asistentes, porterías, clubes y Mundiales.
+              Listas publicadas y verificadas para jugar, discutir y recordar: Liga BBVA, Mundiales, goleadores, porterías y jugadores históricos.
             </p>
             <div className="flex flex-wrap gap-3 mt-6">
               <Link href="/top10-bbva" className="rounded-2xl px-5 py-3 font-oswald font-semibold uppercase text-[13px]" style={{ background: "#ffd04a", color: "#151515" }}>Jugar Top10 BBVA</Link>
@@ -54,30 +73,12 @@ export default function RankingsPage() {
           </div>
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-4">
-          <article className="rounded-[24px] p-4 md:p-5" style={{ background: "white", border: "1px solid rgba(0,0,0,0.06)" }}>
-            <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: "#174ea6" }}>Destacados</div>
-            <h2 className="font-bebas text-[38px] leading-none mt-1">Rankings populares</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              {popular.map((ranking, index) => (
-                <RankingCard key={ranking.slug} href={`/rankings/${ranking.slug}`} title={ranking.title} detail={ranking.description} tone={index % 2 ? "#c8920a" : "#174ea6"} mark={String(index + 1)} />
-              ))}
-            </div>
-          </article>
-
-          <aside className="rounded-[24px] p-4 md:p-5" style={{ background: "#191716", color: "white" }}>
-            <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: "#ffd04a" }}>Buscador futuro</div>
-            <h2 className="font-bebas text-[38px] leading-none mt-1">Encuentra una lista</h2>
-            <p className="text-[13px] text-white/70 mt-2">La estructura ya está preparada para buscar por jugador, club, temporada, Mundial o categoría.</p>
-            <div className="mt-4 rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
-              <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">Categorías</div>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {["BBVA", "Mundiales", "Goles", "Asistencias", "Porteros", "Clubes"].map(item => (
-                  <span key={item} className="rounded-full px-3 py-1 text-[11px] font-semibold" style={{ background: "rgba(255,255,255,0.10)" }}>{item}</span>
-                ))}
-              </div>
-            </div>
-          </aside>
+        <section className="rounded-[24px] p-4 md:p-5" style={{ background: "white", border: "1px solid rgba(0,0,0,0.06)" }}>
+          <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: "#174ea6" }}>Destacados</div>
+          <h2 className="font-bebas text-[38px] leading-none mt-1">Rankings populares</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
+            {popular.map(ranking => <RankingCard key={`${ranking.href}-${ranking.title}`} {...ranking} />)}
+          </div>
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -85,20 +86,15 @@ export default function RankingsPage() {
             <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: "#b47611" }}>Liga BBVA</div>
             <h2 className="font-bebas text-[36px] leading-none mt-1">Rankings BBVA</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              {bbva.map(ranking => <RankingCard key={ranking.slug} href={`/rankings/${ranking.slug}`} title={ranking.title} detail="Ranking de archivo BBVA" tone="#b81c14" mark="BB" />)}
+              {bbva.map(ranking => <RankingCard key={ranking.slug} href={`/rankings/${ranking.slug}`} title={cleanText(ranking.title)} detail={cleanText(ranking.challenge?.period ?? "Liga BBVA 2005-2016")} source={cleanText(ranking.challenge?.sourceName)} tone="#b81c14" mark="BB" />)}
             </div>
           </div>
 
           <div className="rounded-[24px] p-4 md:p-5" style={{ background: "white", border: "1px solid rgba(0,0,0,0.06)" }}>
-            <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: "#174ea6" }}>Últimos añadidos</div>
-            <h2 className="font-bebas text-[36px] leading-none mt-1">Archivo vivo</h2>
-            <div className="flex flex-col gap-2 mt-4">
-              {latest.map(ranking => (
-                <Link key={ranking.slug} href={`/rankings/${ranking.slug}`} className="rounded-xl p-3 flex items-center justify-between" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
-                  <span className="text-[13px] font-semibold">{ranking.title}</span>
-                  <span className="text-[12px]" style={{ color: "#174ea6" }}>→</span>
-                </Link>
-              ))}
+            <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: "#174ea6" }}>Mundiales</div>
+            <h2 className="font-bebas text-[36px] leading-none mt-1">Rankings Mundialistas</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+              {world.map(challenge => <RankingCard key={challenge.id} href="/world-cups/top10" title={challenge.title} detail={`${challenge.period} · ${challenge.criterion}`} source={challenge.sourceName} tone="#174ea6" mark="WC" />)}
             </div>
           </div>
         </section>

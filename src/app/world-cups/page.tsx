@@ -17,10 +17,10 @@ type ModeCard = {
 };
 
 const modes: ModeCard[] = [
-  { href: "/world-cups/mundialdle", eyebrow: "Diario principal", title: "MUNDIALDLE", subtitle: "Pistas de Mundial, selección y club.", accent: "#174ea6", modeId: "mundialdle", mark: "WC", visual: "trophy" },
+  { href: "/world-cups/mundialdle", eyebrow: "Diario principal", title: "MUNDIALDLE", subtitle: "Pistas de Mundial, selección y club.", accent: "#174ea6", modeId: "mundialdle", mark: "🏆", visual: "trophy" },
   { href: "/world-cups/wordle", eyebrow: "Diario rápido", title: "WORDLE MUNDIAL", subtitle: "Apellido mundialista sin pistas.", accent: "#174ea6", modeId: "worldcup-wordle", mark: "ABC", visual: "wordle" },
   { href: "/world-cups/top10", eyebrow: "Ranking", title: "TOP10 MUNDIAL", subtitle: "Listas históricas del torneo.", accent: "#174ea6", modeId: "top10-mundial", mark: "10", visual: "podium" },
-  { href: "/world-cups/champions", eyebrow: "Archivo extra", title: "CAMPEONES", subtitle: "Sede, campeón y finalista.", accent: "#c8920a", modeId: "worldcup-champions", mark: "WIN", visual: "medals" },
+  { href: "/world-cups/champions", eyebrow: "Archivo extra", title: "CAMPEONES", subtitle: "Sede, campeón y finalista.", accent: "#c8920a", modeId: "worldcup-champions", mark: "1", visual: "medals" },
   { href: "/world-cups/camino", eyebrow: "Ruta", title: "CAMINO", subtitle: "Adivina la selección por sus rivales.", accent: "#c8920a", modeId: "camino-titulo", mark: "MAP", visual: "route" },
   { href: "/world-cups/final", eyebrow: "Finales", title: "FINAL MUNDIAL", subtitle: "Marcador, rivales y año.", accent: "#c8920a", modeId: "final-mundial", mark: "90", visual: "final" },
 ];
@@ -36,11 +36,7 @@ function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string
     );
   }
   if (type === "podium") {
-    return (
-      <div className="flex items-end gap-2 w-[110px] h-[64px]">
-        {[2, 1, 3].map((n, i) => <span key={n} className="flex-1 rounded-t-xl grid place-items-center font-bebas" style={{ height: [38, 58, 30][i], background: `${accent}${i === 1 ? "35" : "18"}`, color: accent }}>{n}</span>)}
-      </div>
-    );
+    return <div className="flex items-end gap-2 w-[110px] h-[64px]">{[2, 1, 3].map((n, i) => <span key={n} className="flex-1 rounded-t-xl grid place-items-center font-bebas" style={{ height: [38, 58, 30][i], background: `${accent}${i === 1 ? "35" : "18"}`, color: accent }}>{n}</span>)}</div>;
   }
   if (type === "route") {
     return (
@@ -65,7 +61,7 @@ function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string
   }
   return (
     <div className="fbl-mini-cromo grid h-[78px] w-[64px] place-items-center">
-      <span className="font-bebas text-[42px]" style={{ color: accent }}>🏆</span>
+      <span className="font-bebas text-[38px]" style={{ color: accent }}>🏆</span>
     </div>
   );
 }
@@ -96,7 +92,7 @@ function FutureCard({ title, subtitle, mark }: { title: string; subtitle: string
   return (
     <article className="fbl-card rounded-2xl p-4 min-h-[132px]" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
       <span className="fbl-visual-mark">{mark}</span>
-      <div className="relative z-10 text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>En reserva</div>
+      <div className="relative z-10 text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>Archivo futuro</div>
       <h2 className="relative z-10 font-bebas text-[30px] leading-none" style={{ color: "#18181b" }}>{title}</h2>
       <p className="relative z-10 text-[12px] mt-1 max-w-[250px]" style={{ color: "#6b6b72" }}>{subtitle}</p>
     </article>
@@ -125,7 +121,7 @@ export default function WorldCupsPage() {
             boxShadow: "0 18px 40px rgba(20,50,120,0.22)",
           }}
         >
-          <div className="absolute right-5 -top-8 hidden md:block font-bebas text-[170px] leading-none opacity-10">WC</div>
+          <div className="absolute right-5 -top-6 hidden md:block text-[150px] leading-none opacity-10">🏆</div>
           <div className="absolute right-8 bottom-4 hidden md:grid h-[112px] w-[92px] place-items-center rounded-3xl bg-white/10 border border-white/15">
             <div className="h-16 w-12 rounded-b-2xl rounded-t-full bg-white/18 border border-white/20" />
           </div>
@@ -135,7 +131,7 @@ export default function WorldCupsPage() {
             <p className="text-[15px] md:text-[18px] text-white/82 mt-3 max-w-2xl">Jugadores, finales, campeones y rutas mundialistas con estética de archivo FIFA y cromos Panini.</p>
             <div className="flex flex-wrap gap-3 mt-6">
               <Link href="/world-cups/mundialdle" className="rounded-2xl px-5 py-3 font-oswald font-semibold uppercase text-[13px]" style={{ background: "#ffd04a", color: "#151515" }}>Jugar Mundialdle</Link>
-              <Link href="/world-cups/top10" className="rounded-2xl px-5 py-3 font-oswald font-semibold uppercase text-[13px]" style={{ border: "1px solid rgba(255,255,255,0.35)", color: "white", background: "rgba(255,255,255,0.08)" }}>Ver Top10 Mundial</Link>
+              <Link href="/world-cups/top10" className="rounded-2xl px-5 py-3 font-oswald font-semibold uppercase text-[13px]" style={{ border: "1px solid rgba(255,255,255,0.35)", color: "white", background: "rgba(255,255,255,0.08)" }}>Top10 Mundial</Link>
             </div>
           </div>
         </section>
@@ -171,7 +167,7 @@ export default function WorldCupsPage() {
 
         <Link href="/world-cups/album" className="fbl-card rounded-2xl px-4 py-4 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
           <div className="flex items-center gap-3">
-            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center font-bebas text-[24px]" style={{ color: "#174ea6" }}>WC</span>
+            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center font-bebas text-[24px]" style={{ color: "#174ea6" }}>🏆</span>
             <div>
               <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Colección propia</div>
               <div className="font-bebas text-[30px] leading-none">Álbum Mundialista</div>

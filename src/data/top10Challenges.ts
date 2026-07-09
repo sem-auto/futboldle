@@ -7243,6 +7243,32 @@ function repairTop10Text(value: string) {
   return current;
 }
 
+function top10UnitFor(challenge: Top10Challenge) {
+  const text = repairTop10Text(`${challenge.id} ${challenge.title} ${challenge.criterion} ${challenge.category}`).toLowerCase();
+  if (text.includes("amarilla")) return "tarjetas amarillas";
+  if (text.includes("roja") || text.includes("expulsion") || text.includes("expulsión")) return "tarjetas rojas";
+  if (text.includes("porter") || text.includes("clean")) return "porterías a cero";
+  if (text.includes("asist")) return "asistencias";
+  if (text.includes("partido") || text.includes("aparicion") || text.includes("aparición")) return "partidos";
+  if (text.includes("penalti") || text.includes("penalt")) return "penaltis";
+  if (text.includes("minuto")) return "minutos";
+  if (text.includes("media") || text.includes("fifa")) return "media";
+  if (text.includes("joven") || text.includes("veteran") || text.includes("edad")) return "años";
+  return "goles";
+}
+
+function normalizeTop10Unit(challenge: Top10Challenge, answer: Top10Answer) {
+  if (typeof answer.value !== "number") return;
+  const unit = top10UnitFor(challenge);
+  const current = repairTop10Text(answer.detail || answer.label || "");
+  const currentUnit = current.replace(String(answer.value), "").trim();
+  if (!currentUnit || /goles?|asistencias?|partidos?|porter[ií]as|tarjetas?|rojas?|amarillas?|penaltis?|minutos?|media|años?/i.test(currentUnit)) {
+    const next = `${answer.value} ${unit}`;
+    answer.detail = next;
+    answer.label = next;
+  }
+}
+
 for (const challenge of top10Challenges) {
   challenge.kind = repairTop10Text(challenge.kind) as Top10Challenge["kind"];
   challenge.topType = repairTop10Text(challenge.topType) as Top10Challenge["topType"];
@@ -7263,6 +7289,7 @@ for (const challenge of top10Challenges) {
     answer.hintPosition = repairTop10Text(answer.hintPosition);
     answer.hintClub = repairTop10Text(answer.hintClub);
     answer.hintInitial = repairTop10Text(answer.hintInitial);
+    normalizeTop10Unit(challenge, answer);
   }
 }
 
