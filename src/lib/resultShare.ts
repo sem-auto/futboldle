@@ -19,6 +19,7 @@ export function shareGameResult(text: string, common: ShareCommon) {
   const normalizedBase = text
     .replace(/https?:\/\/futboldle\.(com|es)/g, FUTBOLDLE_URL)
     .replace(/https:\/\/futboldle-liard\.vercel\.app/g, FUTBOLDLE_URL);
+
   const normalized = normalizedBase.includes("¿Puedes superarme?")
     ? normalizedBase
     : normalizedBase.replace(FUTBOLDLE_URL, `¿Puedes superarme?\n${FUTBOLDLE_URL}`);

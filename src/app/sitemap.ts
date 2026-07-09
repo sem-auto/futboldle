@@ -1,15 +1,22 @@
 import type { MetadataRoute } from "next";
+import { seoClubs, seoNationalities, seoPlayers, seoPositions, seoRankings, seoSelections, seoWorldCups } from "@/lib/seoIndex";
 
 const SITE_URL = "https://futboldle.es";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
       lastModified: now,
       changeFrequency: "daily",
       priority: 1,
+    },
+    {
+      url: `${SITE_URL}/hoy`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.95,
     },
     {
       url: `${SITE_URL}/liga-bbva`,
@@ -48,6 +55,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: `${SITE_URL}/duelo-bbva`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.82,
+    },
+    {
       url: `${SITE_URL}/album`,
       lastModified: now,
       changeFrequency: "daily",
@@ -72,6 +85,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     { url: `${SITE_URL}/world-cups/wordle`, lastModified: now, changeFrequency: "daily", priority: 0.88 },
+    { url: `${SITE_URL}/world-cups/top10`, lastModified: now, changeFrequency: "daily", priority: 0.88 },
     { url: `${SITE_URL}/world-cups/album`, lastModified: now, changeFrequency: "daily", priority: 0.78 },
     { url: `${SITE_URL}/world-cups/final`, lastModified: now, changeFrequency: "daily", priority: 0.86 },
     { url: `${SITE_URL}/temporadas/liga-bbva`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
@@ -131,6 +145,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.76,
     },
     {
+      url: `${SITE_URL}/juego-hombres-bbva`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.78,
+    },
+    {
+      url: `${SITE_URL}/quiz-liga-bbva`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.76,
+    },
+    {
+      url: `${SITE_URL}/minijuegos-futbol`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.78,
+    },
+    {
       url: `${SITE_URL}/guias`,
       lastModified: now,
       changeFrequency: "weekly",
@@ -160,5 +192,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.5,
     },
+  ];
+
+  return [
+    ...staticPages,
+    ...seoPlayers.map(player => ({ url: `${SITE_URL}/jugadores/${player.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.62 })),
+    ...seoPlayers.map(player => ({ url: `${SITE_URL}/jugador/${player.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.66 })),
+    ...seoClubs.map(club => ({ url: `${SITE_URL}/clubes/${club.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
+    ...seoClubs.map(club => ({ url: `${SITE_URL}/club/${club.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.64 })),
+    ...seoWorldCups.map(worldCup => ({ url: `${SITE_URL}/mundial/${worldCup.year}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.62 })),
+    ...seoSelections.map(selection => ({ url: `${SITE_URL}/selecciones/${selection.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.56 })),
+    ...seoSelections.map(selection => ({ url: `${SITE_URL}/seleccion/${selection.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
+    ...seoNationalities.map(nationality => ({ url: `${SITE_URL}/nacionalidad/${nationality.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 })),
+    ...seoPositions.map(position => ({ url: `${SITE_URL}/posicion/${position.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 })),
+    ...seoRankings.map(ranking => ({ url: `${SITE_URL}/rankings/${ranking.slug}`, lastModified: now, changeFrequency: ranking.status === "published" ? "weekly" as const : "monthly" as const, priority: ranking.status === "published" ? 0.64 : 0.36 })),
+    ...seoRankings.map(ranking => ({ url: `${SITE_URL}/ranking/${ranking.slug}`, lastModified: now, changeFrequency: ranking.status === "published" ? "weekly" as const : "monthly" as const, priority: ranking.status === "published" ? 0.66 : 0.34 })),
   ];
 }

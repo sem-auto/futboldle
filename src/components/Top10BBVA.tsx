@@ -12,23 +12,10 @@ import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
 import { useCommunityDifficulty } from "@/lib/communityStats";
 import DataReportButton from "@/components/DataReportButton";
 import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
+import { foldAlias, matchesFootballAlias } from "@/lib/playerAliases";
 
 function norm(s: string) {
-  return s.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, "");
-}
-
-const TOP10_ALIASES: Record<string, string[]> = {
-  NAVAS: ["NAVAS"],
-  JOAQUIN: ["JOAQUIN", "JOAQUÍN"],
-  VALERON: ["VALERON", "VALERÓN"],
-  PAREJO: ["PAREJO"],
-  CAZORLA: ["CAZORLA"],
-  JUANFRAN: ["JUANFRAN"],
-};
-
-function answerAliases(answer: string) {
-  const normalized = norm(answer);
-  return TOP10_ALIASES[normalized] ?? [normalized];
+  return foldAlias(s);
 }
 
 interface SavedTop10 { date: string; challengeId: string; guessedAnswers: string[]; allGuesses: string[]; finished: boolean; surrendered: boolean; hintsUsed: number; }
@@ -114,7 +101,7 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
     const normAnswer = norm(answer);
     const newAll = [...allGuesses, normAnswer];
     setAllGuesses(newAll);
-    const hit = challenge.answers.find(a => norm(a.answer) === normAnswer);
+    const hit = challenge.answers.find(a => matchesFootballAlias(answer, [a.answer, a.displayName]));
     if (hit && !guessedAnswers.includes(norm(hit.answer))) {
       const newGuessed = [...guessedAnswers, norm(hit.answer)];
       setGuessedAnswers(newGuessed);
@@ -136,15 +123,16 @@ export default function Top10BBVA({ onBack }: { onBack: () => void }) {
   function submitQueryFromText() {
     const exactAlias = challenge.answers.find(item =>
       !guessedAnswers.includes(norm(item.answer)) &&
-      answerAliases(item.answer).some(alias => alias === norm(query))
+      matchesFootballAlias(query, [item.answer, item.displayName])
     );
     if (exactAlias) handleGuess(exactAlias.displayName, exactAlias.answer);
   }
 
 function submitPlayer(player: typeof bbvaPlayers[0]) {
     const exactName = challenge.answers.find(item =>
-      norm(item.displayName) === norm(player.displayName) ||
-      norm(item.displayName) === norm(player.fullName)
+      matchesFootballAlias(player.displayName, [item.answer, item.displayName]) ||
+      matchesFootballAlias(player.fullName, [item.answer, item.displayName]) ||
+      matchesFootballAlias(player.answer, [item.answer, item.displayName])
     );
     if (exactName) {
       handleGuess(exactName.displayName, exactName.answer);

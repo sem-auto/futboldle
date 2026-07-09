@@ -2,32 +2,104 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { mundialdleChallenges, worldCupChampionChallenges, worldCupPlayers } from "@/data/worldcups";
+import { mundialdleChallenges, worldCupChampionChallenges, worldCupPlayers, worldCupTop10Challenges } from "@/data/worldcups";
 import { trackEvent, trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 
-function ComingSoonCard({ title, subtitle }: { title: string; subtitle: string }) {
+type ModeCard = {
+  href: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  accent: string;
+  modeId: string;
+  mark: string;
+  visual: "trophy" | "wordle" | "podium" | "medals" | "route" | "final";
+};
+
+const modes: ModeCard[] = [
+  { href: "/world-cups/mundialdle", eyebrow: "Diario principal", title: "MUNDIALDLE", subtitle: "Pistas de Mundial, selección y club.", accent: "#174ea6", modeId: "mundialdle", mark: "WC", visual: "trophy" },
+  { href: "/world-cups/wordle", eyebrow: "Diario rápido", title: "WORDLE MUNDIAL", subtitle: "Apellido mundialista sin pistas.", accent: "#174ea6", modeId: "worldcup-wordle", mark: "ABC", visual: "wordle" },
+  { href: "/world-cups/top10", eyebrow: "Ranking", title: "TOP10 MUNDIAL", subtitle: "Listas históricas del torneo.", accent: "#174ea6", modeId: "top10-mundial", mark: "10", visual: "podium" },
+  { href: "/world-cups/champions", eyebrow: "Archivo extra", title: "CAMPEONES", subtitle: "Sede, campeón y finalista.", accent: "#c8920a", modeId: "worldcup-champions", mark: "WIN", visual: "medals" },
+  { href: "/world-cups/camino", eyebrow: "Ruta", title: "CAMINO", subtitle: "Adivina la selección por sus rivales.", accent: "#c8920a", modeId: "camino-titulo", mark: "MAP", visual: "route" },
+  { href: "/world-cups/final", eyebrow: "Finales", title: "FINAL MUNDIAL", subtitle: "Marcador, rivales y año.", accent: "#c8920a", modeId: "final-mundial", mark: "90", visual: "final" },
+];
+
+function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string }) {
+  if (type === "wordle") {
+    return (
+      <div className="grid grid-cols-4 gap-1 w-[92px]">
+        {["M", "U", "N", "D", "I", "A", "L", ""].map((letter, index) => (
+          <span key={index} className="grid h-8 place-items-center rounded-lg font-bebas text-[18px]" style={{ background: index < 5 ? `${accent}18` : "#f1eee7", color: index < 5 ? accent : "#aaa39a", border: `1px solid ${index < 5 ? `${accent}35` : "rgba(0,0,0,0.06)"}` }}>{letter}</span>
+        ))}
+      </div>
+    );
+  }
+  if (type === "podium") {
+    return (
+      <div className="flex items-end gap-2 w-[110px] h-[64px]">
+        {[2, 1, 3].map((n, i) => <span key={n} className="flex-1 rounded-t-xl grid place-items-center font-bebas" style={{ height: [38, 58, 30][i], background: `${accent}${i === 1 ? "35" : "18"}`, color: accent }}>{n}</span>)}
+      </div>
+    );
+  }
+  if (type === "route") {
+    return (
+      <div className="w-[118px]">
+        <div className="flex items-center justify-between">
+          {["A", "B", "C"].map(step => <span key={step} className="grid h-9 w-9 place-items-center rounded-full font-bebas" style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}35` }}>{step}</span>)}
+        </div>
+        <div className="h-4 fbl-route-line" />
+      </div>
+    );
+  }
+  if (type === "final") {
+    return (
+      <div className="rounded-xl px-3 py-2 w-[118px]" style={{ background: `${accent}10`, border: `1px solid ${accent}30` }}>
+        <div className="flex justify-between font-bebas text-[22px]" style={{ color: accent }}><span>2</span><span>1</span></div>
+        <div className="h-1 rounded-full mt-1" style={{ background: `${accent}30` }} />
+      </div>
+    );
+  }
+  if (type === "medals") {
+    return <div className="grid grid-cols-3 gap-2 w-[110px]">{["1", "2", "3"].map(n => <span key={n} className="grid h-12 place-items-center rounded-full font-bebas text-[22px]" style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}35` }}>{n}</span>)}</div>;
+  }
   return (
-    <article className="rounded-2xl p-4" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
-      <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>{"Pr\u00f3ximamente"}</div>
-      <h2 className="font-bebas text-[27px] leading-none" style={{ color: "#18181b" }}>{title}</h2>
-      <p className="text-[12px] mt-1" style={{ color: "#6b6b72" }}>{subtitle}</p>
-    </article>
+    <div className="fbl-mini-cromo grid h-[78px] w-[64px] place-items-center">
+      <span className="font-bebas text-[42px]" style={{ color: accent }}>🏆</span>
+    </div>
   );
 }
 
-function ActiveModeCard({ href, eyebrow, title, subtitle, accent, modeId }: { href: string; eyebrow: string; title: string; subtitle: string; accent: string; modeId: string }) {
+function ActiveModeCard({ card }: { card: ModeCard }) {
   return (
     <Link
-      href={href}
-      onClick={() => trackModeEntered(modeId, "world-cups", { source: "season_page" })}
-      className="rounded-2xl p-4 transition-transform active:scale-[0.99] h-full flex flex-col"
-      style={{ background: accent === "gold" ? "#fffaf0" : "#eef3ff", border: `1px solid ${accent === "gold" ? "rgba(200,146,10,0.26)" : "rgba(23,78,166,0.22)"}` }}
+      href={card.href}
+      onClick={() => trackModeEntered(card.modeId, "world-cups", { source: "season_page" })}
+      className="fbl-card rounded-2xl p-4 min-h-[206px] flex flex-col justify-between"
+      style={{ background: card.accent === "#174ea6" ? "linear-gradient(180deg,#eef3ff,#ffffff)" : "linear-gradient(180deg,#fffaf0,#ffffff)", border: `1px solid ${card.accent}2e` }}
     >
-      <div className="text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: accent === "gold" ? "#c8920a" : "#174ea6" }}>{eyebrow}</div>
-      <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#18181b" }}>{title}</h2>
-      <p className="text-[13px] mt-1" style={{ color: "#6b6b72" }}>{subtitle}</p>
-      <div className="mt-auto pt-4"><span className="inline-flex rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: accent === "gold" ? "#c8920a" : "#174ea6", color: "white" }}>Jugar {"\u2192"}</span></div>
+      <span className="fbl-visual-mark">{card.mark}</span>
+      <div className="relative z-10 flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: card.accent }}>{card.eyebrow}</div>
+          <h2 className="font-bebas text-[38px] leading-none mt-3" style={{ color: "#18181b" }}>{card.title}</h2>
+          <p className="text-[13px] mt-1 max-w-[190px]" style={{ color: "#615f67" }}>{card.subtitle}</p>
+        </div>
+        <CardVisual type={card.visual} accent={card.accent} />
+      </div>
+      <span className="relative z-10 mt-5 inline-flex w-fit rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: card.accent, color: "white" }}>Jugar →</span>
     </Link>
+  );
+}
+
+function FutureCard({ title, subtitle, mark }: { title: string; subtitle: string; mark: string }) {
+  return (
+    <article className="fbl-card rounded-2xl p-4 min-h-[132px]" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
+      <span className="fbl-visual-mark">{mark}</span>
+      <div className="relative z-10 text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>En reserva</div>
+      <h2 className="relative z-10 font-bebas text-[30px] leading-none" style={{ color: "#18181b" }}>{title}</h2>
+      <p className="relative z-10 text-[12px] mt-1 max-w-[250px]" style={{ color: "#6b6b72" }}>{subtitle}</p>
+    </article>
   );
 }
 
@@ -39,60 +111,79 @@ export default function WorldCupsPage() {
 
   return (
     <main className="min-h-dvh px-3 py-4" style={{ background: "#f6f2ea" }}>
-      <div className="max-w-4xl mx-auto flex flex-col gap-4">
+      <div className="max-w-6xl mx-auto flex flex-col gap-5">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>{"\u2190"} Volver</Link>
-          <span className="text-[10px] font-semibold px-3 py-1 rounded-full" style={{ background: "#eef3ff", color: "#174ea6", border: "1px solid rgba(23,78,166,0.18)" }}>Nueva temporada</span>
+          <Link href="/" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>← Volver</Link>
+          <span className="text-[10px] font-semibold px-3 py-1 rounded-full" style={{ background: "#eef3ff", color: "#174ea6", border: "1px solid rgba(23,78,166,0.18)" }}>Temporada activa</span>
         </div>
 
-        <section className="rounded-3xl overflow-hidden" style={{ background: "white", boxShadow: "0 12px 34px rgba(0,0,0,0.08)" }}>
-          <div className="px-5 py-6 md:px-7 md:py-7" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 mb-2">Temporada 2</div>
-            <h1 className="font-bebas text-[54px] md:text-[68px] leading-none">MUNDIALES</h1>
-            <p className="text-[15px] text-white/80 mt-1">2002-2026 {"\u00b7"} La primera expansi{"\u00f3"}n real de Futboldle.</p>
+        <section
+          className="relative rounded-[28px] overflow-hidden px-5 py-7 md:px-8 md:py-10"
+          style={{
+            background: "radial-gradient(circle at 86% 12%, rgba(255,255,255,0.18), transparent 18rem), linear-gradient(135deg,#174ea6 0%,#112b63 45%,#101827 100%)",
+            color: "white",
+            boxShadow: "0 18px 40px rgba(20,50,120,0.22)",
+          }}
+        >
+          <div className="absolute right-5 -top-8 hidden md:block font-bebas text-[170px] leading-none opacity-10">WC</div>
+          <div className="absolute right-8 bottom-4 hidden md:grid h-[112px] w-[92px] place-items-center rounded-3xl bg-white/10 border border-white/15">
+            <div className="h-16 w-12 rounded-b-2xl rounded-t-full bg-white/18 border border-white/20" />
           </div>
-
-          <div className="p-4 md:p-5 flex flex-col gap-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
-              <ActiveModeCard href="/world-cups/mundialdle" eyebrow="Jugable ahora" title="MUNDIALDLE" subtitle="Adivina el jugador mundialista con pistas progresivas." accent="blue" modeId="mundialdle" />
-              <ActiveModeCard href="/world-cups/wordle" eyebrow="Nuevo diario" title="WORDLE MUNDIAL" subtitle="Adivina el apellido sin pistas progresivas." accent="blue" modeId="worldcup-wordle" />
-              <ActiveModeCard href="/world-cups/champions" eyebrow="Nuevo juego" title="CAMPEONES" subtitle={"Te damos la sede. Adivina campe\u00f3n y finalista."} accent="gold" modeId="worldcup-champions" />
-              <ActiveModeCard href="/world-cups/camino" eyebrow="Nuevo juego" title="CAMINO" subtitle={"Adivina el campe\u00f3n por sus rivales."} accent="gold" modeId="camino-titulo" />
-              <ActiveModeCard href="/world-cups/final" eyebrow="Nuevo diario" title="FINAL MUNDIAL" subtitle="Reconoce la final y elige el ano correcto." accent="gold" modeId="final-mundial" />
-            </div>
-
-            <div className="rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.20)" }}>
-              <div>
-                <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Archivo mundialista</div>
-                <div className="text-[12px] mt-0.5" style={{ color: "#6b6b72" }}>Jugadores reconocibles y retos diarios sin datos de relleno.</div>
-              </div>
-              <div className="grid grid-cols-3 gap-5 sm:min-w-[280px]">
-                <div>
-                  <div className="font-bebas text-[28px] leading-none" style={{ color: "#18181b" }}>{worldCupPlayers.length}</div>
-                  <div className="text-[10px]" style={{ color: "#9a9a8a" }}>jugadores</div>
-                </div>
-                <div>
-                  <div className="font-bebas text-[28px] leading-none" style={{ color: "#18181b" }}>{mundialdleChallenges.length}</div>
-                  <div className="text-[10px]" style={{ color: "#9a9a8a" }}>retos</div>
-                </div>
-                <div>
-                  <div className="font-bebas text-[28px] leading-none" style={{ color: "#18181b" }}>{worldCupChampionChallenges.length}</div>
-                  <div className="text-[10px]" style={{ color: "#9a9a8a" }}>finales</div>
-                </div>
-              </div>
+          <div className="relative z-10 max-w-3xl">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/70">Temporada 2</div>
+            <h1 className="font-bebas text-[58px] md:text-[92px] leading-none mt-2">Mundiales 2002-2026</h1>
+            <p className="text-[15px] md:text-[18px] text-white/82 mt-3 max-w-2xl">Jugadores, finales, campeones y rutas mundialistas con estética de archivo FIFA y cromos Panini.</p>
+            <div className="flex flex-wrap gap-3 mt-6">
+              <Link href="/world-cups/mundialdle" className="rounded-2xl px-5 py-3 font-oswald font-semibold uppercase text-[13px]" style={{ background: "#ffd04a", color: "#151515" }}>Jugar Mundialdle</Link>
+              <Link href="/world-cups/top10" className="rounded-2xl px-5 py-3 font-oswald font-semibold uppercase text-[13px]" style={{ border: "1px solid rgba(255,255,255,0.35)", color: "white", background: "rgba(255,255,255,0.08)" }}>Ver Top10 Mundial</Link>
             </div>
           </div>
         </section>
 
-        <Link href="/world-cups/album" className="rounded-2xl px-4 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
-          <div><div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Colección propia</div><div className="font-bebas text-[26px] leading-none">ALBUM MUNDIALISTA</div></div>
-          <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>Ver cromos {"\u2192"}</span>
+        <section className="rounded-[24px] p-4 md:p-5" style={{ background: "white", border: "1px solid rgba(0,0,0,0.06)", boxShadow: "0 10px 28px rgba(0,0,0,0.07)" }}>
+          <div className="flex items-end justify-between gap-3 mb-4">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#174ea6" }}>Retos mundialistas</div>
+              <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#151515" }}>Juegos Mundiales</h2>
+            </div>
+            <span className="hidden sm:inline-flex text-[11px] font-semibold px-3 py-1 rounded-full" style={{ color: "#174ea6", background: "#eef3ff" }}>
+              Mundialdle · Wordle · Top10 · Finales
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {modes.map(card => <ActiveModeCard key={card.href} card={card} />)}
+          </div>
+        </section>
+
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: "Jugadores", value: worldCupPlayers.length },
+            { label: "Retos", value: mundialdleChallenges.length + worldCupTop10Challenges.length },
+            { label: "Finales", value: worldCupChampionChallenges.length },
+            { label: "Periodo", value: "2002-2026" },
+          ].map(item => (
+            <div key={item.label} className="rounded-2xl p-4" style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.20)" }}>
+              <div className="text-[9px] uppercase tracking-[0.2em] font-semibold" style={{ color: "#174ea6" }}>{item.label}</div>
+              <div className="font-bebas text-[34px] leading-none mt-2" style={{ color: "#151515" }}>{item.value}</div>
+            </div>
+          ))}
+        </section>
+
+        <Link href="/world-cups/album" className="fbl-card rounded-2xl px-4 py-4 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
+          <div className="flex items-center gap-3">
+            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center font-bebas text-[24px]" style={{ color: "#174ea6" }}>WC</span>
+            <div>
+              <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Colección propia</div>
+              <div className="font-bebas text-[30px] leading-none">Álbum Mundialista</div>
+            </div>
+          </div>
+          <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>Ver cromos →</span>
         </Link>
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <ComingSoonCard title="Cromo Mundial" subtitle="Revela al jugador como un cromo Panini." />
-          <ComingSoonCard title={"Grupos M\u00edticos"} subtitle={"Recuerda fases de grupos hist\u00f3ricas."} />
-          <ComingSoonCard title="Finales" subtitle="Momentos y goleadores de finales." />
+          <FutureCard title="Cromo Mundial" subtitle="Revela al jugador como cromo Panini." mark="CARD" />
+          <FutureCard title="Grupos Míticos" subtitle="Recuerda fases de grupos históricas." mark="GRP" />
+          <FutureCard title="Más Top10" subtitle="Defensas goleadores, porterías y asistencias." mark="TOP" />
         </section>
       </div>
     </main>

@@ -13,6 +13,8 @@ import OnceBBVA from "@/components/OnceBBVA";
 import QuienFaltaBBVA from "@/components/QuienFaltaBBVA";
 import StatdleBBVA from "@/components/StatdleBBVA";
 import Mundialdle from "@/components/Mundialdle";
+import Top10Mundial from "@/components/Top10Mundial";
+import DueloNostalgia from "@/components/DueloNostalgia";
 import IconUnlockToast from "@/components/IconUnlockToast";
 import { MobileAdBanner, SidebarAds } from "@/components/PromoBanner";
 import { getDayNumber, getDayKey } from "@/lib/daily";
@@ -25,9 +27,9 @@ import { getDailyStatdleChallenge } from "@/data/statdleChallenges";
 import { seasons } from "@/data/product";
 import { trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 import { getWorldCupAlbum } from "@/lib/worldCupCollection";
-import { getDailyMundialdleChallenge, worldCupPlayers } from "@/data/worldcups";
+import { getDailyMundialdleChallenge, getDailyWorldCupTop10, worldCupPlayers } from "@/data/worldcups";
 
-type View = "home" | "wordle" | "trayectoria" | "top10" | "crack" | "statdle" | "mundialdle" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "once" | "quienFalta";
+type View = "home" | "wordle" | "trayectoria" | "top10" | "top10Mundial" | "crack" | "statdle" | "mundialdle" | "album" | "jugoAqui" | "fichaje" | "clubOculto" | "duelo" | "once" | "quienFalta";
 
 const BBVA_PHRASES = [
   "¿Te acuerdas de Apoño?",
@@ -53,6 +55,8 @@ function useDailyStatus() {
   const [statdleWon, setStatdleWon] = useState(false);
   const [mundialdleDone, setMundialdleDone] = useState(false);
   const [mundialdleWon, setMundialdleWon] = useState(false);
+  const [top10MundialDone, setTop10MundialDone] = useState(false);
+  const [top10MundialWon, setTop10MundialWon] = useState(false);
 
   useEffect(() => {
     const key = getDayKey();
@@ -107,9 +111,18 @@ function useDailyStatus() {
       const mundialdle = localStorage.getItem(`fbl-mundialdle-done-${key}`);
       if (mundialdle) { setMundialdleDone(true); setMundialdleWon(mundialdle === "won"); }
     } catch {}
+    try {
+      const challenge = getDailyWorldCupTop10(getDayNumber());
+      const saved = JSON.parse(localStorage.getItem(`fbl-wc-top10-${key}-${challenge.id}`) ?? "null");
+      if (saved?.finished) {
+        const guessed = Array.isArray(saved.guessed) ? saved.guessed.length : 0;
+        setTop10MundialDone(true);
+        setTop10MundialWon(guessed >= challenge.answers.length);
+      }
+    } catch {}
   }, []);
 
-  return { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon, mundialdleDone, mundialdleWon };
+  return { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon, mundialdleDone, mundialdleWon, top10MundialDone, top10MundialWon };
 }
 
 /* ─── Header ─── */
@@ -176,11 +189,7 @@ type DifficultyInfo = { label: string; completion: number; attempts?: number | n
 
 function DifficultyLine({ label, completion, color, attempts, sample, real }: DifficultyInfo & { color: string }) {
   if (!real) {
-    return (
-      <div className="mt-2 text-[9px] font-semibold px-2 py-1 rounded-lg text-center" style={{ background: `${color}10`, color }}>
-        Estadísticas en construcción
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -430,16 +439,38 @@ function QuickGameCard({ title, subtitle, emoji, accent, onClick }: {
   accent: string;
   onClick: () => void;
 }) {
+  const visual = title.includes("STATDLE")
+    ? { mark: "ST", chips: ["PJ", "G", "%"] }
+    : title.includes("JUGO") || title.includes("JUGÓ")
+      ? { mark: "OK", chips: ["CLUB", "SI", "NO"] }
+      : title.includes("FICHAJE")
+        ? { mark: "DOC", chips: ["FIRMA", "RUMOR", "OK"] }
+        : title.includes("CLUB")
+          ? { mark: "ESC", chips: ["1", "2", "?"] }
+          : title.includes("DUELO")
+            ? { mark: "VS", chips: ["A", "VS", "B"] }
+            : { mark: "F", chips: ["BBVA", "?", "!"] };
+
   return (
     <button onClick={onClick}
-      className="w-full text-left rounded-2xl overflow-hidden transition-transform active:scale-[0.98]"
+      className="fbl-card group w-full text-left rounded-2xl overflow-hidden transition-transform active:scale-[0.98]"
       style={{ background: "white", border: `1px solid ${accent}33`, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}>
       <div className="h-[3px]" style={{ background: accent }} />
-      <div className="px-2.5 py-2.5 sm:px-3 sm:py-3">
+      <span className="fbl-visual-mark right-2 top-4 text-[46px] sm:text-[56px] group-hover:scale-105">{visual.mark}</span>
+      <div className="relative z-10 px-2.5 py-2.5 sm:px-3 sm:py-3">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <span className="text-[20px] sm:text-[23px] leading-none">{emoji}</span>
+          <span className="grid h-8 w-8 place-items-center rounded-xl text-[18px] sm:h-9 sm:w-9 sm:text-[20px] leading-none"
+            style={{ background: `${accent}12`, color: accent, border: `1px solid ${accent}24` }}>{emoji}</span>
           <span className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
             style={{ background: `${accent}12`, color: accent }}>Extra</span>
+        </div>
+        <div className="mb-2 grid grid-cols-3 gap-1">
+          {visual.chips.map((chip, index) => (
+            <span key={`${title}-${chip}-${index}`} className="rounded-md px-1.5 py-1 text-center text-[7px] font-bold uppercase tracking-[0.08em]"
+              style={{ background: index === 1 ? `${accent}20` : "#f5f1ea", color: index === 1 ? accent : "#9a9a8a", border: `1px solid ${index === 1 ? `${accent}28` : "rgba(0,0,0,0.06)"}` }}>
+              {chip}
+            </span>
+          ))}
         </div>
         <div className="font-bebas text-[15px] sm:text-[18px] md:text-[19px] leading-none" style={{ color: "#18181b" }}>{title}</div>
         <div className="text-[9px] sm:text-[10px] leading-snug mt-0.5 min-h-[24px]" style={{ color: "#9a9a8a" }}>{subtitle}</div>
@@ -619,6 +650,15 @@ function dailyShareSquare(done: boolean, won: boolean) {
   return won ? "\ud83d\udfe9" : "\ud83d\udfe5";
 }
 
+function simpleSlug(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function ProfileCompact({ played, won, streak, bestStreak, albumProgress, onAlbum }: {
   played: number;
   won: number;
@@ -704,11 +744,167 @@ function ProfileCompact({ played, won, streak, bestStreak, albumProgress, onAlbu
   );
 }
 
+function ProductHero({ onStart, onShare }: {
+  completed: number;
+  total: number;
+  streak: number;
+  cards: number;
+  worldCards: number;
+  onStart: () => void;
+  onShare: () => void;
+}) {
+  return (
+    <section className="rounded-3xl overflow-hidden" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 8px 24px rgba(0,0,0,0.07)" }}>
+      <div className="relative px-4 py-3.5 md:px-5 md:py-4 overflow-hidden" style={{ background: "linear-gradient(135deg,#18181b 0%,#2a1b12 58%,#c8920a 150%)", color: "white" }}>
+        <div className="absolute -right-4 -top-10 font-bebas text-[96px] md:text-[128px] leading-none text-white/5">F</div>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <div className="text-[9px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#fac840" }}>Juegos diarios de fútbol</div>
+            <h1 className="font-bebas text-[34px] md:text-[44px] leading-none mt-1">FUTBOLDLE</h1>
+            <p className="text-[11px] md:text-[12px] text-white/75 mt-1 max-w-xl">Liga BBVA y Mundiales. Adivina jugadores, completa retos y desbloquea cromos cada día.</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={onStart} className="font-oswald font-semibold uppercase tracking-wider text-[11px] px-4 py-2.5 rounded-xl" style={{ background: "#fac840", color: "#18181b" }}>Jugar ahora</button>
+            <button onClick={onShare} className="font-oswald font-semibold uppercase tracking-wider text-[11px] px-4 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.12)", color: "white", border: "1px solid rgba(255,255,255,0.18)" }}>Compartir</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Top10MundialHomeCard({ onClick, done, won, difficulty }: { onClick: () => void; done: boolean; won: boolean; difficulty: DifficultyInfo }) {
+  return (
+    <button onClick={onClick}
+      className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
+      style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(23,78,166,0.24)", display: "flex", flexDirection: "column" }}>
+      <div className="h-[3px]" style={{ background: "#174ea6" }}/>
+      <div className="px-3 md:px-4 py-3 md:py-4 flex flex-col flex-1">
+        <div className="flex items-start justify-between mb-2">
+          <div className="text-[25px] md:text-[30px] leading-none">🌍</div>
+          <div className="flex items-center gap-1">
+            <div className="text-[8px] font-semibold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(23,78,166,0.10)", color: "#174ea6" }}>Nuevo</div>
+            <GamePill done={done} won={won} />
+          </div>
+        </div>
+        <PodiumDeco />
+        <div className="font-bebas text-[17px] md:text-[18px] leading-none mt-1.5 md:mt-2 mb-0.5" style={{ color: "#18181b" }}>TOP10 MUNDIAL</div>
+        <div className="text-[10px] leading-snug flex-1" style={{ color: "#9a9a8a" }}>Rankings históricos de Mundiales</div>
+        <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#174ea6" }}>{done ? "VER RESULTADO →" : "INTENTAR →"}</div>
+        <DifficultyLine {...difficulty} color="#174ea6" />
+      </div>
+    </button>
+  );
+}
+
+function DailyMissionPanel({ wordleDone, mundialDone, anyCardUnlocked }: { wordleDone: boolean; mundialDone: boolean; anyCardUnlocked: boolean }) {
+  const items = [
+    { label: "Completa Wordle BBVA", done: wordleDone },
+    { label: "Juega un reto Mundial", done: mundialDone },
+    { label: "Desbloquea 1 cromo", done: anyCardUnlocked },
+  ];
+  const completed = items.filter(item => item.done).length;
+  return (
+    <section className="rounded-2xl px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.22)" }}>
+      <div>
+        <div className="text-[8px] uppercase font-semibold tracking-[0.18em]" style={{ color: "#c8920a" }}>Misión diaria</div>
+        <div className="font-bebas text-[24px] leading-none mt-1" style={{ color: "#18181b" }}>{completed}/3 completada</div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {items.map(item => (
+          <span key={item.label} className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: item.done ? "#f0faf2" : "white", color: item.done ? "#1e6b2e" : "#6b6b72", border: "1px solid rgba(0,0,0,0.07)" }}>
+            {item.done ? "✓" : "○"} {item.label}
+          </span>
+        ))}
+      </div>
+      <div className="text-[10px] font-semibold whitespace-nowrap" style={{ color: "#c8920a" }}>+50 XP · cromo extra</div>
+    </section>
+  );
+}
+
+function DiscoveryStrip({ playerName, rankingTitle, rankingHref }: { playerName: string; rankingTitle: string; rankingHref: string }) {
+  return (
+    <section className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <Link href={`/jugador/${simpleSlug(playerName)}`} className="rounded-2xl px-3 py-3" style={{ background: "white", border: "1px solid rgba(0,0,0,0.07)" }}>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#9a9a8a" }}>Jugador del dia</div>
+        <div className="font-bebas text-[23px] leading-none mt-1" style={{ color: "#18181b" }}>{playerName}</div>
+        <div className="text-[10px] mt-1" style={{ color: "#6b6b72" }}>Perfil, cromos y juegos</div>
+      </Link>
+      <Link href={rankingHref} className="rounded-2xl px-3 py-3" style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.16)" }}>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#174ea6" }}>Ranking destacado</div>
+        <div className="font-bebas text-[23px] leading-none mt-1" style={{ color: "#18181b" }}>{rankingTitle}</div>
+        <div className="text-[10px] mt-1" style={{ color: "#6b6b72" }}>Tabla, fuente y reto relacionado</div>
+      </Link>
+      <Link href="/que-son-los-hombres-bbva" className="rounded-2xl px-3 py-3" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.18)" }}>
+        <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#c8920a" }}>Pregunta curiosa</div>
+        <div className="font-bebas text-[23px] leading-none mt-1" style={{ color: "#18181b" }}>Que es un Hombre BBVA?</div>
+        <div className="text-[10px] mt-1" style={{ color: "#6b6b72" }}>Origen, ejemplos y nostalgia</div>
+      </Link>
+    </section>
+  );
+}
+
+function NextStepPanel({ pending, nextLabel, onNext, albumProgress, worldCards }: {
+  pending: number;
+  nextLabel: string;
+  onNext: () => void;
+  albumProgress: { unlockedCount: number; total: number; percent: number };
+  worldCards: number;
+}) {
+  const nextRewardAt = [10, 25, 50, 100, 150, 200, albumProgress.total].find(goal => albumProgress.unlockedCount < goal) ?? albumProgress.total;
+  const cardsToReward = Math.max(0, nextRewardAt - albumProgress.unlockedCount);
+  return (
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-2">
+      <button onClick={onNext} className="md:col-span-2 text-left rounded-2xl px-4 py-3" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.22)" }}>
+        <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>{pending > 0 ? "Siguiente reto" : "Una más"}</div>
+        <div className="font-bebas text-[28px] leading-none mt-1" style={{ color: "#18181b" }}>{pending > 0 ? `Te queda ${pending} reto${pending === 1 ? "" : "s"}` : "Juega un extra de nostalgia"}</div>
+        <div className="text-[11px] mt-1" style={{ color: "#6b6b72" }}>{nextLabel}</div>
+      </button>
+      <Link href="/progreso" className="rounded-2xl px-4 py-3" style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.18)" }}>
+        <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#174ea6" }}>Colección</div>
+        <div className="font-bebas text-[28px] leading-none mt-1" style={{ color: "#18181b" }}>{albumProgress.percent}% BBVA</div>
+        <div className="text-[11px] mt-1" style={{ color: "#6b6b72" }}>🎁 Especial en {cardsToReward} cromos · 🌍 {worldCards} mundialistas</div>
+      </Link>
+    </section>
+  );
+}
+
+function CommunityPulse({ items }: { items: Array<{ name: string; stats: DifficultyInfo; color: string }> }) {
+  const realItems = items.filter(item => item.stats.real && (item.stats.sample ?? 0) >= 5);
+  if (realItems.length === 0) return null;
+  const hardest = [...realItems].sort((a, b) => a.stats.completion - b.stats.completion)[0];
+  const mostPlayed = [...realItems].sort((a, b) => (b.stats.sample ?? 0) - (a.stats.sample ?? 0))[0];
+  return (
+    <section className="rounded-2xl px-3 py-3 md:px-4" style={{ background: "rgba(255,255,255,0.72)", border: "1px solid rgba(0,0,0,0.07)" }}>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Comunidad</div>
+          <h3 className="font-bebas text-[22px] leading-none" style={{ color: "#18181b" }}>HOY SE ESTÁ JUGANDO</h3>
+        </div>
+        <Link href="/admin/community" className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Datos reales</Link>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-xl px-3 py-2" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.18)" }}>
+          <div className="text-[8px] uppercase font-semibold tracking-[0.14em]" style={{ color: "#c8920a" }}>Reto más duro</div>
+          <div className="font-bebas text-[22px] leading-none mt-1" style={{ color: "#18181b" }}>{hardest.name}</div>
+          <div className="text-[10px]" style={{ color: "#6b6b72" }}>Solo {hardest.stats.completion}% lo completan</div>
+        </div>
+        <div className="rounded-xl px-3 py-2" style={{ background: "#eef3ff", border: "1px solid rgba(23,78,166,0.18)" }}>
+          <div className="text-[8px] uppercase font-semibold tracking-[0.14em]" style={{ color: "#174ea6" }}>Más jugado</div>
+          <div className="font-bebas text-[22px] leading-none mt-1" style={{ color: "#18181b" }}>{mostPlayed.name}</div>
+          <div className="text-[10px]" style={{ color: "#6b6b72" }}>{mostPlayed.stats.sample} partidas registradas</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   const [view, setView] = useState<View>("home");
   const [albumProgress, setAlbumProgress] = useState({ unlockedCount: 0, total: 0, percent: 0 });
   const [worldCupProgress, setWorldCupProgress] = useState({ unlocked: 0, latest: "" });
-  const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon, mundialdleDone, mundialdleWon } = useDailyStatus();
+  const { wordleDone, wordleWon, extras, trayDone, trayWon, top10Done, top10Won, crackDone, crackWon, statdleDone, statdleWon, mundialdleDone, mundialdleWon, top10MundialDone, top10MundialWon } = useDailyStatus();
   const { stats, refresh } = useStats();
   const goHome = () => setView("home");
   const hasShareableResult = wordleDone || trayDone || top10Done || crackDone || statdleDone || mundialdleDone;
@@ -718,6 +914,28 @@ export default function HomePage() {
   const crackDifficulty = useCommunityDifficulty("crack", `crack-${getDayKey()}`);
   const statdleDifficulty = useCommunityDifficulty("statdle", getDailyStatdleChallenge(getDayNumber()).id);
   const mundialdleDifficulty = useCommunityDifficulty("mundialdle", getDailyMundialdleChallenge(getDayNumber()).id);
+  const top10MundialDifficulty = useCommunityDifficulty("top10-mundial", getDailyWorldCupTop10(getDayNumber()).id);
+  const discoveryPlayer = worldCupPlayers.find(player => player.id === getDailyMundialdleChallenge(getDayNumber()).playerId)?.name ?? "David Villa";
+  const discoveryRanking = getDailyWorldCupTop10(getDayNumber()).title.replace("Máximos ", "");
+  const dailyGames = [
+    { done: wordleDone, won: wordleWon, label: "Wordle BBVA", view: "wordle" as View, modeId: "wordle-bbva", seasonId: "bbva" },
+    { done: trayDone, won: trayWon, label: "Trayectoria BBVA", view: "trayectoria" as View, modeId: "trayectoria-bbva", seasonId: "bbva" },
+    { done: top10Done, won: top10Won, label: "Top10 BBVA", view: "top10" as View, modeId: "top10-bbva", seasonId: "bbva" },
+    { done: mundialdleDone, won: mundialdleWon, label: "Mundialdle", view: "mundialdle" as View, modeId: "mundialdle", seasonId: "world-cups" },
+    { done: top10MundialDone, won: top10MundialWon, label: "Top10 Mundial", view: "top10Mundial" as View, modeId: "top10-mundial", seasonId: "world-cups" },
+    { done: crackDone, won: crackWon, label: "Cromo Oculto", view: "crack" as View, modeId: "cromo-oculto", seasonId: "bbva" },
+  ];
+  const completedDaily = dailyGames.filter(game => game.done && game.won).length;
+  const pendingDaily = dailyGames.filter(game => !game.done).length;
+  const nextGame = dailyGames.find(game => !game.done) ?? { label: "Duelo Nostalgia", view: "duelo" as View, modeId: "duelo-nostalgia", seasonId: "bbva" };
+  const communityItems = [
+    { name: "Wordle", stats: wordleDifficulty, color: "#c8920a" },
+    { name: "Trayectoria", stats: trayDifficulty, color: "#1e6b2e" },
+    { name: "Top10", stats: top10Difficulty, color: "#1a4fa0" },
+    { name: "Mundialdle", stats: mundialdleDifficulty, color: "#174ea6" },
+    { name: "Top10 Mundial", stats: top10MundialDifficulty, color: "#174ea6" },
+    { name: "Cromo", stats: crackDifficulty, color: "#7c3aed" },
+  ];
 
   function openMode(nextView: View, modeId: string, seasonId = "bbva") {
     trackModeEntered(modeId, seasonId, { source: "home" });
@@ -741,8 +959,8 @@ export default function HomePage() {
         if (card?.name && card?.rarity) lastCard = `\n🎴 Último cromo: ${card.name} (${card.rarity})`;
       }
     } catch {}
-    const completedCount = [wordleDone && wordleWon, trayDone && trayWon, top10Done && top10Won, crackDone && crackWon, statdleDone && statdleWon, mundialdleDone && mundialdleWon].filter(Boolean).length;
-    const failedCount = [wordleDone && !wordleWon, trayDone && !trayWon, top10Done && !top10Won, crackDone && !crackWon, statdleDone && !statdleWon, mundialdleDone && !mundialdleWon].filter(Boolean).length;
+    const completedCount = [wordleDone && wordleWon, trayDone && trayWon, top10Done && top10Won, crackDone && crackWon, mundialdleDone && mundialdleWon, top10MundialDone && top10MundialWon].filter(Boolean).length;
+    const failedCount = [wordleDone && !wordleWon, trayDone && !trayWon, top10Done && !top10Won, crackDone && !crackWon, mundialdleDone && !mundialdleWon, top10MundialDone && !top10MundialWon].filter(Boolean).length;
     const lines = [
       "\u26bd Futboldle #" + getDayNumber(),
       "Minijuegos diarios de fútbol nostalgia",
@@ -752,8 +970,8 @@ export default function HomePage() {
       dailyShareSquare(trayDone, trayWon) + " Trayectoria BBVA",
       dailyShareSquare(top10Done, top10Won) + " Top10 BBVA",
       dailyShareSquare(crackDone, crackWon) + " Cromo oculto",
-      dailyShareSquare(statdleDone, statdleWon) + " Statdle BBVA",
       dailyShareSquare(mundialdleDone, mundialdleWon) + " Mundialdle",
+      dailyShareSquare(top10MundialDone, top10MundialWon) + " Top10 Mundial",
       "",
       "🔥 Hoy: " + completedCount + "/6 retos",
       failedCount > 0 ? "💥 Fallados: " + failedCount : "✅ Sin fallos",
@@ -807,6 +1025,17 @@ export default function HomePage() {
       <Header onLogoClick={goHome} />
       <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
         <Mundialdle onBack={goHome} />
+      </main>
+    </div>
+  );
+
+  if (view === "top10Mundial") return (
+    <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
+      <SidebarAds />
+      <IconUnlockToast />
+      <Header onLogoClick={goHome} />
+      <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
+        <Top10Mundial onBack={goHome} />
       </main>
     </div>
   );
@@ -866,6 +1095,17 @@ export default function HomePage() {
     </div>
   );
 
+  if (view === "duelo") return (
+    <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
+      <SidebarAds />
+      <IconUnlockToast />
+      <Header onLogoClick={goHome} />
+      <main className="max-w-lg mx-auto px-3 md:px-4 py-3 md:py-5 overflow-x-hidden">
+        <DueloNostalgia onBack={goHome} />
+      </main>
+    </div>
+  );
+
   if (view === "once") return (
     <div className="min-h-dvh" style={{ background: "#f6f2ea" }}>
       <SidebarAds />
@@ -906,6 +1146,16 @@ export default function HomePage() {
       <Header onLogoClick={goHome} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-3 md:px-4 py-2.5 md:py-5 flex flex-col gap-2.5 md:gap-4 overflow-x-hidden">
+
+        <ProductHero
+          completed={completedDaily}
+          total={dailyGames.length}
+          streak={stats.streak}
+          cards={albumProgress.unlockedCount}
+          worldCards={worldCupProgress.unlocked}
+          onStart={() => openMode(nextGame.view, nextGame.modeId, nextGame.seasonId)}
+          onShare={shareDailyResult}
+        />
 
         <div className="flex items-center justify-between gap-2">
           <div>
@@ -950,8 +1200,8 @@ export default function HomePage() {
               <DifficultyLine {...top10Difficulty} color="#1a4fa0" />
             </div>
           </button>
-          <StatdleCard onClick={() => openMode("statdle", "statdle-bbva")} done={statdleDone} won={statdleWon} difficulty={statdleDifficulty} />
           <MundialdleHomeCard onClick={() => openMode("mundialdle", "mundialdle", "world-cups")} done={mundialdleDone} won={mundialdleWon} difficulty={mundialdleDifficulty} />
+          <Top10MundialHomeCard onClick={() => openMode("top10Mundial", "top10-mundial", "world-cups")} done={top10MundialDone} won={top10MundialWon} difficulty={top10MundialDifficulty} />
           <button onClick={() => openMode("crack", "cromo-oculto")}
             className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
             style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(124,58,237,0.20)", display: "flex", flexDirection: "column" }}>
@@ -974,16 +1224,38 @@ export default function HomePage() {
           </button>
         </div>
 
-        <Link href="/world-cups" onClick={() => trackSeasonEntered("world-cups", { source: "home_featured" })} className="rounded-2xl px-4 py-3 flex items-center justify-between gap-4 overflow-hidden relative" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white", boxShadow: "0 6px 18px rgba(23,78,166,0.18)" }}>
-          <div className="relative z-10"><div className="text-[8px] uppercase font-semibold tracking-[0.2em] text-white/65">Temporada Mundiales</div><div className="font-bebas text-[27px] leading-none mt-1">5 RETOS MUNDIALISTAS</div><div className="text-[10px] text-white/75 mt-1">Mundialdle, Wordle, Campeones, Camino y Final Mundial</div></div>
-          <div className="relative z-10 rounded-full px-3 py-2 text-[10px] font-semibold whitespace-nowrap" style={{ background: "#f8c647", color: "#18181b" }}>Entrar {"\u2192"}</div>
-          <div className="absolute right-24 -top-8 font-bebas text-[100px] leading-none text-white/5">WC</div>
-        </Link>
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
+          <Link href="/liga-bbva" onClick={() => trackSeasonEntered("bbva", { source: "home_season_choice" })} className="rounded-2xl px-4 py-3 flex items-center justify-between gap-4 overflow-hidden relative" style={{ background: "linear-gradient(135deg,#fff8e6,#ffffff)", color: "#18181b", border: "1px solid rgba(200,146,10,0.24)" }}>
+            <div className="relative z-10">
+              <div className="text-[8px] uppercase font-semibold tracking-[0.2em]" style={{ color: "#c8920a" }}>Temporada principal</div>
+              <div className="font-bebas text-[28px] leading-none mt-1">LIGA BBVA</div>
+              <div className="text-[10px] mt-1" style={{ color: "#6b6b72" }}>Wordle, trayectorias, Top10 y duelos de 2005-2016.</div>
+            </div>
+            <div className="relative z-10 rounded-full px-3 py-2 text-[10px] font-semibold whitespace-nowrap" style={{ background: "#18181b", color: "white" }}>Entrar →</div>
+          </Link>
+          <Link href="/world-cups" onClick={() => trackSeasonEntered("world-cups", { source: "home_season_choice" })} className="rounded-2xl px-4 py-3 flex items-center justify-between gap-4 overflow-hidden relative" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white", boxShadow: "0 6px 18px rgba(23,78,166,0.14)" }}>
+            <div className="relative z-10">
+              <div className="text-[8px] uppercase font-semibold tracking-[0.2em] text-white/65">Temporada Mundiales</div>
+              <div className="font-bebas text-[28px] leading-none mt-1">RETOS MUNDIALISTAS</div>
+              <div className="text-[10px] text-white/75 mt-1">Mundialdle, Wordle, Top10, campeones y finales.</div>
+            </div>
+            <div className="relative z-10 rounded-full px-3 py-2 text-[10px] font-semibold whitespace-nowrap" style={{ background: "#f8c647", color: "#18181b" }}>Entrar →</div>
+            <div className="absolute right-16 -top-8 font-bebas text-[100px] leading-none text-white/5">WC</div>
+          </Link>
+        </section>
+
+        <DailyMissionPanel
+          wordleDone={wordleDone && wordleWon}
+          mundialDone={(mundialdleDone && mundialdleWon) || (top10MundialDone && top10MundialWon)}
+          anyCardUnlocked={albumProgress.unlockedCount + worldCupProgress.unlocked > 0}
+        />
 
         <Link href="/progreso" className="rounded-xl px-3 py-2 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.72)", border: "1px solid rgba(0,0,0,0.07)" }}>
           <div className="flex items-center gap-3 text-[10px] font-semibold"><span style={{ color: "#c8920a" }}>BBVA {albumProgress.unlockedCount}/{albumProgress.total}</span><span style={{ color: "#174ea6" }}>Mundiales {worldCupProgress.unlocked}/{worldCupPlayers.length}</span></div>
           <div className="text-[9px] truncate" style={{ color: "#9a9a8a" }}>{worldCupProgress.latest ? `Ultimo: ${worldCupProgress.latest}` : "Ver progreso"}</div>
         </Link>
+
+        <DiscoveryStrip playerName={discoveryPlayer} rankingTitle={discoveryRanking} rankingHref="/world-cups/top10" />
 
         <MobileAdBanner slot={0} />
 
@@ -996,10 +1268,12 @@ export default function HomePage() {
             </div>
             <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Retos extra</div>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <QuickGameCard title="STATDLE BBVA" subtitle="Adivina por estadísticas de temporada." emoji="📊" accent="#18181b" onClick={() => openMode("statdle", "statdle-bbva")} />
             <QuickGameCard title="¿JUGÓ AQUÍ?" subtitle="Jugador y club. ¿Verdad o trampa?" emoji="✅" accent="#1e6b2e" onClick={() => openMode("jugoAqui", "jugo-aqui")} />
             <QuickGameCard title="FICHAJE O INVENTO" subtitle="Operaciones raras de la era BBVA." emoji="📝" accent="#c8920a" onClick={() => openMode("fichaje", "fichaje-invento")} />
             <QuickGameCard title="CLUB OCULTO" subtitle="Adivina el equipo por sus cromos." emoji="🏟️" accent="#1a4fa0" onClick={() => openMode("clubOculto", "club-oculto")} />
+            <QuickGameCard title="DUELO NOSTALGIA" subtitle="¿Quién tuvo más goles o asistencias?" emoji="⚔️" accent="#b81c14" onClick={() => openMode("duelo", "duelo-nostalgia")} />
           </div>
         </section>
 

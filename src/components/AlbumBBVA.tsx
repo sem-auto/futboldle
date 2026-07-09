@@ -300,7 +300,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                     {isUnlocked ? `${style.stars} ${style.label}` : "CROMO OCULTO"}
                   </div>
                   <div className="font-bebas text-[25px] leading-none mt-1 pr-7" style={{ color: isUnlocked ? "#18181b" : "#c8c1b6" }}>
-                    {isUnlocked ? player.displayName.toUpperCase() : "?????"}
+                    {isUnlocked ? player.displayName.toUpperCase() : "?"}
                   </div>
                 </div>
                 {isUnlocked ? (
@@ -319,7 +319,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                   </>
                 ) : (
                   <div className="flex flex-col gap-1 text-[11px] font-semibold" style={{ color: "#9a9a8a" }}>
-                    <span>?????</span>
+                    <span>?</span>
                   </div>
                 )}
               </button>
@@ -337,7 +337,7 @@ export default function AlbumBBVA({ onBack }: { onBack: () => void }) {
                 <div>
                   <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: rarityStyle(selected.rarity).color }}>{selected.rarity}</div>
                   <div className="font-bebas text-[34px] leading-none" style={{ color: "#18181b" }}>
-                    {selected.isUnlocked ? selected.player.displayName.toUpperCase() : "?????"}
+                    {selected.isUnlocked ? selected.player.displayName.toUpperCase() : "?"}
                   </div>
                 </div>
                 <button onClick={() => setSelectedId(null)} className="text-[18px]" style={{ color: "#9a9a8a" }}>×</button>

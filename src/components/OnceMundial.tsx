@@ -183,7 +183,7 @@ export default function OnceMundial() {
               <div key={`${country}-${index}`} className="rounded-xl min-h-[58px] flex flex-col items-center justify-center text-center px-2"
                 style={{ background: placed ? "white" : active ? "#fffaf0" : "rgba(255,255,255,0.55)", border: `1px solid ${active ? "rgba(200,146,10,0.50)" : "rgba(0,0,0,0.08)"}` }}>
                 <div className="text-[9px] font-black" style={{ color: placed ? "#1e6b2e" : active ? "#c8920a" : "#9a9a8a" }}>{placed ? countryCode(country) : active ? "AHORA" : countryCode(country)}</div>
-                <div className="font-oswald font-semibold text-[12px] leading-tight" style={{ color: "#18181b" }}>{placed ? placed.name : "????"}</div>
+                <div className="font-oswald font-semibold text-[12px] leading-tight" style={{ color: "#18181b" }}>{placed ? placed.name : "??"}</div>
                 <div className="text-[8px]" style={{ color: "#9a9a8a" }}>{displayCountry(country)}</div>
               </div>
             );

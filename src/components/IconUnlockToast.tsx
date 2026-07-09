@@ -11,7 +11,14 @@ export default function IconUnlockToast() {
       const detail = (event as CustomEvent<{ name?: string; rarity?: string; clubs?: string[]; position?: string; source?: string; season?: string }>).detail;
       if (!detail?.name) return;
       setCopied(false);
-      setCard({ name: detail.name, rarity: detail.rarity ?? "CROMO", clubs: detail.clubs ?? [], position: detail.position ?? "Jugador", source: detail.source, season: detail.season });
+      setCard({
+        name: detail.name,
+        rarity: detail.rarity ?? "CROMO",
+        clubs: detail.clubs ?? [],
+        position: detail.position ?? "Jugador",
+        source: detail.source,
+        season: detail.season,
+      });
       window.setTimeout(() => setCard(null), 6200);
     }
     window.addEventListener("fbl-card-unlocked", onCard);

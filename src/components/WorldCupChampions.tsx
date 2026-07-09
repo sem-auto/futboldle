@@ -233,13 +233,13 @@ export default function WorldCupChampions() {
           <div className="rounded-2xl p-3" style={{ background: state.championSolved ? "#ecfdf3" : "#f8fafc", border: "1px solid rgba(0,0,0,0.08)" }}>
             <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: state.championSolved ? "#007a35" : "#9a9a8a" }}>Campeón</div>
             <div className="font-oswald font-semibold text-[18px]" style={{ color: state.championSolved || completed ? "#18181b" : "#a0a0a0" }}>
-              {state.championSolved || completed ? challenge.champion : "????"}
+              {state.championSolved || completed ? challenge.champion : "??"}
             </div>
           </div>
           <div className="rounded-2xl p-3" style={{ background: state.won && mode === "hard" ? "#ecfdf3" : "#f8fafc", border: "1px solid rgba(0,0,0,0.08)" }}>
             <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: state.won && mode === "hard" ? "#007a35" : "#9a9a8a" }}>Finalista</div>
             <div className="font-oswald font-semibold text-[18px]" style={{ color: completed ? "#18181b" : "#a0a0a0" }}>
-              {completed ? challenge.runnerUp : mode === "hard" ? "????" : "Modo difícil"}
+              {completed ? challenge.runnerUp : mode === "hard" ? "??" : "Modo difícil"}
             </div>
           </div>
         </div>

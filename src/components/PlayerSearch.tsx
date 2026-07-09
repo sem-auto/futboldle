@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { BBVAPlayer } from "@/data/bbvaPlayers";
 import { normalize } from "@/lib/normalize";
+import { foldAlias, getCommonFootballAliases } from "@/lib/playerAliases";
 
 type Props = {
   value: string;
@@ -15,14 +16,14 @@ type Props = {
 };
 
 function scorePlayer(player: BBVAPlayer, query: string) {
-  const q = normalize(query);
+  const q = foldAlias(query);
   if (!q) return 99;
 
-  const displayName = normalize(player.displayName);
-  const fullName = normalize(player.fullName);
-  const displayWords = player.displayName.split(/\s+/).map(normalize).filter(Boolean);
-  const fullWords = player.fullName.split(/\s+/).map(normalize).filter(Boolean);
-  const aliases = [normalize(player.answer)].filter(Boolean);
+  const displayName = foldAlias(player.displayName);
+  const fullName = foldAlias(player.fullName);
+  const displayWords = player.displayName.split(/\s+/).map(foldAlias).filter(Boolean);
+  const fullWords = player.fullName.split(/\s+/).map(foldAlias).filter(Boolean);
+  const aliases = getCommonFootballAliases(player.displayName, [player.fullName, player.answer]);
   const directStarts = [displayName, ...aliases].filter(field => field.startsWith(q));
   const displayStarts = displayWords.filter(word => word.startsWith(q));
   const fullStarts = [fullName, ...fullWords].filter(field => field.startsWith(q));

@@ -1,4 +1,5 @@
 import { bbvaPlayers } from "./bbvaPlayers";
+import { generatedBBVATop10Challenges } from "./generatedBBVATop10";
 
 export type Top10Category = "GOLEADORES" | "ASISTENCIAS" | "PORTEROS" | "CLUBES";
 
@@ -1708,6 +1709,145 @@ export const removedUnverifiedTops = [
         "hintPosition": "Delantero",
         "hintClub": "Málaga",
         "hintInitial": "S______ R_____"
+      }
+    ]
+  },
+  {
+    "id": "bbva-goleadores-mas-jovenes-2005-2016",
+    "kind": "DIFÍCIL",
+    "category": "GOLEADORES",
+    "topType": "TOP HISTÓRICO VERIFICADO",
+    "period": "2005/06-2015/16",
+    "criterion": "Jugadores más jóvenes en marcar gol en LaLiga durante la era BBVA",
+    "source": "Auditoría manual Futboldle con contraste de fecha de gol y edad del jugador",
+    "sourceName": "Transfermarkt",
+    "sourceUrl": "https://www.transfermarkt.es/",
+    "sourceNote": "Ranking corregido manualmente para el periodo Liga BBVA 2005/06-2015/16.",
+    "top20Unlockable": false,
+    "title": "Goleadores más jóvenes BBVA 2005/06-2015/16",
+    "subtitle": "2005/06-2015/16 · edad al marcar",
+    "consigna": "Completa el Top10 de goleadores más jóvenes de la era BBVA.",
+    "emoji": "👶",
+    "answers": [
+      {
+        "position": 1,
+        "answer": "OLINGA",
+        "displayName": "Olinga",
+        "detail": "16 años y 98 días",
+        "value": 1,
+        "label": "16 años y 98 días",
+        "hintNationality": "Camerún",
+        "hintPosition": "Delantero",
+        "hintClub": "Málaga",
+        "hintInitial": "F______ O_____"
+      },
+      {
+        "position": 2,
+        "answer": "MUNIAIN",
+        "displayName": "Muniain",
+        "detail": "16 años y 289 días",
+        "value": 2,
+        "label": "16 años y 289 días",
+        "hintNationality": "España",
+        "hintPosition": "Centrocampista",
+        "hintClub": "Athletic Club",
+        "hintInitial": "I____ M______"
+      },
+      {
+        "position": 3,
+        "answer": "BOJAN",
+        "displayName": "Bojan",
+        "detail": "17 años y 53 días",
+        "value": 3,
+        "label": "17 años y 53 días",
+        "hintNationality": "España",
+        "hintPosition": "Delantero",
+        "hintClub": "Barcelona",
+        "hintInitial": "B____ K_____"
+      },
+      {
+        "position": 4,
+        "answer": "JUANMI",
+        "displayName": "Juanmi",
+        "detail": "17 años, 3 meses y 23 días",
+        "value": 4,
+        "label": "17 años, 3 meses y 23 días",
+        "hintNationality": "España",
+        "hintPosition": "Delantero",
+        "hintClub": "Málaga",
+        "hintInitial": "J_____ J______"
+      },
+      {
+        "position": 5,
+        "answer": "JAVIMARTINEZ",
+        "displayName": "Javi Martínez",
+        "detail": "17 años y 291 días",
+        "value": 5,
+        "label": "17 años y 291 días",
+        "hintNationality": "España",
+        "hintPosition": "Centrocampista",
+        "hintClub": "Athletic Club",
+        "hintInitial": "J___ M________"
+      },
+      {
+        "position": 6,
+        "answer": "DEULOFEU",
+        "displayName": "Deulofeu",
+        "detail": "18 años y 120 días",
+        "value": 6,
+        "label": "18 años y 120 días",
+        "hintNationality": "España",
+        "hintPosition": "Delantero",
+        "hintClub": "Barcelona",
+        "hintInitial": "G_____ D_______"
+      },
+      {
+        "position": 7,
+        "answer": "ALCACER",
+        "displayName": "Alcácer",
+        "detail": "18 años y 250 días",
+        "value": 7,
+        "label": "18 años y 250 días",
+        "hintNationality": "España",
+        "hintPosition": "Delantero",
+        "hintClub": "Valencia",
+        "hintInitial": "P___ A______"
+      },
+      {
+        "position": 8,
+        "answer": "VARANE",
+        "displayName": "Varane",
+        "detail": "18 años y 152 días",
+        "value": 8,
+        "label": "18 años y 152 días",
+        "hintNationality": "Francia",
+        "hintPosition": "Defensa",
+        "hintClub": "Real Madrid",
+        "hintInitial": "R______ V_____"
+      },
+      {
+        "position": 9,
+        "answer": "SANTIMINA",
+        "displayName": "Santi Mina",
+        "detail": "17 años y 9 meses",
+        "value": 9,
+        "label": "17 años y 9 meses",
+        "hintNationality": "España",
+        "hintPosition": "Delantero",
+        "hintClub": "Celta de Vigo",
+        "hintInitial": "S____ M___"
+      },
+      {
+        "position": 10,
+        "answer": "GRIEZMANN",
+        "displayName": "Griezmann",
+        "detail": "18 años y 7 meses",
+        "value": 10,
+        "label": "18 años y 7 meses",
+        "hintNationality": "Francia",
+        "hintPosition": "Delantero",
+        "hintClub": "Real Sociedad",
+        "hintInitial": "A______ G________"
       }
     ]
   }
@@ -7050,6 +7190,8 @@ export const top10Challenges: Top10Challenge[] = [
     ]
   }
 ];
+
+top10Challenges.push(...generatedBBVATop10Challenges as Top10Challenge[]);
 
 export type Top10ValidationIssueType =
   | "goalkeeper_offensive_metric"

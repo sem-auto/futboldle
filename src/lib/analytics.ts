@@ -74,7 +74,14 @@ export function trackEvent(name: AnalyticsEvent, payload: AnalyticsPayload = {})
       const rawModeId = String(enriched.modeId ?? enriched.game ?? "unknown");
       const modeId = normalizeModeId(rawModeId);
       const challengeId = String(enriched.challengeId ?? enriched.challenge ?? `${modeId}-${new Date().toISOString().slice(0, 10)}`);
-      void submitCommunityResult({ modeId, challengeId, seasonId: String(enriched.seasonId ?? enriched.season ?? "bbva"), won: Boolean(enriched.won), attempts: Number(enriched.attempts) || undefined, timeSpent: Number(enriched.timeSpent) || undefined });
+      void submitCommunityResult({
+        modeId,
+        challengeId,
+        seasonId: String(enriched.seasonId ?? enriched.season ?? "bbva"),
+        won: Boolean(enriched.won),
+        attempts: Number(enriched.attempts) || undefined,
+        timeSpent: Number(enriched.timeSpent) || undefined,
+      });
     }
   } catch {}
 }

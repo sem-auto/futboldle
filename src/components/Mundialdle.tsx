@@ -454,7 +454,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                   <div className="flex-1">
                     <div className="text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#9a9a8a" }}>{clue.label}</div>
                     <div className="font-oswald font-semibold text-[15px]" style={{ color: visible ? style.color : "#aaa" }}>
-                      {visible ? clueValue(clue.label, clue.value) : "?????"}
+                      {visible ? clueValue(clue.label, clue.value) : "?"}
                     </div>
                   </div>
                 </div>

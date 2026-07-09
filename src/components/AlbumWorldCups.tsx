@@ -120,7 +120,7 @@ export default function AlbumWorldCups() {
             <article key={player.id} className="rounded-2xl p-3 relative overflow-hidden min-h-[150px]" style={{ background: entry ? style.background : "#ece8df", border: entry ? `2px solid ${style.border}` : "1px solid rgba(0,0,0,0.08)", boxShadow: entry ? `0 8px 18px rgba(0,0,0,0.10), 0 0 14px ${style.border}25` : "none" }}>
               <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: entry ? style.border : "#c9c2b7" }} />
               <div className="text-[9px] font-semibold uppercase tracking-[0.12em] mt-1" style={{ color: entry ? style.color : "#999" }}>{entry ? rarityLabel(player.iconicLevel) : "Cromo oculto"}</div>
-              <div className="font-bebas text-[25px] leading-none mt-4" style={{ color: entry ? "#18181b" : "#aaa" }}>{entry ? player.name : "?????"}</div>
+              <div className="font-bebas text-[25px] leading-none mt-4" style={{ color: entry ? "#18181b" : "#aaa" }}>{entry ? player.name : "?"}</div>
               <div className="text-[11px] mt-2" style={{ color: entry ? "#174ea6" : "#aaa" }}>{entry ? player.nationality : "Selección oculta"}</div>
               <div className="text-[10px]" style={{ color: entry ? "#6b6b72" : "#aaa" }}>{entry ? `${player.position} · Mundial ${player.mainWorldCup}` : "Completa retos de Mundiales"}</div>
               {entry && <div className="text-[8px] mt-3" style={{ color: "#9a9a8a" }}>Desbloqueado {new Date(entry.unlockedAt).toLocaleDateString("es-ES")}</div>}

@@ -11,6 +11,7 @@ type GameKey =
   | "crack"
   | "statdle"
   | "mundialdle"
+  | "top10-mundial"
   | "worldcup-wordle"
   | "worldcup-champions"
   | "camino-titulo"
@@ -23,6 +24,7 @@ const BASE: Record<GameKey, { completion: number; attempts?: number }> = {
   crack: { completion: 45, attempts: 3.6 },
   statdle: { completion: 52, attempts: 4.1 },
   mundialdle: { completion: 46, attempts: 3.8 },
+  "top10-mundial": { completion: 34 },
   "worldcup-wordle": { completion: 51, attempts: 4.2 },
   "worldcup-champions": { completion: 58, attempts: 2.6 },
   "camino-titulo": { completion: 42, attempts: 2.8 },
@@ -30,9 +32,9 @@ const BASE: Record<GameKey, { completion: number; attempts?: number }> = {
 };
 
 export function getDifficultyLabel(completion: number) {
-  if (completion >= 60) return "Fácil";
+  if (completion >= 60) return "Facil";
   if (completion >= 35) return "Media";
-  return "Difícil";
+  return "Dificil";
 }
 
 function stableOffset(seed: string, range: number) {

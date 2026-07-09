@@ -98,7 +98,7 @@ export default function ShareSheetHost() {
             </button>
             <button onClick={nativeShare} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-2.5 rounded-xl col-span-2"
               style={{ background: "#fff0f7", color: "#b81c62", border: "1px solid rgba(184,28,98,0.18)" }}>
-              Instagram / mas apps
+              Instagram / más apps
             </button>
           </div>
 

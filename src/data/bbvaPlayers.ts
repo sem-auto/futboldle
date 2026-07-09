@@ -1,3 +1,5 @@
+import { generatedBBVAPlayers } from "./generatedBBVAPlayers";
+
 export type Category = "core" | "low";
 
 export interface BBVAPlayer {
@@ -296,7 +298,17 @@ export const bbvaPlayers: BBVAPlayer[] = [
   { id: 331,answer: "CALLEJON", fullName: "José Callejón", displayName: "Callejón", clubs: ["Espanyol","Real Madrid","Napoli"], mainClub: "Espanyol", nationality: "España", position: "Delantero", years: "2008-2013", hint: "Extremo granadino que se hizo mayor en Cornellà antes de volver al Madrid.", category: "core" },
   { id: 332,answer: "ANDRESFERNANDEZ", fullName: "Andrés Fernández", displayName: "Andrés Fernández", clubs: ["Osasuna","Villarreal","Granada"], mainClub: "Osasuna", nationality: "España", position: "Portero", years: "2011-2016", hint: "Portero de reflejos, muy reconocible en Osasuna y Villarreal.", category: "core" },
   { id: 333,answer: "ORELLANA", fullName: "Fabián Orellana", displayName: "Orellana", clubs: ["Granada","Celta de Vigo","Valencia"], mainClub: "Celta de Vigo", nationality: "Chile", position: "Centrocampista", years: "2012-2017", hint: "Mediapunta chileno con mucha fantasía en Balaídos.", category: "core" },
+  { id: 342,answer: "GUTI", fullName: "José María Gutiérrez Hernández", displayName: "Guti", clubs: ["Real Madrid","Beşiktaş"], mainClub: "Real Madrid", nationality: "España", position: "Centrocampista", years: "1995-2010", hint: "Zurda de seda y pases imposibles en el Real Madrid de la era galáctica.", category: "core" },
+  { id: 335,answer: "CARMELO", fullName: "Carmelo González Jiménez", displayName: "Carmelo", clubs: ["Las Palmas","Levante","Hércules","Numancia","Sporting de Gijón"], mainClub: "Sporting de Gijón", nationality: "España", position: "Centrocampista", years: "2005-2016", hint: "Mediapunta canario de recorrido largo por equipos de Primera y Segunda.", category: "low" },
+  { id: 336,answer: "GUIZA", fullName: "Daniel González Güiza", displayName: "Güiza", clubs: ["Mallorca","Getafe","Fenerbahçe","Cádiz"], mainClub: "Mallorca", nationality: "España", position: "Delantero", years: "2005-2008", hint: "Pichichi inesperado con el Mallorca y campeón de Europa con España.", category: "core" },
+  { id: 337,answer: "OLINGA", fullName: "Fabrice Olinga", displayName: "Olinga", clubs: ["Málaga","Apollon Limassol"], mainClub: "Málaga", nationality: "Camerún", position: "Delantero", years: "2012-2014", hint: "El goleador más joven de la historia de LaLiga apareció con el Málaga.", category: "low" },
+  { id: 338,answer: "JUANMI", fullName: "Juanmi Jiménez", displayName: "Juanmi", clubs: ["Málaga","Real Sociedad","Betis"], mainClub: "Málaga", nationality: "España", position: "Delantero", years: "2010-2016", hint: "Canterano del Málaga que marcó muy joven antes de hacerse importante en Primera.", category: "core" },
+  { id: 339,answer: "DEULOFEU", fullName: "Gerard Deulofeu", displayName: "Deulofeu", clubs: ["Barcelona","Sevilla","Everton"], mainClub: "Barcelona", nationality: "España", position: "Delantero", years: "2011-2016", hint: "Extremo de La Masia, talento precoz y eléctrico.", category: "core" },
+  { id: 340,answer: "VARANE", fullName: "Raphaël Varane", displayName: "Varane", clubs: ["Real Madrid","Lens"], mainClub: "Real Madrid", nationality: "Francia", position: "Defensa", years: "2011-2016", hint: "Central francés que llegó adolescente al Madrid y parecía veterano desde el primer día.", category: "core" },
+  { id: 341,answer: "SANTIMINA", fullName: "Santi Mina", displayName: "Santi Mina", clubs: ["Celta de Vigo","Valencia"], mainClub: "Celta de Vigo", nationality: "España", position: "Delantero", years: "2013-2016", hint: "Delantero vigués que debutó y marcó muy joven con el Celta.", category: "low" },
 ];
+
+bbvaPlayers.push(...generatedBBVAPlayers as BBVAPlayer[]);
 
 /** Core players only — used for collection odds and fallback pools */
 export const corePlayers = bbvaPlayers.filter(p => p.category === "core");

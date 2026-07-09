@@ -1,3 +1,5 @@
+import { generatedWorldCupPlayers } from "./generatedPlayers";
+
 export type WorldCupPosition = "Portero" | "Defensa" | "Centrocampista" | "Delantero";
 export type WorldCupIconicLevel = "icono" | "legendario" | "core" | "culto";
 export type WorldCupCategory = "Leyenda" | "Campeon del mundo" | "Goleador" | "Heroe inesperado" | "Portero iconico";
@@ -240,6 +242,15 @@ export const worldCupPlayers: WorldCupPlayer[] = [
   wc("jordi-alba", "Jordi Alba", ["Alba", "Jordi Alba"], "Espana", "", "Defensa", [2014, 2018, 2022], 2014, "core", "Barcelona", 25),
   wc("pepe-reina", "Pepe Reina", ["Reina"], "Espana", "", "Portero", [2006, 2010, 2014], 2010, "culto", "Liverpool", 27),
   wc("gabriel-batistuta", "Gabriel Batistuta", ["Batistuta", "Bati"], "Argentina", "", "Delantero", [2002], 2002, "legendario", "Roma", 33),
+  wc("just-fontaine", "Just Fontaine", ["Fontaine"], "Francia", "", "Delantero", [1958], 1958, "icono", "Reims", 24),
+  wc("pele", "Pele", ["Pele", "Edson Arantes"], "Brasil", "", "Delantero", [1958, 1962, 1966, 1970], 1970, "icono", "Santos", 29),
+  wc("sandor-kocsis", "Sandor Kocsis", ["Kocsis"], "Hungria", "", "Delantero", [1954], 1954, "legendario", "Honved", 24),
+  wc("jurgen-klinsmann", "Jurgen Klinsmann", ["Klinsmann"], "Alemania", "", "Delantero", [1990, 1994, 1998], 1994, "legendario", "Monaco", 29),
+  wc("helmut-rahn", "Helmut Rahn", ["Rahn"], "Alemania", "", "Delantero", [1954, 1958], 1954, "legendario", "Rot-Weiss Essen", 24),
+  wc("gary-lineker", "Gary Lineker", ["Lineker"], "Inglaterra", "", "Delantero", [1986, 1990], 1986, "legendario", "Barcelona", 25),
+  wc("teofilo-cubillas", "Teofilo Cubillas", ["Cubillas"], "Peru", "", "Centrocampista", [1970, 1978, 1982], 1978, "legendario", "Alianza Lima", 29),
+  wc("grzegorz-lato", "Grzegorz Lato", ["Lato"], "Polonia", "", "Delantero", [1974, 1978, 1982], 1974, "legendario", "Stal Mielec", 24),
+  wc("gerd-muller", "Gerd Muller", ["Muller", "Gerd"], "Alemania", "", "Delantero", [1970, 1974], 1970, "icono", "Bayern", 24),
   wc("juan-sebastian-veron", "Juan Sebastian Veron", ["Veron"], "Argentina", "", "Centrocampista", [2002, 2010], 2002, "core", "Manchester United", 27),
   wc("sergio-romero", "Sergio Romero", ["Romero"], "Argentina", "", "Portero", [2010, 2014], 2014, "core", "Monaco", 27),
   wc("nicolas-otamendi", "Nicolas Otamendi", ["Otamendi"], "Argentina", "", "Defensa", [2010, 2018, 2022], 2022, "core", "Benfica", 34),
@@ -453,3 +464,5 @@ export const worldCupPlayers: WorldCupPlayer[] = [
   wc("moussa-dembela", "Mousa Dembele", ["Dembele"], "Belgica", "", "Centrocampista", [2014, 2018], 2018, "core", "Tottenham", 30),
   wc("marouane-fellaini", "Marouane Fellaini", ["Fellaini"], "Belgica", "", "Centrocampista", [2014, 2018], 2018, "core", "Manchester United", 30),
 ];
+
+worldCupPlayers.push(...generatedWorldCupPlayers as WorldCupPlayer[]);

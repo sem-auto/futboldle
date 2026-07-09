@@ -5,3 +5,4 @@ export * from "./champions";
 export * from "./titleRuns";
 export * from "./teams";
 export * from "./appearances";
+export * from "./top10";
