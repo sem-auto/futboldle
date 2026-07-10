@@ -882,7 +882,7 @@ function CommunityPulse({ items }: { items: Array<{ name: string; stats: Difficu
           <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Comunidad</div>
           <h3 className="font-bebas text-[22px] leading-none" style={{ color: "#18181b" }}>HOY SE ESTÁ JUGANDO</h3>
         </div>
-        <Link href="/admin/community" className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Datos reales</Link>
+        <Link href="/progreso" className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Ver progreso</Link>
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-xl px-3 py-2" style={{ background: "#fffaf0", border: "1px solid rgba(200,146,10,0.18)" }}>
@@ -915,8 +915,6 @@ export default function HomePage() {
   const statdleDifficulty = useCommunityDifficulty("statdle", getDailyStatdleChallenge(getDayNumber()).id);
   const mundialdleDifficulty = useCommunityDifficulty("mundialdle", getDailyMundialdleChallenge(getDayNumber()).id);
   const top10MundialDifficulty = useCommunityDifficulty("top10-mundial", getDailyWorldCupTop10(getDayNumber()).id);
-  const discoveryPlayer = worldCupPlayers.find(player => player.id === getDailyMundialdleChallenge(getDayNumber()).playerId)?.name ?? "David Villa";
-  const discoveryRanking = getDailyWorldCupTop10(getDayNumber()).title.replace("Máximos ", "");
   const dailyGames = [
     { done: wordleDone, won: wordleWon, label: "Wordle BBVA", view: "wordle" as View, modeId: "wordle-bbva", seasonId: "bbva" },
     { done: trayDone, won: trayWon, label: "Trayectoria BBVA", view: "trayectoria" as View, modeId: "trayectoria-bbva", seasonId: "bbva" },
@@ -1244,18 +1242,10 @@ export default function HomePage() {
           </Link>
         </section>
 
-        <DailyMissionPanel
-          wordleDone={wordleDone && wordleWon}
-          mundialDone={(mundialdleDone && mundialdleWon) || (top10MundialDone && top10MundialWon)}
-          anyCardUnlocked={albumProgress.unlockedCount + worldCupProgress.unlocked > 0}
-        />
-
         <Link href="/progreso" className="rounded-xl px-3 py-2 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.72)", border: "1px solid rgba(0,0,0,0.07)" }}>
           <div className="flex items-center gap-3 text-[10px] font-semibold"><span style={{ color: "#c8920a" }}>BBVA {albumProgress.unlockedCount}/{albumProgress.total}</span><span style={{ color: "#174ea6" }}>Mundiales {worldCupProgress.unlocked}/{worldCupPlayers.length}</span></div>
           <div className="text-[9px] truncate" style={{ color: "#9a9a8a" }}>{worldCupProgress.latest ? `Ultimo: ${worldCupProgress.latest}` : "Ver progreso"}</div>
         </Link>
-
-        <DiscoveryStrip playerName={discoveryPlayer} rankingTitle={discoveryRanking} rankingHref="/world-cups/top10" />
 
         <MobileAdBanner slot={0} />
 
@@ -1272,14 +1262,11 @@ export default function HomePage() {
             <QuickGameCard title="STATDLE BBVA" subtitle="Adivina por estadísticas de temporada." emoji="📊" accent="#18181b" onClick={() => openMode("statdle", "statdle-bbva")} />
             <QuickGameCard title="¿JUGÓ AQUÍ?" subtitle="Jugador y club. ¿Verdad o trampa?" emoji="✅" accent="#1e6b2e" onClick={() => openMode("jugoAqui", "jugo-aqui")} />
             <QuickGameCard title="FICHAJE O INVENTO" subtitle="Operaciones raras de la era BBVA." emoji="📝" accent="#c8920a" onClick={() => openMode("fichaje", "fichaje-invento")} />
-            <QuickGameCard title="CLUB OCULTO" subtitle="Adivina el equipo por sus cromos." emoji="🏟️" accent="#1a4fa0" onClick={() => openMode("clubOculto", "club-oculto")} />
             <QuickGameCard title="DUELO NOSTALGIA" subtitle="¿Quién tuvo más goles o asistencias?" emoji="⚔️" accent="#b81c14" onClick={() => openMode("duelo", "duelo-nostalgia")} />
           </div>
         </section>
 
         <MobileAdBanner slot={1} />
-
-        <SeasonsBlock />
 
       </main>
     </div>

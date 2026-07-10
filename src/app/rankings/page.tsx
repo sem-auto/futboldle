@@ -37,21 +37,24 @@ export default function RankingsPage() {
   const published = seoRankings.filter(ranking => ranking.status === "published" && ranking.challenge);
   const bbva = published.slice(0, 12);
   const world = worldCupTop10Challenges.filter(challenge => challenge.status === "active").slice(0, 12);
-  const popular = [...bbva.slice(0, 4).map(ranking => ({
-    href: `/rankings/${ranking.slug}`,
-    title: ranking.title,
-    detail: cleanText(ranking.description),
-    source: ranking.challenge?.sourceName,
-    tone: "#b81c14",
-    mark: "BB",
-  })), ...world.slice(0, 2).map(challenge => ({
-    href: "/world-cups/top10",
-    title: challenge.title,
-    detail: `${challenge.period} · ${challenge.criterion}`,
-    source: challenge.sourceName,
-    tone: "#174ea6",
-    mark: "WC",
-  }))];
+  const popular = [
+    ...bbva.slice(0, 4).map(ranking => ({
+      href: `/rankings/${ranking.slug}`,
+      title: cleanText(ranking.title),
+      detail: cleanText(ranking.description),
+      source: cleanText(ranking.challenge?.sourceName),
+      tone: "#b81c14",
+      mark: "BB",
+    })),
+    ...world.slice(0, 2).map(challenge => ({
+      href: "/world-cups/top10",
+      title: cleanText(challenge.title),
+      detail: `${cleanText(challenge.period)} · ${cleanText(challenge.criterion)}`,
+      source: cleanText(challenge.sourceName),
+      tone: "#174ea6",
+      mark: "WC",
+    })),
+  ];
 
   return (
     <main className="min-h-dvh px-3 py-5" style={{ background: "#f6f2ea" }}>
@@ -86,7 +89,17 @@ export default function RankingsPage() {
             <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: "#b47611" }}>Liga BBVA</div>
             <h2 className="font-bebas text-[36px] leading-none mt-1">Rankings BBVA</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              {bbva.map(ranking => <RankingCard key={ranking.slug} href={`/rankings/${ranking.slug}`} title={cleanText(ranking.title)} detail={cleanText(ranking.challenge?.period ?? "Liga BBVA 2005-2016")} source={cleanText(ranking.challenge?.sourceName)} tone="#b81c14" mark="BB" />)}
+              {bbva.map(ranking => (
+                <RankingCard
+                  key={ranking.slug}
+                  href={`/rankings/${ranking.slug}`}
+                  title={cleanText(ranking.title)}
+                  detail={cleanText(ranking.challenge?.period ?? "Liga BBVA 2005-2016")}
+                  source={cleanText(ranking.challenge?.sourceName)}
+                  tone="#b81c14"
+                  mark="BB"
+                />
+              ))}
             </div>
           </div>
 
@@ -94,7 +107,17 @@ export default function RankingsPage() {
             <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: "#174ea6" }}>Mundiales</div>
             <h2 className="font-bebas text-[36px] leading-none mt-1">Rankings Mundialistas</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              {world.map(challenge => <RankingCard key={challenge.id} href="/world-cups/top10" title={challenge.title} detail={`${challenge.period} · ${challenge.criterion}`} source={challenge.sourceName} tone="#174ea6" mark="WC" />)}
+              {world.map(challenge => (
+                <RankingCard
+                  key={challenge.id}
+                  href="/world-cups/top10"
+                  title={cleanText(challenge.title)}
+                  detail={`${cleanText(challenge.period)} · ${cleanText(challenge.criterion)}`}
+                  source={cleanText(challenge.sourceName)}
+                  tone="#174ea6"
+                  mark="WC"
+                />
+              ))}
             </div>
           </div>
         </section>

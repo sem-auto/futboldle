@@ -9,7 +9,7 @@ import { normalize } from "@/lib/normalize";
 import { unlockPlayer } from "@/lib/album";
 import { shareGameResult } from "@/lib/resultShare";
 import { FUTBOLDLE_URL } from "@/lib/share";
-import { trackChallengeCompleted, trackChallengeStarted, trackEvent, trackModeEntered } from "@/lib/analytics";
+import { trackChallengeCompleted, trackChallengeStarted, trackModeEntered } from "@/lib/analytics";
 import DataReportButton from "@/components/DataReportButton";
 
 const MODE_ID = "duelo-nostalgia";
@@ -103,7 +103,9 @@ export default function DueloNostalgia({ onBack }: { onBack?: () => void }) {
   }, [challengeId, duels.length, storageKey]);
 
   function persist(nextAnswers: ("left" | "right")[], nextRound: number, nextRevealed: boolean) {
-    try { localStorage.setItem(storageKey, JSON.stringify({ challengeId, answers: nextAnswers, round: nextRound, revealed: nextRevealed })); } catch {}
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ challengeId, answers: nextAnswers, round: nextRound, revealed: nextRevealed }));
+    } catch {}
   }
 
   function choose(side: "left" | "right") {
@@ -140,8 +142,6 @@ export default function DueloNostalgia({ onBack }: { onBack?: () => void }) {
   }
 
   function restartExtra() {
-    const key = `fbl-duelo-extra-${Date.now()}`;
-    try { localStorage.setItem(key, "1"); } catch {}
     setAnswers([]);
     setRound((round + 2) % duels.length);
     setRevealed(false);

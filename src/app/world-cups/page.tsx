@@ -17,7 +17,7 @@ type ModeCard = {
 };
 
 const modes: ModeCard[] = [
-  { href: "/world-cups/mundialdle", eyebrow: "Diario principal", title: "MUNDIALDLE", subtitle: "Pistas de Mundial, selección y club.", accent: "#174ea6", modeId: "mundialdle", mark: "🏆", visual: "trophy" },
+  { href: "/world-cups/mundialdle", eyebrow: "Diario principal", title: "MUNDIALDLE", subtitle: "Pistas de Mundial, selección y club.", accent: "#174ea6", modeId: "mundialdle", mark: "Copa", visual: "trophy" },
   { href: "/world-cups/wordle", eyebrow: "Diario rápido", title: "WORDLE MUNDIAL", subtitle: "Apellido mundialista sin pistas.", accent: "#174ea6", modeId: "worldcup-wordle", mark: "ABC", visual: "wordle" },
   { href: "/world-cups/top10", eyebrow: "Ranking", title: "TOP10 MUNDIAL", subtitle: "Listas históricas del torneo.", accent: "#174ea6", modeId: "top10-mundial", mark: "10", visual: "podium" },
   { href: "/world-cups/champions", eyebrow: "Archivo extra", title: "CAMPEONES", subtitle: "Sede, campeón y finalista.", accent: "#c8920a", modeId: "worldcup-champions", mark: "1", visual: "medals" },
@@ -61,7 +61,7 @@ function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string
   }
   return (
     <div className="fbl-mini-cromo grid h-[78px] w-[64px] place-items-center">
-      <span className="font-bebas text-[38px]" style={{ color: accent }}>🏆</span>
+      <span className="font-bebas text-[26px]" style={{ color: accent }}>Copa</span>
     </div>
   );
 }
@@ -88,17 +88,6 @@ function ActiveModeCard({ card }: { card: ModeCard }) {
   );
 }
 
-function FutureCard({ title, subtitle, mark }: { title: string; subtitle: string; mark: string }) {
-  return (
-    <article className="fbl-card rounded-2xl p-4 min-h-[132px]" style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)" }}>
-      <span className="fbl-visual-mark">{mark}</span>
-      <div className="relative z-10 text-[9px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "#9a9a8a" }}>Archivo futuro</div>
-      <h2 className="relative z-10 font-bebas text-[30px] leading-none" style={{ color: "#18181b" }}>{title}</h2>
-      <p className="relative z-10 text-[12px] mt-1 max-w-[250px]" style={{ color: "#6b6b72" }}>{subtitle}</p>
-    </article>
-  );
-}
-
 export default function WorldCupsPage() {
   useEffect(() => {
     trackEvent("season_opened_world_cups", { season: "world-cups" });
@@ -121,7 +110,7 @@ export default function WorldCupsPage() {
             boxShadow: "0 18px 40px rgba(20,50,120,0.22)",
           }}
         >
-          <div className="absolute right-5 -top-6 hidden md:block text-[150px] leading-none opacity-10">🏆</div>
+          <div className="absolute right-5 -top-6 hidden md:block font-bebas text-[150px] leading-none opacity-10">COPA</div>
           <div className="absolute right-8 bottom-4 hidden md:grid h-[112px] w-[92px] place-items-center rounded-3xl bg-white/10 border border-white/15">
             <div className="h-16 w-12 rounded-b-2xl rounded-t-full bg-white/18 border border-white/20" />
           </div>
@@ -167,7 +156,7 @@ export default function WorldCupsPage() {
 
         <Link href="/world-cups/album" className="fbl-card rounded-2xl px-4 py-4 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
           <div className="flex items-center gap-3">
-            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center font-bebas text-[24px]" style={{ color: "#174ea6" }}>🏆</span>
+            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center font-bebas text-[18px]" style={{ color: "#174ea6" }}>COPA</span>
             <div>
               <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Colección propia</div>
               <div className="font-bebas text-[30px] leading-none">Álbum Mundialista</div>
@@ -175,12 +164,6 @@ export default function WorldCupsPage() {
           </div>
           <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>Ver cromos →</span>
         </Link>
-
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <FutureCard title="Cromo Mundial" subtitle="Revela al jugador como cromo Panini." mark="CARD" />
-          <FutureCard title="Grupos Míticos" subtitle="Recuerda fases de grupos históricas." mark="GRP" />
-          <FutureCard title="Más Top10" subtitle="Defensas goleadores, porterías y asistencias." mark="TOP" />
-        </section>
       </div>
     </main>
   );

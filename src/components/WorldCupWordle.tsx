@@ -17,6 +17,7 @@ import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
 
 type CellState = "correct" | "partial" | "wrong" | "empty";
 type Row = { letters: string[]; states: CellState[]; submitted: boolean };
+
 const MAX_ATTEMPTS = 6;
 const KEYS = ["QWERTYUIOP".split(""), "ASDFGHJKLÑ".split(""), ["ENTER", ..."ZXCVBNM".split(""), "⌫"]];
 
@@ -38,25 +39,42 @@ function evaluate(guess: string[], answer: string[]) {
   const remaining: Record<string, number> = {};
   answer.forEach(letter => { remaining[letter] = (remaining[letter] ?? 0) + 1; });
   guess.forEach((letter, index) => {
-    if (letter === answer[index]) { states[index] = "correct"; remaining[letter]--; }
+    if (letter === answer[index]) {
+      states[index] = "correct";
+      remaining[letter]--;
+    }
   });
   guess.forEach((letter, index) => {
-    if (states[index] !== "correct" && remaining[letter] > 0) { states[index] = "partial"; remaining[letter]--; }
+    if (states[index] !== "correct" && remaining[letter] > 0) {
+      states[index] = "partial";
+      remaining[letter]--;
+    }
   });
   return states;
 }
 
 function rarityMeta(level: string) {
   if (level === "icono") return { label: "Legendario", color: "#c8920a", background: "linear-gradient(145deg,#fff3bd,#fffdf5,#e8b82e)" };
-  if (level === "legendario") return { label: "Epico", color: "#6d28d9", background: "linear-gradient(145deg,#f3e8ff,#ffffff,#ddd6fe)" };
+  if (level === "legendario") return { label: "Épico", color: "#6d28d9", background: "linear-gradient(145deg,#f3e8ff,#ffffff,#ddd6fe)" };
   if (level === "core") return { label: "Raro", color: "#174ea6", background: "linear-gradient(145deg,#e8f0ff,#ffffff,#c8dcff)" };
-  return { label: "Comun", color: "#1e6b2e", background: "linear-gradient(145deg,#eaf8ed,#ffffff,#cdebd4)" };
+  return { label: "Común", color: "#1e6b2e", background: "linear-gradient(145deg,#eaf8ed,#ffffff,#cdebd4)" };
+}
+
+function isValidSavedRows(value: unknown, length: number): value is Row[] {
+  return Array.isArray(value) && value.length === MAX_ATTEMPTS && value.every(row =>
+    row &&
+    Array.isArray((row as Row).letters) &&
+    Array.isArray((row as Row).states) &&
+    (row as Row).letters.length === length &&
+    (row as Row).states.length === length
+  );
 }
 
 export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtraIndex?: number }) {
   const dayNumber = getDayNumber();
-  const extraIndex = initialExtraIndex;
-  const player = wordlePool[(dayNumber * 17 + 7 + extraIndex * 31) % wordlePool.length];
+  const extraIndex = Number.isFinite(initialExtraIndex) ? Math.max(0, initialExtraIndex) : 0;
+  const fallbackPlayer = wordlePool[0] ?? worldCupPlayers[0];
+  const player = wordlePool.length > 0 ? wordlePool[(dayNumber * 17 + 7 + extraIndex * 31) % wordlePool.length] : fallbackPlayer;
   const challengeId = extraIndex === 0 ? `wc-wordle-${dayNumber}` : `wc-wordle-${dayNumber}-extra-${extraIndex}`;
   const answer = useMemo(() => playerAnswer(player.name).split(""), [player.name]);
   const storageKey = `fbl-worldcup-wordle-${getDayKey()}-${extraIndex === 0 ? "daily" : `extra-${extraIndex}`}`;
@@ -70,6 +88,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
   const [startedAt] = useState(() => Date.now());
   const community = useCommunityDifficulty("worldcup-wordle", challengeId);
   useChallengeLifecycle({ modeId: "worldcup-wordle", challengeId, seasonId: "world-cups", completed: gameOver, attempts: rowIndex, startedAt });
+
   const keyboardStates = useMemo(() => {
     const priority: Record<CellState, number> = { empty: 0, wrong: 1, partial: 2, correct: 3 };
     const result: Record<string, CellState> = {};
@@ -79,6 +98,7 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
     }));
     return result;
   }, [rows]);
+
   const rarity = rarityMeta(player.iconicLevel);
 
   useEffect(() => {
@@ -86,9 +106,9 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
     trackChallengeStarted("worldcup-wordle", challengeId, { seasonId: "world-cups" });
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null");
-      if (saved && Array.isArray(saved.rows)) {
+      if (saved && isValidSavedRows(saved.rows, answer.length)) {
         setRows(saved.rows);
-        setRowIndex(Number(saved.rowIndex) || 0);
+        setRowIndex(Math.min(Number(saved.rowIndex) || 0, MAX_ATTEMPTS));
         setWon(Boolean(saved.won));
         setGameOver(Boolean(saved.gameOver));
       } else {
@@ -97,26 +117,41 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
         setWon(false);
         setGameOver(false);
       }
-    } catch {}
+    } catch {
+      setRows(Array.from({ length: MAX_ATTEMPTS }, () => emptyRow(answer.length)));
+      setRowIndex(0);
+      setWon(false);
+      setGameOver(false);
+    }
     setCurrentGuess("");
     setMessage("");
-  }, [answer.length, challengeId, dayNumber, storageKey]);
+  }, [answer.length, challengeId, storageKey]);
 
   const persist = useCallback((nextRows: Row[], nextIndex: number, nextWon: boolean, nextOver: boolean) => {
-    try { localStorage.setItem(storageKey, JSON.stringify({ rows: nextRows, rowIndex: nextIndex, won: nextWon, gameOver: nextOver })); } catch {}
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ rows: nextRows, rowIndex: nextIndex, won: nextWon, gameOver: nextOver }));
+    } catch {}
   }, [storageKey]);
 
   const submit = useCallback(() => {
     if (gameOver) return;
     const row = rows[rowIndex];
     const guessLetters = currentGuess.split("");
-    if (!row || guessLetters.length !== answer.length) { setMessage(`${answer.length} letras`); return; }
+    if (!row || guessLetters.length !== answer.length) {
+      setMessage(`${answer.length} letras`);
+      return;
+    }
     const states = evaluate(guessLetters, answer);
     const correct = states.every(state => state === "correct");
     const nextIndex = rowIndex + 1;
     const over = correct || nextIndex >= MAX_ATTEMPTS;
     const nextRows = rows.map((item, index) => index === rowIndex ? { letters: guessLetters, states, submitted: true } : item);
-    setRows(nextRows); setRowIndex(nextIndex); setWon(correct); setGameOver(over); setMessage(""); setCurrentGuess("");
+    setRows(nextRows);
+    setRowIndex(nextIndex);
+    setWon(correct);
+    setGameOver(over);
+    setMessage("");
+    setCurrentGuess("");
     persist(nextRows, nextIndex, correct, over);
     if (over) {
       recordWorldCupDay(dayNumber);
@@ -133,7 +168,10 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
 
   const press = useCallback((key: string) => {
     if (gameOver) return;
-    if (key === "ENTER") { submit(); return; }
+    if (key === "ENTER") {
+      submit();
+      return;
+    }
     if (key === "⌫") setCurrentGuess(value => value.slice(0, -1));
     else setCurrentGuess(value => value.length < answer.length ? `${value}${key}` : value);
     setMessage("");
@@ -150,14 +188,29 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
   }, [press]);
 
   function share() {
-    const symbols = rows.filter(row => row.submitted).map(row => row.states.map(state => state === "correct" ? "🟩" : state === "partial" ? "🟨" : "⬛").join(""));
-    const text = [`🏆 Wordle Mundial #${dayNumber}`, ...symbols, won ? `Resuelto en ${rowIndex} intentos` : "Hoy no salió", `🌍 ${FUTBOLDLE_URL}`].join("\n");
-    shareGameResult(text, { modeId: "worldcup-wordle", challengeId, seasonId: "world-cups", won, attempts: rowIndex, title: "Wordle Mundial", onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); } });
+    const symbols = rows
+      .filter(row => row.submitted)
+      .map(row => row.states.map(state => state === "correct" ? "🟩" : state === "partial" ? "🟨" : "⬛").join(""));
+    const text = [
+      `🏆 Wordle Mundial #${dayNumber}`,
+      ...symbols,
+      won ? `Resuelto en ${rowIndex} intentos` : "Hoy no salió",
+      "¿Puedes superarme?",
+      FUTBOLDLE_URL,
+    ].join("\n");
+    shareGameResult(text, {
+      modeId: "worldcup-wordle",
+      challengeId,
+      seasonId: "world-cups",
+      won,
+      attempts: rowIndex,
+      title: "Wordle Mundial",
+      onCopied: () => { setCopied(true); setTimeout(() => setCopied(false), 1800); },
+    });
   }
 
   function playAnother() {
-    const nextExtra = extraIndex + 1;
-    window.location.assign(`/world-cups/wordle?extra=${nextExtra}`);
+    window.location.assign(`/world-cups/wordle?extra=${extraIndex + 1}`);
   }
 
   const colors: Record<CellState, { background: string; color: string; border: string }> = {
@@ -180,27 +233,62 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
           {rows.map((row, index) => {
             const visibleLetters = row.submitted ? row.letters : index === rowIndex ? [...currentGuess.split(""), ...Array(Math.max(0, answer.length - currentGuess.length)).fill("")] : row.letters;
             return (
-            <div key={index} className="flex gap-1.5">
-              {visibleLetters.map((letter, cell) => (
-                <div key={cell} className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center font-bebas text-[24px]" style={{ background: colors[row.states[cell]].background, color: colors[row.states[cell]].color, border: `2px solid ${colors[row.states[cell]].border}` }}>{letter}</div>
-              ))}
-            </div>
-          )})}
+              <div key={index} className="flex gap-1.5">
+                {visibleLetters.map((letter, cell) => {
+                  const state = row.states[cell] ?? "empty";
+                  return (
+                    <div key={cell} className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center font-bebas text-[24px]" style={{ background: colors[state].background, color: colors[state].color, border: `2px solid ${colors[state].border}` }}>
+                      {letter}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
         {message && <div className="text-center text-[11px] font-semibold" style={{ color: "#b81c14" }}>{message}</div>}
-        {!gameOver && <div className="flex flex-col gap-1.5">{KEYS.map((line, index) => <div key={index} className="flex justify-center gap-1">{line.map(key => {
-          const state = keyboardStates[key] ?? "empty";
-          const neutral = key === "ENTER" || key === "⌫";
-          return <button key={key} onClick={() => press(key)} className="h-10 min-w-0 rounded-md font-semibold text-[11px] px-2 transition-colors" style={{ flex: key === "ENTER" ? 1.5 : 1, background: neutral ? "#dbe2ec" : state === "empty" ? "#e9edf4" : colors[state].background, color: neutral || state === "empty" ? "#18181b" : "white", border: state !== "empty" && !neutral ? `1px solid ${colors[state].border}` : "1px solid transparent" }}>{key}</button>})}</div>)}</div>}
-        {gameOver && <div className="rounded-2xl p-4 text-center relative overflow-hidden" style={{ background: won ? rarity.background : "#fff5f5", border: `2px solid ${won ? rarity.color : "rgba(184,28,20,0.18)"}`, boxShadow: won ? `0 10px 28px ${rarity.color}25` : "none" }}>
-          {won && <div className="absolute -right-12 -top-20 h-56 w-16 rotate-[28deg] opacity-50" style={{ background: "linear-gradient(90deg,transparent,white,transparent)" }} />}
-          <div className="relative z-10"><div className="text-[9px] uppercase font-semibold tracking-[0.18em]" style={{ color: won ? rarity.color : "#b81c14" }}>{won ? "Nuevo cromo mundialista" : "El jugador era"}</div>
-          <div className="mx-auto mt-3 w-24 h-28 rounded-xl flex flex-col items-center justify-center" style={{ background: "rgba(255,255,255,0.72)", border: `1px solid ${won ? rarity.color : "rgba(0,0,0,0.10)"}` }}><div className="text-[10px] font-semibold" style={{ color: rarity.color }}>{player.nationality}</div><div className="font-bebas text-[46px] leading-none mt-1">{player.name.slice(0, 1)}</div><div className="text-[8px] uppercase font-semibold mt-1" style={{ color: rarity.color }}>{won ? rarity.label : "Solución"}</div></div>
-          <div className="font-bebas text-[38px] leading-none mt-3">{player.name}</div>
-          <div className="flex flex-wrap justify-center gap-1.5 mt-2"><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75" style={{ color: rarity.color }}>{rarity.label}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">{player.position}</span><span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">Mundial {player.mainWorldCup}</span></div>
-          <button onClick={share} className="w-full mt-3 py-3 rounded-xl font-oswald font-semibold uppercase text-[12px]" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir sin revelar"}</button>
-          <div className="grid grid-cols-2 gap-2 mt-2"><button onClick={playAnother} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button><Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link></div><div className="mt-3 text-right"><DataReportButton modeId="worldcup-wordle" challengeId={challengeId} /></div></div>
-        </div>}
+        {!gameOver && (
+          <div className="flex flex-col gap-1.5">
+            {KEYS.map((line, index) => (
+              <div key={index} className="flex justify-center gap-1">
+                {line.map(key => {
+                  const state = keyboardStates[key] ?? "empty";
+                  const neutral = key === "ENTER" || key === "⌫";
+                  return (
+                    <button key={key} onClick={() => press(key)} className="h-10 min-w-0 rounded-md font-semibold text-[11px] px-2 transition-colors" style={{ flex: key === "ENTER" ? 1.5 : 1, background: neutral ? "#dbe2ec" : state === "empty" ? "#e9edf4" : colors[state].background, color: neutral || state === "empty" ? "#18181b" : "white", border: state !== "empty" && !neutral ? `1px solid ${colors[state].border}` : "1px solid transparent" }}>
+                      {key}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        )}
+        {gameOver && (
+          <div className="rounded-2xl p-4 text-center relative overflow-hidden" style={{ background: won ? rarity.background : "#fff5f5", border: `2px solid ${won ? rarity.color : "rgba(184,28,20,0.18)"}`, boxShadow: won ? `0 10px 28px ${rarity.color}25` : "none" }}>
+            {won && <div className="absolute -right-12 -top-20 h-56 w-16 rotate-[28deg] opacity-50" style={{ background: "linear-gradient(90deg,transparent,white,transparent)" }} />}
+            <div className="relative z-10">
+              <div className="text-[9px] uppercase font-semibold tracking-[0.18em]" style={{ color: won ? rarity.color : "#b81c14" }}>{won ? "Nuevo cromo mundialista" : "El jugador era"}</div>
+              <div className="mx-auto mt-3 w-24 h-28 rounded-xl flex flex-col items-center justify-center" style={{ background: "rgba(255,255,255,0.72)", border: `1px solid ${won ? rarity.color : "rgba(0,0,0,0.10)"}` }}>
+                <div className="text-[10px] font-semibold" style={{ color: rarity.color }}>{player.nationality}</div>
+                <div className="font-bebas text-[46px] leading-none mt-1">{player.name.slice(0, 1)}</div>
+                <div className="text-[8px] uppercase font-semibold mt-1" style={{ color: rarity.color }}>{won ? rarity.label : "Solución"}</div>
+              </div>
+              <div className="font-bebas text-[38px] leading-none mt-3">{player.name}</div>
+              <div className="flex flex-wrap justify-center gap-1.5 mt-2">
+                <span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75" style={{ color: rarity.color }}>{rarity.label}</span>
+                <span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">{player.position}</span>
+                <span className="rounded-full px-2 py-1 text-[10px] font-semibold bg-white/75">Mundial {player.mainWorldCup}</span>
+              </div>
+              <button onClick={share} className="w-full mt-3 py-3 rounded-xl font-oswald font-semibold uppercase text-[12px]" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir sin revelar"}</button>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <button onClick={playAnother} className="rounded-xl py-2.5 text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Jugar otro</button>
+                <Link href="/world-cups/album" className="rounded-xl py-2.5 text-[11px] font-semibold flex items-center justify-center" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver álbum</Link>
+              </div>
+              <div className="mt-3 text-right"><DataReportButton modeId="worldcup-wordle" challengeId={challengeId} /></div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
