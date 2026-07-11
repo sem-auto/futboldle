@@ -1,8 +1,8 @@
 "use client";
 
+import { trackChallengeShared, trackEvent } from "./analytics";
 import { getDayNumber } from "./daily";
 import { FUTBOLDLE_URL, shareResult } from "./share";
-import { trackChallengeShared, trackEvent } from "./analytics";
 
 type ShareCommon = {
   modeId: string;
@@ -15,14 +15,21 @@ type ShareCommon = {
   onCopied?: () => void;
 };
 
-export function shareGameResult(text: string, common: ShareCommon) {
+function normalizeShareText(text: string) {
   const normalizedBase = text
     .replace(/https?:\/\/futboldle\.(com|es)/g, FUTBOLDLE_URL)
     .replace(/https:\/\/futboldle-liard\.vercel\.app/g, FUTBOLDLE_URL);
 
-  const normalized = normalizedBase.includes("¿Puedes superarme?")
-    ? normalizedBase
-    : normalizedBase.replace(FUTBOLDLE_URL, `¿Puedes superarme?\n${FUTBOLDLE_URL}`);
+  if (normalizedBase.includes("¿Puedes superarme?")) return normalizedBase;
+  if (normalizedBase.includes(FUTBOLDLE_URL)) {
+    return normalizedBase.replace(FUTBOLDLE_URL, `¿Puedes superarme?\n${FUTBOLDLE_URL}`);
+  }
+
+  return `${normalizedBase}\n\n¿Puedes superarme?\n${FUTBOLDLE_URL}`;
+}
+
+export function shareGameResult(text: string, common: ShareCommon) {
+  const normalized = normalizeShareText(text);
 
   trackChallengeShared(common.modeId, common.challengeId ?? `day-${getDayNumber()}`, {
     seasonId: common.seasonId,
@@ -32,7 +39,11 @@ export function shareGameResult(text: string, common: ShareCommon) {
     dayNumber: getDayNumber(),
     shared: true,
   });
-  trackEvent("share_clicked", { modeId: common.modeId, challengeId: common.challengeId, seasonId: common.seasonId });
+  trackEvent("share_clicked", {
+    modeId: common.modeId,
+    challengeId: common.challengeId,
+    seasonId: common.seasonId,
+  });
 
   shareResult(normalized, common.onCopied, common.title ?? "Futboldle");
 }
@@ -40,7 +51,7 @@ export function shareGameResult(text: string, common: ShareCommon) {
 export function buildWordleShare(rows: string[], attempts: number, won: boolean) {
   return [
     `Wordle BBVA #${getDayNumber()}`,
-    rows.join(""),
+    rows.join("\n"),
     won ? `Lo resolví en ${attempts} intento${attempts === 1 ? "" : "s"}.` : "No lo resolví hoy.",
     FUTBOLDLE_URL,
   ].join("\n");

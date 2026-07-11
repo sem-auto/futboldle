@@ -2,23 +2,24 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getDayKey, getDayNumber } from "@/lib/daily";
-import { normalize } from "@/lib/normalize";
-import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackModeEntered } from "@/lib/analytics";
-import { shareGameResult } from "@/lib/resultShare";
-import { unlockWorldCupCard } from "@/lib/worldCupCollection";
+import DataReportButton from "@/components/DataReportButton";
 import { getDailyWorldCupTop10, worldCupPlayers } from "@/data/worldcups";
 import type { WorldCupPlayer } from "@/data/worldcups";
+import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackModeEntered } from "@/lib/analytics";
+import { getDayKey, getDayNumber } from "@/lib/daily";
+import { matchesFootballAlias } from "@/lib/playerAliases";
+import { normalize } from "@/lib/normalize";
+import { shareGameResult } from "@/lib/resultShare";
+import { FUTBOLDLE_URL } from "@/lib/share";
 import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
-import DataReportButton from "@/components/DataReportButton";
-import { getCommonFootballAliases, matchesFootballAlias } from "@/lib/playerAliases";
+import { unlockWorldCupCard } from "@/lib/worldCupCollection";
 
 function score(player: WorldCupPlayer, query: string) {
   const q = normalize(query);
   if (q.length < 2) return 99;
   const name = normalize(player.name);
   const words = player.name.split(/\s+/).map(normalize);
-  const aliases = getCommonFootballAliases(player.name, player.aliases).map(normalize);
+  const aliases = player.aliases.map(normalize);
   if (name.startsWith(q) || aliases.some(alias => alias.startsWith(q))) return 0;
   if (words.some(word => word.startsWith(q))) return 1;
   if (name.includes(q) || aliases.some(alias => alias.includes(q))) return 2;
@@ -133,11 +134,11 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
     const text = [
       `🌍 Top10 Mundial #${getDayNumber()}`,
       grid,
-      `${guessed.length}/10 encontrados`,
+      `${guessed.length}/${challenge.answers.length} encontrados`,
       `Dificultad: ${challenge.difficulty}`,
       "",
       "¿Puedes superarme?",
-      "https://futboldle.es",
+      FUTBOLDLE_URL,
     ].join("\n");
     shareGameResult(text, {
       modeId: "top10-mundial",
@@ -154,6 +155,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
   }
 
   const pct = Math.round((guessed.length / challenge.answers.length) * 100);
+  const wrongCount = Math.max(0, allGuesses.length - guessed.length);
 
   return (
     <section className="mx-auto max-w-3xl rounded-[28px] overflow-hidden" style={{ background: "white", boxShadow: "0 14px 34px rgba(0,0,0,0.09)" }}>
@@ -222,14 +224,29 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
         ) : (
           <div className="rounded-2xl p-4" style={{ background: "#f0faf2", border: "1px solid rgba(30,107,46,0.18)" }}>
             <div className="text-[9px] uppercase font-semibold tracking-[0.18em]" style={{ color: "#1e6b2e" }}>Resultado</div>
-            <div className="font-bebas text-[34px] leading-none mt-1" style={{ color: "#18181b" }}>{guessed.length}/10</div>
+            <div className="font-bebas text-[40px] leading-none mt-1" style={{ color: "#18181b" }}>{guessed.length}/10</div>
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              <div className="rounded-xl p-2 text-center" style={{ background: "white" }}>
+                <div className="font-bebas text-[22px] leading-none" style={{ color: "#174ea6" }}>{guessed.length}</div>
+                <div className="text-[8px] uppercase font-semibold tracking-[0.12em]" style={{ color: "#6b6b72" }}>Aciertos</div>
+              </div>
+              <div className="rounded-xl p-2 text-center" style={{ background: "white" }}>
+                <div className="font-bebas text-[22px] leading-none" style={{ color: "#b81c14" }}>{wrongCount}</div>
+                <div className="text-[8px] uppercase font-semibold tracking-[0.12em]" style={{ color: "#6b6b72" }}>Fallos</div>
+              </div>
+              <div className="rounded-xl p-2 text-center" style={{ background: "white" }}>
+                <div className="font-bebas text-[22px] leading-none" style={{ color: "#c8920a" }}>{challenge.difficulty}</div>
+                <div className="text-[8px] uppercase font-semibold tracking-[0.12em]" style={{ color: "#6b6b72" }}>Nivel</div>
+              </div>
+            </div>
+            <p className="text-[12px] mt-3" style={{ color: "#5f5f66" }}>Reta a tu grupo sin revelar el ranking completo.</p>
             <p className="text-[12px] mt-2" style={{ color: "#5f5f66" }}>Fuente: <a href={challenge.sourceUrl} target="_blank" rel="noreferrer" className="font-semibold underline">{challenge.sourceName}</a></p>
           </div>
         )}
 
         <div className="flex flex-col sm:flex-row gap-2">
           {!finished ? <button onClick={surrender} className="rounded-xl px-4 py-3 text-[11px] font-semibold" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Rendirse y ver ranking</button> : null}
-          <button onClick={share} className="flex-1 rounded-xl px-4 py-3 text-[11px] font-semibold" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir resultado"}</button>
+          <button onClick={share} className="flex-1 rounded-xl px-4 py-3 text-[11px] font-semibold" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir reto"}</button>
         </div>
 
         <div className="flex items-center justify-between gap-2">

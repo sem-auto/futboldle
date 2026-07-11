@@ -8,7 +8,8 @@ import { unlockPlayer } from "@/lib/album";
 import { recordGameCompletion, recordGameResult } from "@/lib/profile";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackEvent } from "@/lib/analytics";
 import PlayerSearch from "@/components/PlayerSearch";
-import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
+import { shareGameResult } from "@/lib/resultShare";
+import { FUTBOLDLE_URL } from "@/lib/share";
 import { useCommunityDifficulty } from "@/lib/communityStats";
 import DataReportButton from "@/components/DataReportButton";
 import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
@@ -197,7 +198,15 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
   async function share() {
     const score = surrendered ? `X/${challenge.answers.length}` : `${guessedAnswers.length}/${challenge.answers.length}`;
     const grid = challenge.answers.map(a => guessedAnswers.includes(norm(a.answer)) ? "🟩" : "⬛").join("");
-    const txt = buildScoreShare("Top10 BBVA", `${score} encontrados`, `Dificultad: ${community.label}\n${grid}`);
+    const txt = [
+      `Top10 BBVA #${getDayNumber()}`,
+      grid,
+      `${score} encontrados`,
+      `Dificultad: ${community.label}`,
+      "",
+      "¿Puedes superarme?",
+      FUTBOLDLE_URL,
+    ].join("\n");
     shareGameResult(txt, {
       modeId: "top10-bbva",
       challengeId: challenge.id,
@@ -388,6 +397,20 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
                 <span key={a.position} className="text-[16px]">{guessedAnswers.includes(norm(a.answer)) ? "🟦" : "⬛"}</span>
               ))}
             </div>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="rounded-xl p-2.5 text-center" style={{ background: "#eff4ff" }}>
+                <div className="font-bebas text-[24px] leading-none" style={{ color: "#1a4fa0" }}>{guessedAnswers.length}/{challenge.answers.length}</div>
+                <div className="text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#6b6b72" }}>Marcador</div>
+              </div>
+              <div className="rounded-xl p-2.5 text-center" style={{ background: "#fff5f5" }}>
+                <div className="font-bebas text-[24px] leading-none" style={{ color: "#b81c14" }}>{wrongCount}</div>
+                <div className="text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#6b6b72" }}>Fallos</div>
+              </div>
+              <div className="rounded-xl p-2.5 text-center" style={{ background: "#fffbf0" }}>
+                <div className="font-bebas text-[24px] leading-none" style={{ color: "#c8920a" }}>{community.label.replace(/[🎯🔥💀]\s*/g, "")}</div>
+                <div className="text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#6b6b72" }}>Dificultad</div>
+              </div>
+            </div>
             <div className="rounded-xl p-3 mb-3" style={{ background: "#f8f5f0", border: "1px solid rgba(0,0,0,0.06)" }}>
               <div className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-1" style={{ color: "#1a4fa0" }}>Fuente</div>
               <div className="text-[11px] font-semibold" style={{ color: "#18181b" }}>{sourceLabel(challenge)}</div>
@@ -395,9 +418,10 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
               <div className="text-[10px] mt-1" style={{ color: "#9a9a8a" }}>Criterio: {challenge.criterion}</div>
               <div className="text-[10px] mt-2" style={{ color: "#8a6200" }}><strong>Dato curioso:</strong> {topCuriosity(challenge.title, challenge.answers[0])}</div>
             </div>
+            <p className="text-center text-[11px] font-semibold mb-3" style={{ color: "#6b6b72" }}>Reta a tu grupo sin revelar las respuestas.</p>
             <button onClick={share} className="w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
               style={{ background: copied ? "#1e6b2e" : "#1a4fa0", color: "white" }}>
-              {copied ? "✓ Copiado" : "Compartir resultado"}
+              {copied ? "✓ Copiado" : "Compartir reto"}
             </button>
             <div className="mt-3 text-right"><DataReportButton modeId="top10-bbva" challengeId={challenge.id} /></div>
             {challenge.extendedAnswers && (
