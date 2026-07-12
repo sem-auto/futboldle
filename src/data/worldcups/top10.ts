@@ -68,7 +68,29 @@ export const worldCupTop10Challenges: WorldCupTop10Challenge[] = [
   },
 ];
 
-worldCupTop10Challenges.push(...generatedWorldCupTop10Challenges as WorldCupTop10Challenge[]);
+function cleanGeneratedChallenge(challenge: WorldCupTop10Challenge): WorldCupTop10Challenge {
+  const isEditionsTop = challenge.id.includes("5-o-mas-ediciones");
+  return {
+    ...challenge,
+    title: isEditionsTop ? "Futbolistas con 5 o más Mundiales jugados" : challenge.title,
+    subtitle: isEditionsTop ? "El club de jugadores que disputaron cinco Copas del Mundo" : challenge.subtitle,
+    criterion: isEditionsTop ? "Ediciones distintas del Mundial con al menos un minuto disputado" : challenge.criterion,
+    answers: challenge.answers.map(answer => {
+      const player = byId.get(answer.playerId);
+      return {
+        ...answer,
+        name: player?.name ?? answer.name,
+        aliases: Array.from(new Set([...(player?.aliases ?? []), ...answer.aliases, answer.name])),
+        label: isEditionsTop ? `${answer.value} ediciones` : answer.label,
+        nationality: player?.nationality ?? answer.nationality,
+        flag: player?.flag ?? answer.flag,
+        position: player?.position ?? answer.position,
+      };
+    }),
+  };
+}
+
+worldCupTop10Challenges.push(...(generatedWorldCupTop10Challenges as WorldCupTop10Challenge[]).map(cleanGeneratedChallenge));
 
 export function getDailyWorldCupTop10(dayNumber: number) {
   const active = worldCupTop10Challenges.filter(challenge => challenge.status === "active");

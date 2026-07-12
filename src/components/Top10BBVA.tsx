@@ -140,7 +140,7 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
       return;
     }
 
-    handleGuess(player.displayName, `${player.answer}${player.id}`);
+    handleGuess(player.displayName, player.displayName);
   }
 
   function handleHint() {
@@ -183,6 +183,12 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
   const done = finished;
   const community = useCommunityDifficulty("top10", challenge.id);
   const wrongFlashPlayer = wrongFlash ? bbvaPlayers.find(p => norm(p.displayName) === norm(wrongFlash) || norm(p.fullName) === norm(wrongFlash)) : null;
+  const usedSearchIds = bbvaPlayers
+    .filter(player => {
+      const terms = [player.answer, player.displayName, player.fullName].map(norm);
+      return terms.some(term => guessedAnswers.includes(term) || allGuesses.includes(term));
+    })
+    .map(player => player.id);
 
   // Which hints are visible for "current unsolved item"
   // Find first unsolved item and show hints for it
@@ -363,7 +369,7 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
       {!done && (
         <div className="flex flex-col gap-2">
           <div className="relative">
-            <PlayerSearch value={query} onChange={setQuery} players={bbvaPlayers} usedIds={bbvaPlayers.filter(p => allGuesses.includes(norm(p.answer))).map(p => p.id)} accent="#1a4fa0" onSelect={submitPlayer} onEnterNoMatch={submitQueryFromText} />
+            <PlayerSearch value={query} onChange={setQuery} players={bbvaPlayers} usedIds={usedSearchIds} accent="#1a4fa0" onSelect={submitPlayer} onEnterNoMatch={submitQueryFromText} />
           </div>
 
           {/* Hint + Surrender */}

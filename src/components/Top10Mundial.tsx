@@ -26,9 +26,45 @@ function score(player: WorldCupPlayer, query: string) {
   return 99;
 }
 
-function safeHint(value: string) {
-  if (!value || /por auditar|undefined|null|^-$/i.test(value)) return "Pista oculta";
-  return value;
+function flagForNationality(nationality: string, fallback?: string) {
+  const key = normalize(nationality);
+  const flags: Record<string, string> = {
+    alemania: "🇩🇪",
+    argentina: "🇦🇷",
+    belgica: "🇧🇪",
+    brasil: "🇧🇷",
+    camerun: "🇨🇲",
+    colombia: "🇨🇴",
+    coreadelsur: "🇰🇷",
+    croacia: "🇭🇷",
+    dinamarca: "🇩🇰",
+    espana: "🇪🇸",
+    estadosunidos: "🇺🇸",
+    francia: "🇫🇷",
+    gales: "🏴",
+    ghana: "🇬🇭",
+    holanda: "🇳🇱",
+    inglaterra: "🏴",
+    italia: "🇮🇹",
+    japon: "🇯🇵",
+    marruecos: "🇲🇦",
+    mexico: "🇲🇽",
+    nigeria: "🇳🇬",
+    paisesbajos: "🇳🇱",
+    paraguay: "🇵🇾",
+    peru: "🇵🇪",
+    polonia: "🇵🇱",
+    portugal: "🇵🇹",
+    republicacheca: "🇨🇿",
+    rusia: "🇷🇺",
+    senegal: "🇸🇳",
+    serbia: "🇷🇸",
+    suecia: "🇸🇪",
+    suiza: "🇨🇭",
+    uruguay: "🇺🇾",
+  };
+  if (flags[key]) return flags[key];
+  return fallback && fallback.length <= 4 && !/[A-Z]{2}/.test(fallback) ? fallback : "🌍";
 }
 
 export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
@@ -44,14 +80,25 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
 
   const suggestions = useMemo(() => {
     if (query.trim().length < 2) return [];
+    const usedTerms = new Set([
+      ...guessed,
+      ...allGuesses.map(normalize),
+      ...challenge.answers
+        .filter(answer => guessed.includes(answer.playerId))
+        .flatMap(answer => [answer.name, ...answer.aliases].map(normalize)),
+    ]);
+
     return worldCupPlayers
-      .filter(player => !guessed.includes(player.id))
+      .filter(player => {
+        if (usedTerms.has(player.id) || usedTerms.has(normalize(player.name))) return false;
+        return !player.aliases.some(alias => usedTerms.has(normalize(alias)));
+      })
       .map(player => ({ player, score: score(player, query) }))
       .filter(item => item.score < 99)
       .sort((a, b) => a.score - b.score || a.player.name.localeCompare(b.player.name, "es"))
       .slice(0, 8)
       .map(item => item.player);
-  }, [guessed, query]);
+  }, [allGuesses, challenge.answers, guessed, query]);
 
   useChallengeLifecycle({
     modeId: "top10-mundial",
@@ -184,12 +231,13 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
         <div className="flex flex-col gap-2">
           {challenge.answers.map((answer, index) => {
             const revealed = guessed.includes(answer.playerId) || finished;
+            const flag = flagForNationality(answer.nationality, answer.flag);
             return (
               <div key={`${answer.playerId}-${index}`} className="rounded-xl px-3 py-2.5 flex items-center gap-3" style={{ background: revealed ? "#eef3ff" : "#fbfaf7", border: `1px solid ${revealed ? "rgba(23,78,166,0.18)" : "rgba(0,0,0,0.07)"}` }}>
                 <div className="w-9 h-9 rounded-full flex items-center justify-center font-bebas text-[20px]" style={{ background: revealed ? "#174ea6" : "#e6e0d6", color: revealed ? "white" : "#9a9a8a" }}>{index + 1}</div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-oswald font-semibold text-[15px]" style={{ color: revealed ? "#18181b" : "#9a9a8a" }}>{revealed ? `${answer.flag} ${answer.name}` : "?????"}</div>
-                  <div className="text-[10px]" style={{ color: "#8a8a80" }}>{revealed ? answer.label : `${safeHint(answer.nationality)} · ${safeHint(answer.position)}`}</div>
+                  <div className="font-oswald font-semibold text-[15px]" style={{ color: revealed ? "#18181b" : "#9a9a8a" }}>{revealed ? `${flag} ${answer.name}` : "?????"}</div>
+                  <div className="text-[18px] leading-none mt-1" aria-label={answer.nationality}>{revealed ? answer.label : flag}</div>
                 </div>
                 {revealed ? <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>✓</span> : null}
               </div>
@@ -213,7 +261,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
               <div className="absolute z-30 left-0 right-0 mt-1 rounded-xl overflow-hidden" style={{ background: "white", border: "1px solid rgba(0,0,0,0.10)", boxShadow: "0 10px 26px rgba(0,0,0,0.12)" }}>
                 {suggestions.map(player => (
                   <button key={player.id} onMouseDown={event => { event.preventDefault(); submit(player.name); }} className="w-full px-4 py-2.5 text-left border-b last:border-0" style={{ borderColor: "rgba(0,0,0,0.06)" }}>
-                    <div className="font-oswald font-semibold text-[13px]">{player.flag} {player.name}</div>
+                    <div className="font-oswald font-semibold text-[13px]">{flagForNationality(player.nationality, player.flag)} {player.name}</div>
                     <div className="text-[10px]" style={{ color: "#9a9a8a" }}>{player.nationality} · {player.position}</div>
                   </button>
                 ))}
