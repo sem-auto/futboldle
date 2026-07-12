@@ -20,7 +20,7 @@ export type WorldCupTop10Challenge = {
   criterion: string;
   sourceName: string;
   sourceUrl: string;
-  difficulty: "Fácil" | "Medio" | "Difícil";
+  difficulty: string;
   status: "active" | "needs_review" | "disabled";
   answers: WorldCupTop10Answer[];
 };
@@ -45,8 +45,8 @@ function answer(playerId: string, value: number, label: string, aliases: string[
 export const worldCupTop10Challenges: WorldCupTop10Challenge[] = [
   {
     id: "wc-all-time-top-scorers",
-    title: "Máximos goleadores de la historia de los Mundiales",
-    subtitle: "Ranking histórico FIFA",
+    title: "Maximos goleadores de la historia de los Mundiales",
+    subtitle: "Ranking historico FIFA",
     period: "1930-2022",
     criterion: "Goles acumulados en fases finales de la Copa Mundial FIFA",
     sourceName: "FIFA",
@@ -55,13 +55,13 @@ export const worldCupTop10Challenges: WorldCupTop10Challenge[] = [
     status: "active",
     answers: [
       answer("miroslav-klose", 16, "16 goles", ["Klose"]),
-      answer("ronaldo-nazario", 15, "15 goles", ["Ronaldo", "Ronaldo Nazario", "Ronaldo Nazário", "R9", "El Fenomeno"]),
+      answer("ronaldo-nazario", 15, "15 goles", ["Ronaldo", "Ronaldo Nazario", "R9", "El Fenomeno"]),
       answer("lionel-messi", 13, "13 goles", ["Messi", "Leo Messi"]),
       answer("just-fontaine", 13, "13 goles", ["Fontaine"]),
-      answer("kylian-mbappe", 12, "12 goles", ["Mbappe", "Mbappé"]),
-      answer("pele", 12, "12 goles", ["Pele", "Pelé"]),
-      answer("sandor-kocsis", 11, "11 goles", ["Kocsis", "Sándor Kocsis"]),
-      answer("jurgen-klinsmann", 11, "11 goles", ["Klinsmann", "Jürgen Klinsmann", "Jurgen Klinsmann"]),
+      answer("kylian-mbappe", 12, "12 goles", ["Mbappe"]),
+      answer("pele", 12, "12 goles", ["Pele"]),
+      answer("sandor-kocsis", 11, "11 goles", ["Kocsis", "Sandor Kocsis"]),
+      answer("jurgen-klinsmann", 11, "11 goles", ["Klinsmann", "Jurgen Klinsmann"]),
       answer("helmut-rahn", 10, "10 goles", ["Rahn"]),
       answer("gary-lineker", 10, "10 goles", ["Lineker"]),
     ],
@@ -72,7 +72,7 @@ function cleanGeneratedChallenge(challenge: WorldCupTop10Challenge): WorldCupTop
   const isEditionsTop = challenge.id.includes("5-o-mas-ediciones");
   return {
     ...challenge,
-    title: isEditionsTop ? "Futbolistas con 5 o más Mundiales jugados" : challenge.title,
+    title: isEditionsTop ? "Futbolistas con 5 o mas Mundiales jugados" : challenge.title,
     subtitle: isEditionsTop ? "El club de jugadores que disputaron cinco Copas del Mundo" : challenge.subtitle,
     criterion: isEditionsTop ? "Ediciones distintas del Mundial con al menos un minuto disputado" : challenge.criterion,
     answers: challenge.answers.map(answer => {

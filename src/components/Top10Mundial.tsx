@@ -26,45 +26,66 @@ function score(player: WorldCupPlayer, query: string) {
   return 99;
 }
 
-function flagForNationality(nationality: string, fallback?: string) {
+function countryCode(nationality: string) {
   const key = normalize(nationality);
-  const flags: Record<string, string> = {
-    alemania: "🇩🇪",
-    argentina: "🇦🇷",
-    belgica: "🇧🇪",
-    brasil: "🇧🇷",
-    camerun: "🇨🇲",
-    colombia: "🇨🇴",
-    coreadelsur: "🇰🇷",
-    croacia: "🇭🇷",
-    dinamarca: "🇩🇰",
-    espana: "🇪🇸",
-    estadosunidos: "🇺🇸",
-    francia: "🇫🇷",
-    gales: "🏴",
-    ghana: "🇬🇭",
-    holanda: "🇳🇱",
-    inglaterra: "🏴",
-    italia: "🇮🇹",
-    japon: "🇯🇵",
-    marruecos: "🇲🇦",
-    mexico: "🇲🇽",
-    nigeria: "🇳🇬",
-    paisesbajos: "🇳🇱",
-    paraguay: "🇵🇾",
-    peru: "🇵🇪",
-    polonia: "🇵🇱",
-    portugal: "🇵🇹",
-    republicacheca: "🇨🇿",
-    rusia: "🇷🇺",
-    senegal: "🇸🇳",
-    serbia: "🇷🇸",
-    suecia: "🇸🇪",
-    suiza: "🇨🇭",
-    uruguay: "🇺🇾",
+  const codes: Record<string, string> = {
+    alemania: "DE",
+    argentina: "AR",
+    belgica: "BE",
+    brasil: "BR",
+    camerun: "CM",
+    colombia: "CO",
+    coreadelsur: "KR",
+    croacia: "HR",
+    dinamarca: "DK",
+    espana: "ES",
+    estadosunidos: "US",
+    francia: "FR",
+    gales: "WAL",
+    ghana: "GH",
+    holanda: "NL",
+    inglaterra: "ENG",
+    italia: "IT",
+    japon: "JP",
+    marruecos: "MA",
+    mexico: "MX",
+    nigeria: "NG",
+    paisesbajos: "NL",
+    paraguay: "PY",
+    peru: "PE",
+    polonia: "PL",
+    portugal: "PT",
+    republicacheca: "CZ",
+    rusia: "RU",
+    senegal: "SN",
+    serbia: "RS",
+    suecia: "SE",
+    suiza: "CH",
+    uruguay: "UY",
   };
-  if (flags[key]) return flags[key];
-  return fallback && fallback.length <= 4 && !/[A-Z]{2}/.test(fallback) ? fallback : "🌍";
+  return codes[key] ?? "WC";
+}
+
+function FlagChip({ nationality, compact = false }: { nationality: string; compact?: boolean }) {
+  const code = countryCode(nationality);
+  return (
+    <span
+      className="inline-grid place-items-center rounded-md font-oswald font-semibold shadow-sm"
+      style={{
+        width: compact ? 34 : 42,
+        height: compact ? 24 : 30,
+        background: "linear-gradient(135deg,#0f172a,#174ea6)",
+        color: "white",
+        border: "1px solid rgba(255,255,255,0.28)",
+        fontSize: compact ? 11 : 13,
+        letterSpacing: "0.04em",
+      }}
+      aria-label={nationality}
+      title={nationality}
+    >
+      {code}
+    </span>
+  );
 }
 
 export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
@@ -177,14 +198,14 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
   }
 
   function share() {
-    const grid = challenge.answers.map(answer => guessed.includes(answer.playerId) ? "🟩" : "⬛").join("");
+    const grid = challenge.answers.map(answer => guessed.includes(answer.playerId) ? "\u{1F7E9}" : "\u2B1B").join("");
     const text = [
-      `🌍 Top10 Mundial #${getDayNumber()}`,
+      `Top10 Mundial #${getDayNumber()}`,
       grid,
       `${guessed.length}/${challenge.answers.length} encontrados`,
       `Dificultad: ${challenge.difficulty}`,
       "",
-      "¿Puedes superarme?",
+      "\u00bfPuedes superarme?",
       FUTBOLDLE_URL,
     ].join("\n");
     shareGameResult(text, {
@@ -208,7 +229,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
     <section className="mx-auto max-w-3xl rounded-[28px] overflow-hidden" style={{ background: "white", boxShadow: "0 14px 34px rgba(0,0,0,0.09)" }}>
       <header className="px-5 py-5 md:px-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
         <div className="absolute right-4 -top-5 font-bebas text-[110px] leading-none text-white/10">10</div>
-        {onBack ? <button onClick={onBack} className="relative z-10 text-[11px] font-semibold text-white/70 mb-4">← Volver</button> : null}
+        {onBack ? <button onClick={onBack} className="relative z-10 text-[11px] font-semibold text-white/70 mb-4">Volver</button> : null}
         <div className="relative z-10 text-[9px] uppercase font-semibold tracking-[0.22em] text-white/70">Mundiales · #{getDayNumber()}</div>
         <h1 className="relative z-10 font-bebas text-[46px] md:text-[58px] leading-none mt-1">Top10 Mundial</h1>
         <p className="relative z-10 text-[12px] text-white/75 mt-1">{challenge.subtitle}</p>
@@ -231,15 +252,16 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
         <div className="flex flex-col gap-2">
           {challenge.answers.map((answer, index) => {
             const revealed = guessed.includes(answer.playerId) || finished;
-            const flag = flagForNationality(answer.nationality, answer.flag);
             return (
               <div key={`${answer.playerId}-${index}`} className="rounded-xl px-3 py-2.5 flex items-center gap-3" style={{ background: revealed ? "#eef3ff" : "#fbfaf7", border: `1px solid ${revealed ? "rgba(23,78,166,0.18)" : "rgba(0,0,0,0.07)"}` }}>
                 <div className="w-9 h-9 rounded-full flex items-center justify-center font-bebas text-[20px]" style={{ background: revealed ? "#174ea6" : "#e6e0d6", color: revealed ? "white" : "#9a9a8a" }}>{index + 1}</div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-oswald font-semibold text-[15px]" style={{ color: revealed ? "#18181b" : "#9a9a8a" }}>{revealed ? `${flag} ${answer.name}` : "?????"}</div>
-                  <div className="text-[18px] leading-none mt-1" aria-label={answer.nationality}>{revealed ? answer.label : flag}</div>
+                  <div className="font-oswald font-semibold text-[15px]" style={{ color: revealed ? "#18181b" : "#9a9a8a" }}>
+                    {revealed ? <><FlagChip nationality={answer.nationality} compact /> <span className="ml-2">{answer.name}</span></> : "?????"}
+                  </div>
+                  <div className="mt-1">{revealed ? <span className="text-[10px]" style={{ color: "#8a8a80" }}>{answer.label}</span> : <FlagChip nationality={answer.nationality} />}</div>
                 </div>
-                {revealed ? <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>✓</span> : null}
+                {revealed ? <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>OK</span> : null}
               </div>
             );
           })}
@@ -261,13 +283,13 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
               <div className="absolute z-30 left-0 right-0 mt-1 rounded-xl overflow-hidden" style={{ background: "white", border: "1px solid rgba(0,0,0,0.10)", boxShadow: "0 10px 26px rgba(0,0,0,0.12)" }}>
                 {suggestions.map(player => (
                   <button key={player.id} onMouseDown={event => { event.preventDefault(); submit(player.name); }} className="w-full px-4 py-2.5 text-left border-b last:border-0" style={{ borderColor: "rgba(0,0,0,0.06)" }}>
-                    <div className="font-oswald font-semibold text-[13px]">{flagForNationality(player.nationality, player.flag)} {player.name}</div>
-                    <div className="text-[10px]" style={{ color: "#9a9a8a" }}>{player.nationality} · {player.position}</div>
+                    <div className="font-oswald font-semibold text-[13px]"><FlagChip nationality={player.nationality} compact /> <span className="ml-2">{player.name}</span></div>
+                    <div className="text-[10px] mt-1" style={{ color: "#9a9a8a" }}>{player.nationality} · {player.position}</div>
                   </button>
                 ))}
               </div>
             )}
-            {wrong ? <div className="mt-2 text-[11px] font-semibold" style={{ color: "#b81c14" }}>{wrong} no está en este Top10.</div> : null}
+            {wrong ? <div className="mt-2 text-[11px] font-semibold" style={{ color: "#b81c14" }}>{wrong} no esta en este Top10.</div> : null}
           </div>
         ) : (
           <div className="rounded-2xl p-4" style={{ background: "#f0faf2", border: "1px solid rgba(30,107,46,0.18)" }}>
@@ -298,7 +320,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <Link href="/world-cups/album" className="text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver colección mundialista</Link>
+          <Link href="/world-cups/album" className="text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver coleccion mundialista</Link>
           <DataReportButton modeId="top10-mundial" challengeId={challenge.id} />
         </div>
       </div>

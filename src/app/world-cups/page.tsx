@@ -12,17 +12,17 @@ type ModeCard = {
   subtitle: string;
   accent: string;
   modeId: string;
-  mark: string;
   visual: "trophy" | "wordle" | "podium" | "medals" | "route" | "final";
+  primary?: boolean;
 };
 
 const modes: ModeCard[] = [
-  { href: "/world-cups/mundialdle", eyebrow: "Diario principal", title: "MUNDIALDLE", subtitle: "Pistas de Mundial, selección y club.", accent: "#174ea6", modeId: "mundialdle", mark: "Copa", visual: "trophy" },
-  { href: "/world-cups/wordle", eyebrow: "Diario rápido", title: "WORDLE MUNDIAL", subtitle: "Apellido mundialista sin pistas.", accent: "#174ea6", modeId: "worldcup-wordle", mark: "ABC", visual: "wordle" },
-  { href: "/world-cups/top10", eyebrow: "Ranking", title: "TOP10 MUNDIAL", subtitle: "Listas históricas del torneo.", accent: "#174ea6", modeId: "top10-mundial", mark: "10", visual: "podium" },
-  { href: "/world-cups/champions", eyebrow: "Archivo extra", title: "CAMPEONES", subtitle: "Sede, campeón y finalista.", accent: "#c8920a", modeId: "worldcup-champions", mark: "1", visual: "medals" },
-  { href: "/world-cups/camino", eyebrow: "Ruta", title: "CAMINO", subtitle: "Adivina la selección por sus rivales.", accent: "#c8920a", modeId: "camino-titulo", mark: "MAP", visual: "route" },
-  { href: "/world-cups/final", eyebrow: "Finales", title: "FINAL MUNDIAL", subtitle: "Marcador, rivales y año.", accent: "#c8920a", modeId: "final-mundial", mark: "90", visual: "final" },
+  { href: "/world-cups/mundialdle", eyebrow: "Diario principal", title: "MUNDIALDLE", subtitle: "Adivina el jugador con pistas de Mundial, seleccion y club.", accent: "#174ea6", modeId: "mundialdle", visual: "trophy", primary: true },
+  { href: "/world-cups/top10", eyebrow: "Ranking diario", title: "TOP10 MUNDIAL", subtitle: "Listas historicas del torneo para picarte con tu grupo.", accent: "#174ea6", modeId: "top10-mundial", visual: "podium", primary: true },
+  { href: "/world-cups/wordle", eyebrow: "Reto rapido", title: "WORDLE MUNDIAL", subtitle: "Apellido mundialista sin pistas progresivas.", accent: "#174ea6", modeId: "worldcup-wordle", visual: "wordle", primary: true },
+  { href: "/world-cups/champions", eyebrow: "Archivo extra", title: "CAMPEONES", subtitle: "Sede, campeon y finalista.", accent: "#c8920a", modeId: "worldcup-champions", visual: "medals" },
+  { href: "/world-cups/camino", eyebrow: "Ruta", title: "CAMINO", subtitle: "Adivina la seleccion por sus rivales.", accent: "#c8920a", modeId: "camino-titulo", visual: "route" },
+  { href: "/world-cups/final", eyebrow: "Finales", title: "FINAL MUNDIAL", subtitle: "Marcador, rivales y ano.", accent: "#c8920a", modeId: "final-mundial", visual: "final" },
 ];
 
 function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string }) {
@@ -61,7 +61,7 @@ function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string
   }
   return (
     <div className="fbl-mini-cromo grid h-[78px] w-[64px] place-items-center">
-      <span className="font-bebas text-[26px]" style={{ color: accent }}>Copa</span>
+      <span className="font-bebas text-[24px]" style={{ color: accent }}>CUP</span>
     </div>
   );
 }
@@ -72,18 +72,20 @@ function ActiveModeCard({ card }: { card: ModeCard }) {
       href={card.href}
       onClick={() => trackModeEntered(card.modeId, "world-cups", { source: "season_page" })}
       className="fbl-card rounded-2xl p-4 min-h-[206px] flex flex-col justify-between"
-      style={{ background: card.accent === "#174ea6" ? "linear-gradient(180deg,#eef3ff,#ffffff)" : "linear-gradient(180deg,#fffaf0,#ffffff)", border: `1px solid ${card.accent}2e` }}
+      style={{
+        background: card.primary ? "linear-gradient(180deg,#eef3ff,#ffffff)" : "linear-gradient(180deg,#fffaf0,#ffffff)",
+        border: `1px solid ${card.accent}2e`,
+      }}
     >
-      <span className="fbl-visual-mark">{card.mark}</span>
       <div className="relative z-10 flex items-start justify-between gap-3">
         <div>
           <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: card.accent }}>{card.eyebrow}</div>
           <h2 className="font-bebas text-[38px] leading-none mt-3" style={{ color: "#18181b" }}>{card.title}</h2>
-          <p className="text-[13px] mt-1 max-w-[190px]" style={{ color: "#615f67" }}>{card.subtitle}</p>
+          <p className="text-[13px] mt-1 max-w-[220px]" style={{ color: "#615f67" }}>{card.subtitle}</p>
         </div>
         <CardVisual type={card.visual} accent={card.accent} />
       </div>
-      <span className="relative z-10 mt-5 inline-flex w-fit rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: card.accent, color: "white" }}>Jugar →</span>
+      <span className="relative z-10 mt-5 inline-flex w-fit rounded-full px-3 py-2 font-oswald font-semibold uppercase tracking-wider text-[12px]" style={{ background: card.accent, color: "white" }}>Jugar ahora</span>
     </Link>
   );
 }
@@ -98,7 +100,7 @@ export default function WorldCupsPage() {
     <main className="min-h-dvh px-3 py-4" style={{ background: "#f6f2ea" }}>
       <div className="max-w-6xl mx-auto flex flex-col gap-5">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>← Volver</Link>
+          <Link href="/" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>Volver</Link>
           <span className="text-[10px] font-semibold px-3 py-1 rounded-full" style={{ background: "#eef3ff", color: "#174ea6", border: "1px solid rgba(23,78,166,0.18)" }}>Temporada activa</span>
         </div>
 
@@ -117,7 +119,7 @@ export default function WorldCupsPage() {
           <div className="relative z-10 max-w-3xl">
             <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/70">Temporada 2</div>
             <h1 className="font-bebas text-[58px] md:text-[92px] leading-none mt-2">Mundiales 2002-2026</h1>
-            <p className="text-[15px] md:text-[18px] text-white/82 mt-3 max-w-2xl">Jugadores, finales, campeones y rutas mundialistas con estética de archivo FIFA y cromos Panini.</p>
+            <p className="text-[15px] md:text-[18px] text-white/82 mt-3 max-w-2xl">Jugadores, finales, campeones, rankings y rutas mundialistas con alma de archivo FIFA y cromos Panini.</p>
             <div className="flex flex-wrap gap-3 mt-6">
               <Link href="/world-cups/mundialdle" className="rounded-2xl px-5 py-3 font-oswald font-semibold uppercase text-[13px]" style={{ background: "#ffd04a", color: "#151515" }}>Jugar Mundialdle</Link>
               <Link href="/world-cups/top10" className="rounded-2xl px-5 py-3 font-oswald font-semibold uppercase text-[13px]" style={{ border: "1px solid rgba(255,255,255,0.35)", color: "white", background: "rgba(255,255,255,0.08)" }}>Top10 Mundial</Link>
@@ -156,13 +158,13 @@ export default function WorldCupsPage() {
 
         <Link href="/world-cups/album" className="fbl-card rounded-2xl px-4 py-4 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
           <div className="flex items-center gap-3">
-            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center font-bebas text-[18px]" style={{ color: "#174ea6" }}>COPA</span>
+            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center font-bebas text-[18px]" style={{ color: "#174ea6" }}>CUP</span>
             <div>
-              <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Colección propia</div>
-              <div className="font-bebas text-[30px] leading-none">Álbum Mundialista</div>
+              <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Coleccion propia</div>
+              <div className="font-bebas text-[30px] leading-none">Album Mundialista</div>
             </div>
           </div>
-          <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>Ver cromos →</span>
+          <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>Ver cromos</span>
         </Link>
       </div>
     </main>
