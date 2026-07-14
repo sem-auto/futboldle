@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminUnauthorized, isAdminRequest } from "@/lib/serverAdminAuth";
+import { isRateLimited, requestIp } from "@/lib/rateLimit";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -13,7 +15,14 @@ function headers(prefer = "return=representation") {
   };
 }
 
-export async function GET() {
+async function readJson(request: NextRequest, maxBytes = 2_000) {
+  const text = await request.text();
+  if (text.length > maxBytes) throw new Error("payload_too_large");
+  return JSON.parse(text);
+}
+
+export async function GET(request: NextRequest) {
+  if (!isAdminRequest(request)) return adminUnauthorized();
   if (!SUPABASE_URL || !SUPABASE_KEY) return NextResponse.json({ configured: false, reports: [] });
 
   const response = await fetch(
@@ -28,8 +37,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   if (!SUPABASE_URL || !SUPABASE_KEY) return NextResponse.json({ configured: false }, { status: 202 });
+  if (isRateLimited(`report:${requestIp(request)}`, 12, 60_000)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   try {
-    const body = await request.json();
+    const body = await readJson(request);
     if (!body?.modeId || !body?.challengeId || !body?.issue) return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
     const row = {
       install_id: String(body.installId ?? "anonymous").slice(0, 80),
@@ -53,10 +63,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  if (!isAdminRequest(request)) return adminUnauthorized();
   if (!SUPABASE_URL || !SUPABASE_KEY) return NextResponse.json({ configured: false }, { status: 202 });
 
   try {
-    const body = await request.json();
+    const body = await readJson(request);
     const id = String(body?.id ?? "");
     const status = String(body?.status ?? "");
     if (!id || !VALID_STATUSES.has(status)) return NextResponse.json({ error: "invalid_payload" }, { status: 400 });

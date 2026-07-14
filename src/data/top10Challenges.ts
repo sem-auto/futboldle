@@ -7434,6 +7434,9 @@ export function getTop10ValidationIssues() {
 export const activeTop10Challenges = top10Challenges.filter(challenge =>
   !retiredTop10Ids.has(challenge.id) &&
   !isCoachTop10(challenge) &&
+  challenge.answers.length === 10 &&
+  Boolean(challenge.sourceUrl) &&
+  !JSON.stringify(challenge).includes("Por auditar") &&
   validateTop10Challenge(challenge).length === 0
 );
 
@@ -7457,8 +7460,9 @@ function getDayNumberForTop10(date = new Date()): number {
 }
 
 function pickTop10ForDay(dayNumber: number, previous?: Top10Challenge): Top10Challenge {
-  const publishableTop10Challenges = activeTop10Challenges.length ? activeTop10Challenges : top10Challenges;
+  const publishableTop10Challenges = activeTop10Challenges;
   const total = publishableTop10Challenges.length;
+  if (!total) throw new Error("No hay Top10 BBVA publicables.");
   const baseIndex = Math.abs(dayNumber * 37 + 11) % total;
   const previousFamily = previous ? getTop10Family(previous) : null;
 

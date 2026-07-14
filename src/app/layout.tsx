@@ -23,11 +23,6 @@ const jsonLd = {
       url: SITE_URL,
       inLanguage: "es",
       description: SITE_DESCRIPTION,
-      potentialAction: {
-        "@type": "SearchAction",
-        target: `${SITE_URL}/blog?q={search_term_string}`,
-        "query-input": "required name=search_term_string",
-      },
     },
     {
       "@type": "WebApplication",
@@ -157,7 +152,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#0b1410" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

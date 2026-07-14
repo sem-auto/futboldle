@@ -92,7 +92,25 @@ function cleanGeneratedChallenge(challenge: WorldCupTop10Challenge): WorldCupTop
 
 worldCupTop10Challenges.push(...(generatedWorldCupTop10Challenges as WorldCupTop10Challenge[]).map(cleanGeneratedChallenge));
 
+function isPublishableWorldCupTop10(challenge: WorldCupTop10Challenge) {
+  if (challenge.status !== "active") return false;
+  if (challenge.answers.length !== 10) return false;
+  if (!challenge.sourceName || !challenge.sourceUrl) return false;
+  if (JSON.stringify(challenge).includes("Por auditar")) return false;
+  return challenge.answers.every(answer =>
+    answer.playerId &&
+    answer.name &&
+    answer.aliases.length > 0 &&
+    answer.label &&
+    answer.nationality &&
+    answer.flag &&
+    answer.position
+  );
+}
+
+export const activeWorldCupTop10Challenges = worldCupTop10Challenges.filter(isPublishableWorldCupTop10);
+
 export function getDailyWorldCupTop10(dayNumber: number) {
-  const active = worldCupTop10Challenges.filter(challenge => challenge.status === "active");
-  return active[dayNumber % active.length] ?? worldCupTop10Challenges[0];
+  if (!activeWorldCupTop10Challenges.length) throw new Error("No hay Top10 Mundial publicables.");
+  return activeWorldCupTop10Challenges[dayNumber % activeWorldCupTop10Challenges.length];
 }

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { mundialdleChallenges, worldCupChampionChallenges, worldCupPlayers, worldCupTop10Challenges } from "@/data/worldcups";
+import { activeWorldCupTop10Challenges, mundialdleChallenges, worldCupChampionChallenges, worldCupPlayers } from "@/data/worldcups";
 import { trackEvent, trackModeEntered, trackSeasonEntered } from "@/lib/analytics";
 
 type ModeCard = {
@@ -150,7 +150,7 @@ export default function WorldCupsPage() {
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: "Jugadores", value: worldCupPlayers.length },
-            { label: "Retos", value: mundialdleChallenges.length + worldCupTop10Challenges.length },
+            { label: "Retos", value: mundialdleChallenges.length + activeWorldCupTop10Challenges.length },
             { label: "Finales", value: worldCupChampionChallenges.length },
             { label: "Periodo", value: "2002-2026" },
           ].map(item => (

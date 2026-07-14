@@ -11,7 +11,7 @@ import {
   removedUnverifiedTops,
   top10Challenges,
 } from "@/data/top10Challenges";
-import { mundialdleChallenges, worldCupChampionChallenges, worldCupPlayers, worldCupTitleRuns, worldCupTop10Challenges } from "@/data/worldcups";
+import { activeWorldCupTop10Challenges, mundialdleChallenges, worldCupChampionChallenges, worldCupPlayers, worldCupTitleRuns, worldCupTop10Challenges } from "@/data/worldcups";
 import { getAlbumEntries, getAlbumProgress, getTrophyShowcase } from "@/lib/album";
 import { getWorldCupAlbum, getWorldCupStreak } from "@/lib/worldCupCollection";
 import { loadGameCounts } from "@/lib/profile";
@@ -76,9 +76,13 @@ function getBrokenWorldCupItems() {
 
 function getWorldCupTopIssues() {
   const ids = new Set(worldCupPlayers.map(player => player.id));
+  const publicableIds = new Set(activeWorldCupTop10Challenges.map(challenge => challenge.id));
   const issues: string[] = [];
   for (const challenge of worldCupTop10Challenges) {
     if (!challenge.sourceUrl || !challenge.sourceName) issues.push(`${challenge.title}: falta fuente.`);
+    if (challenge.answers.length !== 10) issues.push(`${challenge.title}: debe tener exactamente 10 respuestas.`);
+    if (JSON.stringify(challenge).includes("Por auditar")) issues.push(`${challenge.title}: contiene datos Por auditar.`);
+    if (challenge.status === "active" && !publicableIds.has(challenge.id)) issues.push(`${challenge.title}: marcado active pero bloqueado para publico por validacion.`);
     for (const answer of challenge.answers) {
       if (!ids.has(answer.playerId)) issues.push(`${challenge.title}: jugador inexistente ${answer.name}`);
       if (hasBrokenEncoding(answer.name) || hasBrokenEncoding(answer.label)) issues.push(`${challenge.title}: encoding roto en ${answer.name}`);
@@ -131,7 +135,7 @@ function getCompetitionData(id: CompetitionId) {
         ...worldCupTitleRuns.map(run => ({ name: `${run.champion} ${run.year}`, first: run.host, rest: run.rivals.join(" · "), source: "World Cup path" })),
       ],
       errors: [...topIssues, ...broken.map(item => `Encoding: ${item}`)],
-      pending: worldCupTop10Challenges.filter(challenge => challenge.status !== "active").map(challenge => challenge.title),
+      pending: worldCupTop10Challenges.filter(challenge => !activeWorldCupTop10Challenges.some(active => active.id === challenge.id)).map(challenge => challenge.title),
       removed: [] as string[],
       duplicates,
       broken,

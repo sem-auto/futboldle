@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminUnauthorized, isAdminRequest } from "@/lib/serverAdminAuth";
+import { isRateLimited, requestIp } from "@/lib/rateLimit";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -170,8 +172,11 @@ function summarize(results: ResultRow[], events: EventRow[], reports: ReportRow[
 
 export async function POST(request: NextRequest) {
   if (!SUPABASE_URL || !SUPABASE_KEY) return NextResponse.json({ configured: false }, { status: 202 });
+  if (isRateLimited(`community-post:${requestIp(request)}`, 80, 60_000)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   try {
-    const body = await request.json();
+    const text = await request.text();
+    if (text.length > 2_000) return NextResponse.json({ error: "payload_too_large" }, { status: 413 });
+    const body = JSON.parse(text);
     if (!body?.modeId || !body?.challengeId || typeof body?.won !== "boolean" || !body?.installId) return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
     const row = { install_id: String(body.installId).slice(0, 80), mode_id: String(body.modeId).slice(0, 80), challenge_id: String(body.challengeId).slice(0, 120), season_id: String(body.seasonId ?? "bbva").slice(0, 40), won: body.won, attempts: Number(body.attempts) || null, time_spent: Number(body.timeSpent) || null };
     const response = await fetch(`${SUPABASE_URL}/rest/v1/community_results?on_conflict=install_id,challenge_id`, { method: "POST", headers: { ...headers(), Prefer: "resolution=merge-duplicates" }, body: JSON.stringify(row) });
@@ -188,6 +193,7 @@ export async function GET(request: NextRequest) {
   const challengeId = request.nextUrl.searchParams.get("challengeId")?.slice(0, 120);
 
   if (!modeId || !challengeId) {
+    if (!isAdminRequest(request)) return adminUnauthorized();
     const [results, events, reports] = await Promise.all([
       fetchRows<ResultRow>("community_results?select=install_id,mode_id,challenge_id,season_id,won,attempts,time_spent,created_at&order=created_at.desc&limit=5000"),
       fetchRows<EventRow>("community_events?select=install_id,event_name,mode_id,challenge_id,season_id,created_at&order=created_at.desc&limit=5000"),

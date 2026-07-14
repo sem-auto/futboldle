@@ -17,5 +17,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: "/jugadores/:slug", destination: "/jugador/:slug", permanent: true },
+      { source: "/clubes/:slug", destination: "/club/:slug", permanent: true },
+      { source: "/selecciones/:slug", destination: "/seleccion/:slug", permanent: true },
+      { source: "/ranking/:slug", destination: "/rankings/:slug", permanent: true },
+    ];
+  },
 };
 export default nextConfig;

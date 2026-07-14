@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isRateLimited, requestIp } from "@/lib/rateLimit";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -14,9 +15,12 @@ function headers() {
 
 export async function POST(request: NextRequest) {
   if (!SUPABASE_URL || !SUPABASE_KEY) return NextResponse.json({ configured: false }, { status: 202 });
+  if (isRateLimited(`event:${requestIp(request)}`, 120, 60_000)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
   try {
-    const body = await request.json();
+    const text = await request.text();
+    if (text.length > 2_000) return NextResponse.json({ error: "payload_too_large" }, { status: 413 });
+    const body = JSON.parse(text);
     if (!body?.eventName || !body?.installId) return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
 
     const row = {

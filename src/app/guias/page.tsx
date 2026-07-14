@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: `${SITE_URL}/guias` },
+  robots: { index: false, follow: true },
   openGraph: { title, description, url: `${SITE_URL}/guias`, type: "website", images: [`${SITE_URL}/og-image.png`] },
   twitter: { card: "summary_large_image", title, description, images: [`${SITE_URL}/og-image.png`] },
 };

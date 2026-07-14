@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cleanText, seoRankings } from "@/lib/seoIndex";
-import { worldCupTop10Challenges } from "@/data/worldcups/top10";
+import { activeWorldCupTop10Challenges } from "@/data/worldcups/top10";
 
 const SITE_URL = "https://futboldle.es";
 const title = "Rankings de fútbol nostalgia - Futboldle";
@@ -36,7 +36,7 @@ function RankingCard({ href, title, detail, source, tone = "#174ea6", mark = "10
 export default function RankingsPage() {
   const published = seoRankings.filter(ranking => ranking.status === "published" && ranking.challenge);
   const bbva = published.slice(0, 12);
-  const world = worldCupTop10Challenges.filter(challenge => challenge.status === "active").slice(0, 12);
+  const world = activeWorldCupTop10Challenges.slice(0, 12);
   const popular = [
     ...bbva.slice(0, 4).map(ranking => ({
       href: `/rankings/${ranking.slug}`,
