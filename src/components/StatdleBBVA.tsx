@@ -235,6 +235,16 @@ export default function StatdleBBVA({ onBack }: { onBack: () => void }) {
               <div className="text-[12px]" style={{ color: "#6b6b72" }}>{player.mainClub} {"\u00b7"} {player.position} {"\u00b7"} {player.nationality}</div>
               <button onClick={share} className="mt-3 w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl"
                 style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Copiado" : "Compartir resultado"}</button>
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <a href="/album" className="text-center font-oswald font-semibold uppercase tracking-wider text-[11px] py-3 rounded-xl"
+                  style={{ background: "#f8f5f0", color: "#c8920a", border: "1px solid rgba(200,146,10,0.18)" }}>
+                  Ver álbum BBVA
+                </a>
+                <button onClick={onBack} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-3 rounded-xl"
+                  style={{ background: "white", color: "#18181b", border: "1px solid rgba(0,0,0,0.08)" }}>
+                  Seguir jugando
+                </button>
+              </div>
             </div>
           )}
         </div>

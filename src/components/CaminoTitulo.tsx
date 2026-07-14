@@ -4,7 +4,8 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getCountrySuggestions, getDailyTitleRun } from "@/data/worldcups";
 import { getDayKey, getDayNumber } from "@/lib/daily";
-import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
+import { shareGameResult } from "@/lib/resultShare";
+import { FUTBOLDLE_URL } from "@/lib/share";
 import { trackChallengeCompleted, trackChallengeFailed, trackChallengeStarted, trackModeEntered } from "@/lib/analytics";
 import CommunityStatsPanel from "@/components/CommunityStatsPanel";
 import { useCommunityDifficulty } from "@/lib/communityStats";
@@ -79,7 +80,14 @@ export default function CaminoTitulo() {
   }
 
   function share() {
-    const text = buildScoreShare("Camino al Título", won ? `Correcto en ${guesses.length}` : `${guesses.length}/${MAX_ATTEMPTS} intentos`, `${run.champion} ${run.year}`);
+    const text = [
+      `🗺️ Camino al Título #${dayNumber}`,
+      won ? `Correcto en ${guesses.length} intentos` : `${guesses.length}/${MAX_ATTEMPTS} intentos`,
+      `${revealedCount}/${run.rivals.length} rivales revelados`,
+      "",
+      "¿Puedes superarme?",
+      FUTBOLDLE_URL,
+    ].join("\n");
     shareGameResult(text, {
       modeId: MODE_ID,
       seasonId: SEASON_ID,
@@ -165,6 +173,10 @@ export default function CaminoTitulo() {
             <button onClick={share} className="mt-4 w-full rounded-2xl py-4 font-oswald font-semibold uppercase tracking-wider" style={{ background: "#18181b", color: "white" }}>
               {copied ? "Resultado copiado" : "Compartir resultado"}
             </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+              <Link href="/world-cups" className="rounded-xl py-3 text-center text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Más retos mundiales</Link>
+              <Link href="/world-cups/album" className="rounded-xl py-3 text-center text-[11px] font-semibold" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver colección</Link>
+            </div>
           </div>
         )}
 

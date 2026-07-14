@@ -15,7 +15,8 @@ import {
   trackChallengeStarted,
   trackModeEntered,
 } from "@/lib/analytics";
-import { buildScoreShare, shareGameResult } from "@/lib/resultShare";
+import { shareGameResult } from "@/lib/resultShare";
+import { FUTBOLDLE_URL } from "@/lib/share";
 import CommunityStatsPanel from "@/components/CommunityStatsPanel";
 import { useCommunityDifficulty } from "@/lib/communityStats";
 import { useChallengeLifecycle } from "@/lib/useChallengeLifecycle";
@@ -179,8 +180,14 @@ export default function WorldCupChampions() {
       mode === "hard"
         ? `${state.won ? "Campeón y finalista" : "Fallado"} - ${state.attempts.length}/${MAX_ATTEMPTS}`
         : `${state.won ? "Campeón acertado" : "Fallado"} - ${state.attempts.length}/${MAX_ATTEMPTS}`;
-    const detail = `${challenge.year}: ${challenge.champion}${mode === "hard" ? ` vs ${challenge.runnerUp}` : ""}`;
-    const text = buildScoreShare("Campeones del Mundo", score, detail);
+    const text = [
+      `🏆 Campeones del Mundo #${dayNumber}`,
+      score,
+      mode === "hard" ? "Modo difícil" : "Modo normal",
+      "",
+      "¿Puedes superarme?",
+      FUTBOLDLE_URL,
+    ].join("\n");
     shareGameResult(text, {
       modeId: MODE_ID,
       seasonId: SEASON_ID,
@@ -295,6 +302,10 @@ export default function WorldCupChampions() {
             <button onClick={share} className="mt-4 w-full rounded-2xl py-4 font-oswald font-semibold uppercase tracking-wider" style={{ background: "#18181b", color: "white" }}>
               {copied ? "Resultado copiado" : "Compartir resultado"}
             </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+              <Link href="/world-cups" className="rounded-xl py-3 text-center text-[11px] font-semibold" style={{ background: "#174ea6", color: "white" }}>Más retos mundiales</Link>
+              <Link href="/world-cups/album" className="rounded-xl py-3 text-center text-[11px] font-semibold" style={{ background: "white", color: "#8a6200", border: "1px solid rgba(200,146,10,0.22)" }}>Ver colección</Link>
+            </div>
           </div>
         )}
 

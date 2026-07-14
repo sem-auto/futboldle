@@ -426,7 +426,7 @@ function CSCard({ title, subtitle, emoji, accent, badge, deco }: CSCardProps) {
         <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: "#f0ede6" }}>
           <div className="h-full rounded-full" style={{ width: "30%", background: accent+"50" }}/>
         </div>
-        <div className="text-[8px] mt-1 font-semibold uppercase tracking-wider" style={{ color: "#ccc" }}>En desarrollo</div>
+        <div className="text-[8px] mt-1 font-semibold uppercase tracking-wider" style={{ color: "#ccc" }}>Archivo futuro</div>
       </div>
     </div>
   );
@@ -475,6 +475,34 @@ function QuickGameCard({ title, subtitle, emoji, accent, onClick }: {
         <div className="font-bebas text-[15px] sm:text-[18px] md:text-[19px] leading-none" style={{ color: "#18181b" }}>{title}</div>
         <div className="text-[9px] sm:text-[10px] leading-snug mt-0.5 min-h-[24px]" style={{ color: "#9a9a8a" }}>{subtitle}</div>
         <div className="mt-2 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: accent }}>JUGAR →</div>
+      </div>
+    </button>
+  );
+}
+
+function FeaturedDuelCard({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="fbl-card group col-span-2 sm:col-span-2 w-full text-left rounded-2xl overflow-hidden transition-transform active:scale-[0.98]"
+      style={{ background: "linear-gradient(135deg,#fff7f5,#ffffff)", border: "1px solid rgba(184,28,20,0.22)", boxShadow: "0 6px 18px rgba(184,28,20,0.08)" }}
+    >
+      <div className="h-[3px]" style={{ background: "#b81c14" }} />
+      <div className="relative px-3 py-3 sm:px-4 sm:py-4 overflow-hidden">
+        <div className="absolute right-3 top-1 font-bebas text-[78px] leading-none opacity-[0.06]" style={{ color: "#b81c14" }}>VS</div>
+        <div className="relative z-10 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#b81c14" }}>Reto para picar</div>
+            <div className="font-bebas text-[25px] leading-none mt-1" style={{ color: "#18181b" }}>DUELO NOSTALGIA</div>
+            <div className="text-[10px] leading-snug mt-1" style={{ color: "#6b6b72" }}>Elige quién tuvo más goles, asistencias o partidos. Se entiende en 5 segundos.</div>
+          </div>
+          <div className="shrink-0 grid grid-cols-[1fr_auto_1fr] items-center gap-1 rounded-xl px-2 py-2" style={{ background: "white", border: "1px solid rgba(184,28,20,0.14)" }}>
+            <span className="grid h-8 w-8 place-items-center rounded-lg font-bebas text-[18px]" style={{ background: "rgba(184,28,20,0.10)", color: "#b81c14" }}>A</span>
+            <span className="font-bebas text-[18px]" style={{ color: "#18181b" }}>VS</span>
+            <span className="grid h-8 w-8 place-items-center rounded-lg font-bebas text-[18px]" style={{ background: "rgba(200,146,10,0.12)", color: "#c8920a" }}>B</span>
+          </div>
+        </div>
+        <div className="relative z-10 mt-3 font-oswald font-semibold uppercase tracking-wider text-[10px]" style={{ color: "#b81c14" }}>JUGAR →</div>
       </div>
     </button>
   );
@@ -1238,7 +1266,7 @@ export default function HomePage() {
               <div className="text-[10px] text-white/75 mt-1">Mundialdle, Wordle, Top10, campeones y finales.</div>
             </div>
             <div className="relative z-10 rounded-full px-3 py-2 text-[10px] font-semibold whitespace-nowrap" style={{ background: "#f8c647", color: "#18181b" }}>Entrar →</div>
-            <div className="absolute right-16 -top-8 font-bebas text-[100px] leading-none text-white/5">WC</div>
+            <div className="absolute right-10 -top-8 hidden sm:block font-bebas text-[92px] leading-none text-white/5">COPA</div>
           </Link>
         </section>
 
@@ -1259,10 +1287,10 @@ export default function HomePage() {
             <div className="text-[9px] font-semibold" style={{ color: "#9a9a8a" }}>Retos extra</div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <FeaturedDuelCard onClick={() => openMode("duelo", "duelo-nostalgia")} />
             <QuickGameCard title="STATDLE BBVA" subtitle="Adivina por estadísticas de temporada." emoji="📊" accent="#18181b" onClick={() => openMode("statdle", "statdle-bbva")} />
             <QuickGameCard title="¿JUGÓ AQUÍ?" subtitle="Jugador y club. ¿Verdad o trampa?" emoji="✅" accent="#1e6b2e" onClick={() => openMode("jugoAqui", "jugo-aqui")} />
             <QuickGameCard title="FICHAJE O INVENTO" subtitle="Operaciones raras de la era BBVA." emoji="📝" accent="#c8920a" onClick={() => openMode("fichaje", "fichaje-invento")} />
-            <QuickGameCard title="DUELO NOSTALGIA" subtitle="¿Quién tuvo más goles o asistencias?" emoji="⚔️" accent="#b81c14" onClick={() => openMode("duelo", "duelo-nostalgia")} />
           </div>
         </section>
 

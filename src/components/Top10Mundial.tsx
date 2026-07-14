@@ -66,13 +66,31 @@ function countryCode(nationality: string) {
   return codes[key] ?? "WC";
 }
 
+function flagEmoji(nationality: string) {
+  const code = countryCode(nationality);
+  const overrides: Record<string, string> = {
+    ENG: "🏴",
+    WAL: "🏴",
+    WC: "🌍",
+  };
+  if (overrides[code]) return overrides[code];
+  if (code.length !== 2) return "🌍";
+  return code
+    .toUpperCase()
+    .split("")
+    .map(char => String.fromCodePoint(127397 + char.charCodeAt(0)))
+    .join("");
+}
+
 function FlagChip({ nationality, compact = false }: { nationality: string; compact?: boolean }) {
   const code = countryCode(nationality);
+  const flag = flagEmoji(nationality);
   return (
     <span
-      className="inline-grid place-items-center rounded-md font-oswald font-semibold shadow-sm"
+      className="inline-flex items-center justify-center gap-1 rounded-md font-oswald font-semibold shadow-sm"
       style={{
-        width: compact ? 34 : 42,
+        minWidth: compact ? 34 : 48,
+        paddingInline: compact ? 5 : 7,
         height: compact ? 24 : 30,
         background: "linear-gradient(135deg,#0f172a,#174ea6)",
         color: "white",
@@ -83,9 +101,24 @@ function FlagChip({ nationality, compact = false }: { nationality: string; compa
       aria-label={nationality}
       title={nationality}
     >
-      {code}
+      <span>{flag}</span>
+      {!compact ? <span className="text-[10px] opacity-80">{code}</span> : null}
     </span>
   );
+}
+
+function maskedName(name: string) {
+  return name
+    .split(/\s+/)
+    .map(part => `${part[0] ?? ""}${"_".repeat(Math.max(0, part.length - 1))}`)
+    .join(" ");
+}
+
+function rarityLabel(level?: string) {
+  if (level === "icono") return "Leyenda";
+  if (level === "legendario") return "Legendario";
+  if (level === "core") return "Estrella";
+  return "Culto";
 }
 
 export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
@@ -94,6 +127,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
   const [query, setQuery] = useState("");
   const [guessed, setGuessed] = useState<string[]>([]);
   const [allGuesses, setAllGuesses] = useState<string[]>([]);
+  const [hintsUsed, setHintsUsed] = useState(0);
   const [finished, setFinished] = useState(false);
   const [copied, setCopied] = useState(false);
   const [wrong, setWrong] = useState("");
@@ -136,6 +170,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
       if (saved && Array.isArray(saved.guessed)) {
         setGuessed(saved.guessed);
         setAllGuesses(Array.isArray(saved.allGuesses) ? saved.allGuesses : []);
+        setHintsUsed(Math.min(3, Number(saved.hintsUsed) || 0));
         setFinished(!!saved.finished);
       }
     } catch {}
@@ -146,9 +181,9 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
     trackChallengeStarted("top10-mundial", challenge.id, { seasonId: "world-cups" });
   }, [challenge.id]);
 
-  function persist(nextGuessed: string[], nextAll: string[], nextFinished: boolean) {
+  function persist(nextGuessed: string[], nextAll: string[], nextFinished: boolean, nextHints = hintsUsed) {
     try {
-      localStorage.setItem(storageKey, JSON.stringify({ guessed: nextGuessed, allGuesses: nextAll, finished: nextFinished }));
+      localStorage.setItem(storageKey, JSON.stringify({ guessed: nextGuessed, allGuesses: nextAll, hintsUsed: nextHints, finished: nextFinished }));
     } catch {}
   }
 
@@ -170,7 +205,21 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
     const complete = nextGuessed.length === challenge.answers.length;
     setGuessed(nextGuessed);
     setFinished(complete);
-    unlockWorldCupCard(hit.playerId, challenge.id);
+    const unlocked = unlockWorldCupCard(hit.playerId, challenge.id);
+    if (unlocked) {
+      const player = worldCupPlayers.find(item => item.id === hit.playerId);
+      window.dispatchEvent(new CustomEvent("fbl-card-unlocked", {
+        detail: {
+          name: hit.name,
+          rarity: rarityLabel(player?.iconicLevel),
+          clubs: player?.clubsByWorldCup?.map(item => item.club) ?? [],
+          position: hit.position,
+          source: "Top10 Mundial",
+          season: challenge.period,
+          collectionUrl: "/world-cups/album",
+        },
+      }));
+    }
     persist(nextGuessed, nextAll, complete);
 
     if (complete) {
@@ -195,6 +244,12 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
       attempts: allGuesses.length,
       timeSpent: Math.round((Date.now() - startedAt) / 1000),
     });
+  }
+
+  function handleHint() {
+    const nextHints = Math.min(3, hintsUsed + 1);
+    setHintsUsed(nextHints);
+    persist(guessed, allGuesses, finished, nextHints);
   }
 
   function share() {
@@ -224,6 +279,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
 
   const pct = Math.round((guessed.length / challenge.answers.length) * 100);
   const wrongCount = Math.max(0, allGuesses.length - guessed.length);
+  const unsolvedAnswer = challenge.answers.find(answer => !guessed.includes(answer.playerId));
 
   return (
     <section className="mx-auto max-w-3xl rounded-[28px] overflow-hidden" style={{ background: "white", boxShadow: "0 14px 34px rgba(0,0,0,0.09)" }}>
@@ -248,6 +304,18 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
             <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: "#43d477" }} />
           </div>
         </div>
+
+        {!finished ? (
+          <div className="rounded-xl p-3" style={{ background: "white", border: "1px solid rgba(23,78,166,0.12)" }}>
+            <div className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: "#174ea6" }}>Recompensas</div>
+            <div className="flex flex-col gap-1.5">
+              <div className="font-oswald font-semibold text-[13px]" style={{ color: "#18181b" }}>
+                10 cromos mundialistas desbloqueables
+              </div>
+              <div className="text-[11px]" style={{ color: "#6b6b72" }}>Incluye jugadores de distintas selecciones y rarezas.</div>
+            </div>
+          </div>
+        ) : null}
 
         <div className="flex flex-col gap-2">
           {challenge.answers.map((answer, index) => {
@@ -289,12 +357,16 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
                 ))}
               </div>
             )}
-            {wrong ? <div className="mt-2 text-[11px] font-semibold" style={{ color: "#b81c14" }}>{wrong} no esta en este Top10.</div> : null}
+            {wrong ? <div className="mt-2 text-[11px] font-semibold" style={{ color: "#b81c14" }}>{wrong} no está en este Top10.</div> : null}
           </div>
         ) : (
-          <div className="rounded-2xl p-4" style={{ background: "#f0faf2", border: "1px solid rgba(30,107,46,0.18)" }}>
-            <div className="text-[9px] uppercase font-semibold tracking-[0.18em]" style={{ color: "#1e6b2e" }}>Resultado</div>
-            <div className="font-bebas text-[40px] leading-none mt-1" style={{ color: "#18181b" }}>{guessed.length}/10</div>
+          <div className="rounded-2xl overflow-hidden" style={{ background: "#f0faf2", border: "1px solid rgba(30,107,46,0.18)", boxShadow: "0 8px 28px rgba(23,78,166,0.10)" }}>
+            <div className="px-4 py-3" style={{ background: "linear-gradient(135deg,#174ea6,#0f172a)", color: "white" }}>
+              <div className="text-[9px] uppercase font-semibold tracking-[0.18em] text-white/65">Resultado mundialista</div>
+              <div className="font-bebas text-[34px] leading-none mt-1">{guessed.length}/10</div>
+              <p className="text-[11px] text-white/70 mt-1">Reta a tu grupo sin revelar el ranking completo.</p>
+            </div>
+            <div className="p-4">
             <div className="grid grid-cols-3 gap-2 mt-3">
               <div className="rounded-xl p-2 text-center" style={{ background: "white" }}>
                 <div className="font-bebas text-[22px] leading-none" style={{ color: "#174ea6" }}>{guessed.length}</div>
@@ -309,18 +381,66 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
                 <div className="text-[8px] uppercase font-semibold tracking-[0.12em]" style={{ color: "#6b6b72" }}>Nivel</div>
               </div>
             </div>
-            <p className="text-[12px] mt-3" style={{ color: "#5f5f66" }}>Reta a tu grupo sin revelar el ranking completo.</p>
-            <p className="text-[12px] mt-2" style={{ color: "#5f5f66" }}>Fuente: <a href={challenge.sourceUrl} target="_blank" rel="noreferrer" className="font-semibold underline">{challenge.sourceName}</a></p>
+            <div className="rounded-xl p-3 mt-3" style={{ background: "white", border: "1px solid rgba(23,78,166,0.10)" }}>
+              <div className="text-[9px] uppercase font-semibold tracking-[0.16em]" style={{ color: "#174ea6" }}>Fuente</div>
+              <p className="text-[12px] mt-1" style={{ color: "#5f5f66" }}>
+                <a href={challenge.sourceUrl} target="_blank" rel="noreferrer" className="font-semibold underline">{challenge.sourceName}</a>
+                <span> · {challenge.period}</span>
+              </p>
+              <p className="text-[11px] mt-1" style={{ color: "#8a8a80" }}>{challenge.criterion}</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+              <Link href="/world-cups/album" className="rounded-xl px-4 py-3 text-center text-[11px] font-semibold" style={{ background: "#eef3ff", color: "#174ea6", border: "1px solid rgba(23,78,166,0.14)" }}>Ver colección</Link>
+              <Link href="/world-cups" className="rounded-xl px-4 py-3 text-center text-[11px] font-semibold" style={{ background: "#18181b", color: "white" }}>Más retos mundiales</Link>
+            </div>
+            </div>
           </div>
         )}
 
+        {!finished && unsolvedAnswer && hintsUsed > 0 ? (
+          <div className="rounded-xl p-3.5" style={{ background: "#fffbf0", border: "1px solid rgba(200,146,10,0.25)" }}>
+            <div className="text-[9px] font-semibold uppercase tracking-[0.15em] mb-2" style={{ color: "#c8920a" }}>
+              Pistas del jugador oculto
+            </div>
+            <div className="flex flex-col gap-1">
+              {hintsUsed >= 1 ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.12em] w-24 flex-shrink-0" style={{ color: "#c8920a" }}>Bandera</span>
+                  <FlagChip nationality={unsolvedAnswer.nationality} />
+                </div>
+              ) : null}
+              {hintsUsed >= 2 ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.12em] w-24 flex-shrink-0" style={{ color: "#c8920a" }}>Posición</span>
+                  <span className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{unsolvedAnswer.position}</span>
+                </div>
+              ) : null}
+              {hintsUsed >= 3 ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.12em] w-24 flex-shrink-0" style={{ color: "#c8920a" }}>Inicial</span>
+                  <span className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{maskedName(unsolvedAnswer.name)}</span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
         <div className="flex flex-col sm:flex-row gap-2">
+          {!finished && hintsUsed < 3 && unsolvedAnswer ? (
+            <button
+              onClick={handleHint}
+              className="rounded-xl px-4 py-3 text-[11px] font-semibold"
+              style={{ background: "#fffbf0", border: "1px solid rgba(200,146,10,0.30)", color: "#c8920a" }}
+            >
+              Pista ({3 - hintsUsed} restantes)
+            </button>
+          ) : null}
           {!finished ? <button onClick={surrender} className="rounded-xl px-4 py-3 text-[11px] font-semibold" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Rendirse y ver ranking</button> : null}
           <button onClick={share} className="flex-1 rounded-xl px-4 py-3 text-[11px] font-semibold" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Resultado copiado" : "Compartir reto"}</button>
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <Link href="/world-cups/album" className="text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver coleccion mundialista</Link>
+          <Link href="/world-cups/album" className="text-[11px] font-semibold" style={{ color: "#174ea6" }}>Ver colección mundialista</Link>
           <DataReportButton modeId="top10-mundial" challengeId={challenge.id} />
         </div>
       </div>

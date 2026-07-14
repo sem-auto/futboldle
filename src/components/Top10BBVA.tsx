@@ -429,6 +429,14 @@ function submitPlayer(player: typeof bbvaPlayers[0]) {
               style={{ background: copied ? "#1e6b2e" : "#1a4fa0", color: "white" }}>
               {copied ? "✓ Copiado" : "Compartir reto"}
             </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+              <a href="/album" className="rounded-xl px-4 py-3 text-center text-[11px] font-semibold" style={{ background: "#fff8e6", color: "#8a6200", border: "1px solid rgba(200,146,10,0.20)" }}>
+                Ver álbum BBVA
+              </a>
+              <button onClick={onBack} className="rounded-xl px-4 py-3 text-center text-[11px] font-semibold" style={{ background: "#18181b", color: "white" }}>
+                Seguir jugando
+              </button>
+            </div>
             <div className="mt-3 text-right"><DataReportButton modeId="top10-bbva" challengeId={challenge.id} /></div>
             {challenge.extendedAnswers && (
               <button

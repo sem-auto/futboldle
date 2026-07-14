@@ -22,7 +22,7 @@ const modes: ModeCard[] = [
   { href: "/world-cups/wordle", eyebrow: "Reto rapido", title: "WORDLE MUNDIAL", subtitle: "Apellido mundialista sin pistas progresivas.", accent: "#174ea6", modeId: "worldcup-wordle", visual: "wordle", primary: true },
   { href: "/world-cups/champions", eyebrow: "Archivo extra", title: "CAMPEONES", subtitle: "Sede, campeon y finalista.", accent: "#c8920a", modeId: "worldcup-champions", visual: "medals" },
   { href: "/world-cups/camino", eyebrow: "Ruta", title: "CAMINO", subtitle: "Adivina la seleccion por sus rivales.", accent: "#c8920a", modeId: "camino-titulo", visual: "route" },
-  { href: "/world-cups/final", eyebrow: "Finales", title: "FINAL MUNDIAL", subtitle: "Marcador, rivales y ano.", accent: "#c8920a", modeId: "final-mundial", visual: "final" },
+  { href: "/world-cups/final", eyebrow: "Finales", title: "FINAL MUNDIAL", subtitle: "Marcador, rivales y año.", accent: "#c8920a", modeId: "final-mundial", visual: "final" },
 ];
 
 function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string }) {
@@ -60,8 +60,13 @@ function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string
     return <div className="grid grid-cols-3 gap-2 w-[110px]">{["1", "2", "3"].map(n => <span key={n} className="grid h-12 place-items-center rounded-full font-bebas text-[22px]" style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}35` }}>{n}</span>)}</div>;
   }
   return (
-    <div className="fbl-mini-cromo grid h-[78px] w-[64px] place-items-center">
-      <span className="font-bebas text-[24px]" style={{ color: accent }}>CUP</span>
+    <div className="relative grid h-[78px] w-[64px] place-items-center rounded-2xl" style={{ background: `linear-gradient(145deg, ${accent}18, #ffffff)`, border: `1px solid ${accent}35`, boxShadow: `0 10px 22px ${accent}18` }}>
+      <div className="absolute inset-x-3 top-2 h-2 rounded-full" style={{ background: `${accent}28` }} />
+      <div className="relative mt-2 flex flex-col items-center">
+        <div className="h-8 w-10 rounded-b-2xl rounded-t-md" style={{ background: `linear-gradient(180deg, #ffd04a, ${accent})`, border: "1px solid rgba(0,0,0,0.08)" }} />
+        <div className="mt-1 h-2 w-7 rounded-sm" style={{ background: accent }} />
+        <div className="h-1.5 w-10 rounded-sm" style={{ background: `${accent}40` }} />
+      </div>
     </div>
   );
 }
@@ -158,10 +163,13 @@ export default function WorldCupsPage() {
 
         <Link href="/world-cups/album" className="fbl-card rounded-2xl px-4 py-4 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#fff8e6,#eef3ff)", border: "1px solid rgba(200,146,10,0.28)" }}>
           <div className="flex items-center gap-3">
-            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center font-bebas text-[18px]" style={{ color: "#174ea6" }}>CUP</span>
+            <span className="fbl-mini-cromo grid h-14 w-11 place-items-center relative overflow-hidden" style={{ color: "#174ea6" }}>
+              <span className="absolute inset-x-2 top-2 h-1.5 rounded-full" style={{ background: "rgba(23,78,166,0.20)" }} />
+              <span className="font-bebas text-[22px] leading-none">★</span>
+            </span>
             <div>
-              <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Coleccion propia</div>
-              <div className="font-bebas text-[30px] leading-none">Album Mundialista</div>
+              <div className="text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#c8920a" }}>Colección propia</div>
+              <div className="font-bebas text-[30px] leading-none">Álbum Mundialista</div>
             </div>
           </div>
           <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>Ver cromos</span>

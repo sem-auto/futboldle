@@ -7419,13 +7419,23 @@ const retiredTop10Ids = new Set<string>([
   "statbunker-laliga-historico-asistencias",
   "statbunker-laliga-historico-sin-barca-madrid-asistencias",
   "statbunker-laliga-historico-goleadores-extranjeros",
+  "audited-bbva-entrenadores-con-mas-partidos-bbva-2005-06-2015-16-2005-06-2015-16",
 ]);
+
+function isCoachTop10(challenge: Top10Challenge) {
+  const text = `${challenge.id} ${challenge.title} ${challenge.criterion} ${challenge.consigna}`.toLowerCase();
+  return /\b(entrenador|entrenadores|seleccionador|seleccionadores|tecnico|técnico)\b/.test(text);
+}
 
 export function getTop10ValidationIssues() {
   return top10Challenges.flatMap(validateTop10Challenge);
 }
 
-export const activeTop10Challenges = top10Challenges.filter(challenge => !retiredTop10Ids.has(challenge.id) && validateTop10Challenge(challenge).length === 0);
+export const activeTop10Challenges = top10Challenges.filter(challenge =>
+  !retiredTop10Ids.has(challenge.id) &&
+  !isCoachTop10(challenge) &&
+  validateTop10Challenge(challenge).length === 0
+);
 
 export function getTop10Family(challenge: Top10Challenge): Top10Family {
   const text = `${challenge.id} ${challenge.title} ${challenge.category}`.toLowerCase();

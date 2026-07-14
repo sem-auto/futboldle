@@ -187,6 +187,10 @@ export default function ClubOcultoBBVA({ onBack }: { onBack: () => void }) {
               <div className="font-bebas text-[24px] leading-none" style={{ color: won ? "#1e6b2e" : "#b81c14" }}>{won ? item.club.toUpperCase() : `ERA ${item.club.toUpperCase()}`}</div>
               <p className="text-[12px] mt-1" style={{ color: "#6b6b72" }}>{item.note}</p>
               <button onClick={share} className="mt-3 w-full font-oswald font-semibold uppercase tracking-wider text-[12px] py-3 rounded-xl" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Copiado" : "Compartir"}</button>
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <a href="/album" className="text-center font-oswald font-semibold uppercase tracking-wider text-[11px] py-3 rounded-xl" style={{ background: "#edf4ff", color: "#1a4fa0", border: "1px solid rgba(26,79,160,0.18)" }}>Ver álbum BBVA</a>
+                <button onClick={onBack} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-3 rounded-xl" style={{ background: "white", color: "#18181b", border: "1px solid rgba(0,0,0,0.08)" }}>Seguir jugando</button>
+              </div>
             </div>
           )}
         </div>

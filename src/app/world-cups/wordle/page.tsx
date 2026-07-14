@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import IconUnlockToast from "@/components/IconUnlockToast";
 import WorldCupWordle from "@/components/WorldCupWordle";
 
 const SITE_URL = "https://futboldle.es";
@@ -27,6 +28,7 @@ export default async function WorldCupWordlePage({ searchParams }: { searchParam
   const extraIndex = Number.isFinite(parsedExtra) ? Math.max(0, Math.min(parsedExtra, 999)) : 0;
   return (
     <main className="min-h-dvh px-3 py-4" style={{ background: "#f6f2ea" }}>
+      <IconUnlockToast />
       <div className="max-w-xl mx-auto flex flex-col gap-3">
         <Link href="/world-cups" className="text-[12px] font-semibold" style={{ color: "#6b6b72" }}>{"\u2190"} Mundiales</Link>
         <WorldCupWordle key={extraIndex} initialExtraIndex={extraIndex} />

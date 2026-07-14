@@ -343,6 +343,16 @@ export default function AdivinaElCrack({ onBack }: { onBack: () => void }) {
               style={{ background: copied ? "#1e6b2e" : PURPLE, color: "white" }}>
               {copied ? "✓ Copiado" : "Compartir resultado"}
             </button>
+            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <a href="/album" className="text-center font-oswald font-semibold uppercase tracking-wider text-[11px] py-3 rounded-xl"
+                style={{ background: PURPLE_BG, color: PURPLE, border: `1px solid ${PURPLE_BD}` }}>
+                Ver álbum BBVA
+              </a>
+              <button onClick={onBack} className="font-oswald font-semibold uppercase tracking-wider text-[11px] py-3 rounded-xl"
+                style={{ background: "#f8f5f0", color: "#18181b", border: "1px solid rgba(0,0,0,0.08)" }}>
+                Seguir jugando
+              </button>
+            </div>
           </div>
         </div>
       )}

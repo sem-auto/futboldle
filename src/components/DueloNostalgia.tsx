@@ -45,6 +45,7 @@ function ChoiceCard({
 }) {
   const border = revealed ? (correct ? "rgba(30,107,46,0.45)" : selected ? "rgba(184,28,20,0.38)" : "rgba(0,0,0,0.08)") : "rgba(200,146,10,0.22)";
   const bg = revealed ? (correct ? "#f0faf2" : selected ? "#fff5f5" : "white") : "white";
+  const badge = revealed ? (correct ? "GANA" : selected ? "PIERDE" : "") : "ELIGE";
 
   return (
     <button
@@ -55,17 +56,18 @@ function ChoiceCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
+          <div className="text-[8px] font-semibold uppercase tracking-[0.16em] mb-1" style={{ color: correct && revealed ? "#1e6b2e" : selected && revealed ? "#b81c14" : "#c8920a" }}>{badge}</div>
           <div className="font-bebas text-[34px] leading-none" style={{ color: "#18181b" }}>{name}</div>
           <div className="text-[11px] mt-1" style={{ color: "#6b6b72" }}>{note}</div>
         </div>
         {revealed ? (
           <div className="rounded-xl px-3 py-2 text-center" style={{ background: correct ? "#1e6b2e" : "#f8f5f0", color: correct ? "white" : "#9a9a8a" }}>
             <div className="font-bebas text-[28px] leading-none">{value}</div>
-            <div className="text-[8px] uppercase font-semibold">{metricLabel}</div>
+              <div className="text-[8px] uppercase font-semibold">{metricLabel}</div>
           </div>
         ) : (
           <div className="rounded-xl px-3 py-2 text-center" style={{ background: "#fff8e6", color: "#c8920a" }}>
-            <div className="font-bebas text-[28px] leading-none">?</div>
+              <div className="font-bebas text-[28px] leading-none">?</div>
             <div className="text-[8px] uppercase font-semibold">{metricLabel}</div>
           </div>
         )}
@@ -183,6 +185,19 @@ export default function DueloNostalgia({ onBack }: { onBack?: () => void }) {
             <div className="text-[8px] uppercase font-semibold tracking-[0.18em]" style={{ color: "#c8920a" }}>Ronda</div>
             <div className="font-bebas text-[26px] leading-none">{Math.min(answers.length + 1, duels.length)}/{duels.length}</div>
           </div>
+          <div className="hidden sm:flex items-center gap-1">
+            {duels.map((item, index) => {
+              const answered = answers[index];
+              const ok = answered && answered === optionWinner(item);
+              return (
+                <span
+                  key={`${item.question}-${index}`}
+                  className="h-2.5 w-7 rounded-full"
+                  style={{ background: !answered ? "#e8e4dc" : ok ? "#1e6b2e" : "#b81c14" }}
+                />
+              );
+            })}
+          </div>
           <div className="text-right">
             <div className="text-[8px] uppercase font-semibold tracking-[0.18em]" style={{ color: "#9a9a8a" }}>Marcador</div>
             <div className="font-bebas text-[30px] leading-none" style={{ color: "#18181b" }}>{score}/{answers.length}</div>
@@ -213,7 +228,7 @@ export default function DueloNostalgia({ onBack }: { onBack?: () => void }) {
               {score >= 3 ? "Duelo ganado" : "Duelo completado"}
             </div>
             <div className="font-bebas text-[58px] leading-none mt-2" style={{ color: "#18181b" }}>{score}/{duels.length}</div>
-            <p className="text-[12px] mt-2" style={{ color: "#6b6b72" }}>Ideal para picar a alguien en X: no revela respuestas y se entiende en 5 segundos.</p>
+            <p className="text-[12px] mt-2" style={{ color: "#6b6b72" }}>Comparte el marcador sin revelar las respuestas y reta a tu grupo.</p>
             <button onClick={share} className="w-full rounded-xl py-3 mt-4 font-oswald font-semibold uppercase text-[12px]" style={{ background: copied ? "#1e6b2e" : "#18181b", color: "white" }}>{copied ? "Copiado" : "Compartir resultado"}</button>
             <button onClick={restartExtra} className="w-full rounded-xl py-3 mt-2 text-[11px] font-semibold" style={{ background: "white", color: "#b81c14", border: "1px solid rgba(184,28,20,0.18)" }}>Jugar otra tanda</button>
             <div className="flex items-center justify-between mt-4">

@@ -366,6 +366,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
             position: player.position,
             source: "Mundialdle",
             season: `Mundial ${challenge.worldCup}`,
+            collectionUrl: "/world-cups/album",
           },
         }));
       }
@@ -540,7 +541,7 @@ export default function Mundialdle({ onBack }: { onBack?: () => void }) {
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>STAR {rarityLabel(player.iconicLevel)}</span>
                     <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#174ea6" }}><FlagMark country={player.nationality} compact /> {player.nationality}</span>
                     <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#18181b" }}>{positionCode(player.position)} {player.position}</span>
-                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>WC Mundial {challenge.worldCup}</span>
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "white", color: "#8a6200" }}>Mundial {challenge.worldCup}</span>
                   </div>
                   {won && (
                     <div className="mt-2 text-[12px] font-semibold" style={{ color: "#1e6b2e" }}>

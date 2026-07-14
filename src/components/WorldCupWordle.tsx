@@ -157,7 +157,20 @@ export default function WorldCupWordle({ initialExtraIndex = 0 }: { initialExtra
       recordWorldCupDay(dayNumber);
       if (correct) {
         const unlocked = unlockWorldCupCard(player.id, challengeId);
-        if (unlocked) trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "worldcup-wordle", playerId: player.id });
+        if (unlocked) {
+          trackEvent("card_unlocked", { seasonId: "world-cups", modeId: "worldcup-wordle", playerId: player.id });
+          window.dispatchEvent(new CustomEvent("fbl-card-unlocked", {
+            detail: {
+              name: player.name,
+              rarity: rarity.label,
+              clubs: player.clubsByWorldCup?.map(item => item.club) ?? [],
+              position: player.position,
+              source: "Wordle Mundial",
+              season: `Mundial ${player.mainWorldCup}`,
+              collectionUrl: "/world-cups/album",
+            },
+          }));
+        }
       }
       syncAchievements({ modeId: "worldcup-wordle", won: correct });
       const payload = { seasonId: "world-cups", attempts: nextIndex, won: correct, timeSpent: Math.round((Date.now() - startedAt) / 1000) };

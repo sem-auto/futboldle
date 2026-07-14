@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { shareResult } from "@/lib/share";
 
 export default function IconUnlockToast() {
-  const [card, setCard] = useState<{ name: string; rarity: string; clubs: string[]; position: string; source?: string; season?: string } | null>(null);
+  const [card, setCard] = useState<{ name: string; rarity: string; clubs: string[]; position: string; source?: string; season?: string; collectionUrl?: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     function onCard(event: Event) {
-      const detail = (event as CustomEvent<{ name?: string; rarity?: string; clubs?: string[]; position?: string; source?: string; season?: string }>).detail;
+      const detail = (event as CustomEvent<{ name?: string; rarity?: string; clubs?: string[]; position?: string; source?: string; season?: string; collectionUrl?: string }>).detail;
       if (!detail?.name) return;
       setCopied(false);
       setCard({
@@ -18,6 +18,7 @@ export default function IconUnlockToast() {
         position: detail.position ?? "Jugador",
         source: detail.source,
         season: detail.season,
+        collectionUrl: detail.collectionUrl,
       });
       window.setTimeout(() => setCard(null), 6200);
     }
@@ -55,9 +56,9 @@ export default function IconUnlockToast() {
           </div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <a href="/album" className="font-oswald font-semibold uppercase tracking-wider text-[11px] px-3 py-2 rounded-lg"
+          <a href={card.collectionUrl ?? "/album"} className="font-oswald font-semibold uppercase tracking-wider text-[11px] px-3 py-2 rounded-lg"
             style={{ background: "#fac840", color: "#111" }}>
-            Ver álbum
+            Ver colección
           </a>
           <button onClick={shareCard} className="font-oswald font-semibold uppercase tracking-wider text-[11px] px-3 py-2 rounded-lg"
             style={{ background: copied ? "#1e6b2e" : "white", color: copied ? "white" : "#18181b" }}>
