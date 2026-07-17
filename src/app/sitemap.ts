@@ -53,11 +53,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.82,
     },
     {
-      url: `${SITE_URL}/album`,
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    {
       url: `${SITE_URL}/world-cups`,
       changeFrequency: "daily",
       priority: 0.8,
@@ -137,21 +132,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/rankings`,
       changeFrequency: "weekly",
       priority: 0.45,
-    },
-    {
-      url: `${SITE_URL}/perfil`,
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: `${SITE_URL}/progreso`,
-      changeFrequency: "daily",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/vitrina`,
-      changeFrequency: "weekly",
-      priority: 0.5,
     },
   ];
 

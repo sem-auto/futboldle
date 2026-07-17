@@ -102,7 +102,7 @@ export default async function RankingSeoPage({ params }: Props) {
                     <tr key={`${row.position}-${row.displayName}`} style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
                       <td className="py-2 font-bebas text-[22px]" style={{ color: "#174ea6" }}>{row.position}</td>
                       <td>
-                        <Link href={link?.href ?? "/tops"} className="font-semibold" style={{ color: "#18181b" }}>
+                        <Link href={link?.href ?? "/rankings"} className="font-semibold" style={{ color: "#18181b" }}>
                           {cleanText(row.displayName)}
                         </Link>
                       </td>
