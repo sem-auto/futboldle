@@ -76,6 +76,9 @@ for (const forbidden of ["/admin", "/api", "/debug", "/tops", "/guias"]) {
 for (const legacy of ["/jugadores/", "/clubes/", "/selecciones/", "/ranking/"]) {
   assert(!sitemap.includes(legacy), `sitemap no debe incluir ruta legacy ${legacy}.`);
 }
+assert(!sitemap.includes("new Date()"), "sitemap no debe marcar todas las paginas como modificadas hoy.");
+assert(!sitemap.includes("lastModified: now"), "sitemap no debe usar lastModified global.");
+assert(sitemap.includes("worldCup.year < 2026"), "sitemap debe excluir Mundial 2026 hasta que tenga contenido real.");
 
 const layout = read("src/app/layout.tsx");
 assert(!layout.includes("SearchAction"), "No debe existir SearchAction sin buscador real.");
@@ -101,6 +104,10 @@ assert(eventsApi.includes("payload_too_large") && eventsApi.includes("rate_limit
 
 const bbvaTop10 = read("src/data/top10Challenges.ts");
 assert(bbvaTop10.includes("activeTop10Challenges"), "Falta lista publica filtrada de Top10 BBVA.");
+assert(bbvaTop10.includes("top10AuditRegistry"), "Top10 BBVA debe usar registro explicito de auditoria.");
+assert(bbvaTop10.includes("getTop10AuditStatus(challenge).status === \"verified\""), "Top10 BBVA publico debe requerir estado verified.");
+assert(bbvaTop10.includes("updatedAt") && bbvaTop10.includes("auditedAt"), "Top10 BBVA verified debe exigir updatedAt y auditedAt.");
+assert(bbvaTop10.includes("hasGenericSourceUrl"), "Top10 BBVA debe bloquear fuentes genericas.");
 assert(bbvaTop10.includes('!JSON.stringify(challenge).includes("Por auditar")'), "Top10 BBVA publicos deben excluir Por auditar.");
 assert(bbvaTop10.includes("challenge.answers.length === 10"), "Top10 BBVA publicos deben tener exactamente 10 respuestas.");
 assert(!bbvaTop10.includes("activeTop10Challenges.length ? activeTop10Challenges : top10Challenges"), "Top10 BBVA no debe caer a lista sin filtrar.");
@@ -109,7 +116,35 @@ const wcTop10 = read("src/data/worldcups/top10.ts");
 assert(wcTop10.includes("activeWorldCupTop10Challenges"), "Falta lista publica filtrada de Top10 Mundial.");
 assert(wcTop10.includes('JSON.stringify(challenge).includes("Por auditar")'), "Top10 Mundial publicos deben excluir Por auditar.");
 assert(wcTop10.includes("challenge.answers.length !== 10"), "Top10 Mundial publicos deben exigir 10 respuestas.");
+assert(wcTop10.includes("https://www.fifa.com/") && wcTop10.includes("https://www.statbunker.com/"), "Top10 Mundial debe bloquear fuentes genericas.");
 assert(!wcTop10.includes("worldCupTop10Challenges.filter(challenge => challenge.status === \"active\")"), "Top10 Mundial no debe usar solo status active.");
+
+const seoIndex = read("src/lib/seoIndex.ts");
+assert(!seoIndex.includes("findChallengeForIntent"), "Rankings SEO no deben mapearse por busqueda difusa.");
+assert(!seoIndex.includes("match: ["), "Rankings SEO deben usar challengeId explicito.");
+assert(seoIndex.includes("challengeId?: string"), "Rankings SEO deben soportar challengeId explicito.");
+
+for (const legacyRoute of [
+  "src/app/jugadores/[slug]/page.tsx",
+  "src/app/clubes/[slug]/page.tsx",
+  "src/app/selecciones/[slug]/page.tsx",
+  "src/app/ranking/[slug]/page.tsx",
+]) {
+  assert(!exists(legacyRoute), `Ruta legacy fisica debe eliminarse: ${legacyRoute}`);
+}
+
+for (const dynamicRoute of [
+  "src/app/jugador/[slug]/page.tsx",
+  "src/app/club/[slug]/page.tsx",
+  "src/app/seleccion/[slug]/page.tsx",
+  "src/app/nacionalidad/[slug]/page.tsx",
+  "src/app/posicion/[slug]/page.tsx",
+  "src/app/rankings/[slug]/page.tsx",
+]) {
+  const text = read(dynamicRoute);
+  assert(text.includes("dynamicParams = true"), `${dynamicRoute} debe permitir ISR/dynamic params.`);
+  assert(text.includes("revalidate"), `${dynamicRoute} debe definir revalidate.`);
+}
 
 const publicFiles = walk(path.join(root, "src", "app"));
 for (const file of publicFiles) {

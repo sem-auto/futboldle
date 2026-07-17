@@ -5,8 +5,12 @@ import { canonical, OG_IMAGE, seoClubs, seoRankings } from "@/lib/seoIndex";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 86400;
+export const dynamicParams = true;
+
 export function generateStaticParams() {
-  return seoClubs.map(club => ({ slug: club.slug }));
+  const priority = new Set(["valencia", "sevilla", "villarreal", "atletico-de-madrid", "barcelona", "real-madrid", "malaga", "betis"]);
+  return seoClubs.filter(club => priority.has(club.slug)).map(club => ({ slug: club.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -25,9 +29,12 @@ export default async function ClubPage({ params }: Props) {
   if (!club) notFound();
   const playerLinks = club.players.map(player => ({ href: `/jugador/${player.slug}`, label: player.name, detail: player.position }));
   const rankingLinks = seoRankings
-    .filter(ranking => ranking.title.toLowerCase().includes(club.name.toLowerCase()) || ranking.status === "published")
+    .filter(ranking => ranking.status === "published" && (
+      ranking.title.toLowerCase().includes(club.name.toLowerCase()) ||
+      ranking.challenge?.answers.some(answer => answer.hintClub.toLowerCase() === club.name.toLowerCase())
+    ))
     .slice(0, 8)
-    .map(ranking => ({ href: `/ranking/${ranking.slug}`, label: ranking.title, detail: ranking.status === "published" ? "Publicado" : "Pendiente" }));
+    .map(ranking => ({ href: `/rankings/${ranking.slug}`, label: ranking.title, detail: "Publicado" }));
 
   return (
     <>
@@ -50,4 +57,3 @@ export default async function ClubPage({ params }: Props) {
     </>
   );
 }
-

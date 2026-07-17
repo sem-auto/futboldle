@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -68,13 +68,8 @@ function countryCode(nationality: string) {
 
 function flagEmoji(nationality: string) {
   const code = countryCode(nationality);
-  const overrides: Record<string, string> = {
-    ENG: "🏴",
-    WAL: "🏴",
-    WC: "🌍",
-  };
-  if (overrides[code]) return overrides[code];
-  if (code.length !== 2) return "🌍";
+  if (code === "ENG" || code === "WAL" || code === "WC") return code;
+  if (code.length !== 2) return "WC";
   return code
     .toUpperCase()
     .split("")
@@ -170,7 +165,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
       if (saved && Array.isArray(saved.guessed)) {
         setGuessed(saved.guessed);
         setAllGuesses(Array.isArray(saved.allGuesses) ? saved.allGuesses : []);
-        setHintsUsed(Math.min(3, Number(saved.hintsUsed) || 0));
+        setHintsUsed(Math.min(1, Number(saved.hintsUsed) || 0));
         setFinished(!!saved.finished);
       }
     } catch {}
@@ -194,8 +189,15 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
     setAllGuesses(nextAll);
     setQuery("");
 
-    if (!hit || guessed.includes(hit.playerId)) {
+    if (!hit) {
       setWrong(value);
+      setTimeout(() => setWrong(""), 1400);
+      persist(guessed, nextAll, false);
+      return;
+    }
+
+    if (guessed.includes(hit.playerId)) {
+      setWrong(`${hit.name} ya estaba acertado`);
       setTimeout(() => setWrong(""), 1400);
       persist(guessed, nextAll, false);
       return;
@@ -247,7 +249,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
   }
 
   function handleHint() {
-    const nextHints = Math.min(3, hintsUsed + 1);
+    const nextHints = Math.min(1, hintsUsed + 1);
     setHintsUsed(nextHints);
     persist(guessed, allGuesses, finished, nextHints);
   }
@@ -260,7 +262,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
       `${guessed.length}/${challenge.answers.length} encontrados`,
       `Dificultad: ${challenge.difficulty}`,
       "",
-      "\u00bfPuedes superarme?",
+      "¿Puedes superarme?",
       FUTBOLDLE_URL,
     ].join("\n");
     shareGameResult(text, {
@@ -327,7 +329,16 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
                   <div className="font-oswald font-semibold text-[15px]" style={{ color: revealed ? "#18181b" : "#9a9a8a" }}>
                     {revealed ? <><FlagChip nationality={answer.nationality} compact /> <span className="ml-2">{answer.name}</span></> : "?????"}
                   </div>
-                  <div className="mt-1">{revealed ? <span className="text-[10px]" style={{ color: "#8a8a80" }}>{answer.label}</span> : <FlagChip nationality={answer.nationality} />}</div>
+                  <div className="mt-1">
+                    {revealed ? (
+                      <span className="text-[10px]" style={{ color: "#8a8a80" }}>{answer.label}</span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <FlagChip nationality={answer.nationality} />
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#9a9a8a" }}>Bandera</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {revealed ? <span className="text-[12px] font-semibold" style={{ color: "#174ea6" }}>OK</span> : null}
               </div>
@@ -357,7 +368,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
                 ))}
               </div>
             )}
-            {wrong ? <div className="mt-2 text-[11px] font-semibold" style={{ color: "#b81c14" }}>{wrong} no está en este Top10.</div> : null}
+            {wrong ? <div className="mt-2 text-[11px] font-semibold" style={{ color: "#b81c14" }}>{wrong}{wrong.includes("acertado") ? "." : " no está en este Top10."}</div> : null}
           </div>
         ) : (
           <div className="rounded-2xl overflow-hidden" style={{ background: "#f0faf2", border: "1px solid rgba(30,107,46,0.18)", boxShadow: "0 8px 28px rgba(23,78,166,0.10)" }}>
@@ -400,7 +411,7 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
         {!finished && unsolvedAnswer && hintsUsed > 0 ? (
           <div className="rounded-xl p-3.5" style={{ background: "#fffbf0", border: "1px solid rgba(200,146,10,0.25)" }}>
             <div className="text-[9px] font-semibold uppercase tracking-[0.15em] mb-2" style={{ color: "#c8920a" }}>
-              Pistas del jugador oculto
+              Pista del jugador oculto
             </div>
             <div className="flex flex-col gap-1">
               {hintsUsed >= 1 ? (
@@ -409,30 +420,18 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
                   <FlagChip nationality={unsolvedAnswer.nationality} />
                 </div>
               ) : null}
-              {hintsUsed >= 2 ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-semibold uppercase tracking-[0.12em] w-24 flex-shrink-0" style={{ color: "#c8920a" }}>Posición</span>
-                  <span className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{unsolvedAnswer.position}</span>
-                </div>
-              ) : null}
-              {hintsUsed >= 3 ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-semibold uppercase tracking-[0.12em] w-24 flex-shrink-0" style={{ color: "#c8920a" }}>Inicial</span>
-                  <span className="font-oswald font-semibold text-[12px]" style={{ color: "#18181b" }}>{maskedName(unsolvedAnswer.name)}</span>
-                </div>
-              ) : null}
             </div>
           </div>
         ) : null}
 
         <div className="flex flex-col sm:flex-row gap-2">
-          {!finished && hintsUsed < 3 && unsolvedAnswer ? (
+          {!finished && hintsUsed < 1 && unsolvedAnswer ? (
             <button
               onClick={handleHint}
               className="rounded-xl px-4 py-3 text-[11px] font-semibold"
               style={{ background: "#fffbf0", border: "1px solid rgba(200,146,10,0.30)", color: "#c8920a" }}
             >
-              Pista ({3 - hintsUsed} restantes)
+              Pista de bandera
             </button>
           ) : null}
           {!finished ? <button onClick={surrender} className="rounded-xl px-4 py-3 text-[11px] font-semibold" style={{ background: "#f8f5f0", color: "#6b6b72" }}>Rendirse y ver ranking</button> : null}
@@ -447,3 +446,5 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
     </section>
   );
 }
+
+

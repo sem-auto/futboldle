@@ -15,17 +15,6 @@ const ADS = [
     cta: "Ver SIDGI",
     url: "https://sem-auto.github.io/sigdi-landing/",
   },
-  {
-    id: "instaapply",
-    accent: "#1a4fa0",
-    accentLight: "#eff4ff",
-    eyebrowIcon: "\ud83e\udd16",
-    eyebrow: "Busca trabajo",
-    title: "Aplica 10x mas rapido con IA",
-    desc: "Rellena formularios de empleo automaticamente con tu CV.",
-    cta: "Probar gratis",
-    url: "https://chromewebstore.google.com/detail/instaapply/fpiaeondjkdaagegkjfjlnfmpojgkjgf?pli=1",
-  },
 ];
 
 export function SidebarAds() {
@@ -38,19 +27,12 @@ export function SidebarAds() {
       >
         <SideCard ad={ADS[0]} />
       </aside>
-      <aside
-        className="fixed right-3 top-24 z-20 hidden xl:block"
-        style={{ width: "clamp(160px,13vw,188px)" }}
-        aria-label="Publicidad derecha"
-      >
-        <SideCard ad={ADS[1]} />
-      </aside>
     </>
   );
 }
 
 export function MobileAdBanner({ slot = 0 }: { slot?: 0 | 1 }) {
-  const ad = ADS[slot];
+  const ad = ADS[0];
 
   return (
     <a

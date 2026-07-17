@@ -5,8 +5,12 @@ import { canonical, OG_IMAGE, seoSelections, seoWorldCups } from "@/lib/seoIndex
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 86400;
+export const dynamicParams = true;
+
 export function generateStaticParams() {
-  return seoSelections.map(selection => ({ slug: selection.slug }));
+  const priority = new Set(["espana", "argentina", "brasil", "alemania", "francia", "italia", "portugal", "inglaterra", "holanda", "uruguay"]);
+  return seoSelections.filter(selection => priority.has(selection.slug)).map(selection => ({ slug: selection.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -45,4 +49,3 @@ export default async function SelectionPage({ params }: Props) {
     />
   );
 }
-

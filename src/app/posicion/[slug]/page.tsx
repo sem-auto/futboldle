@@ -5,6 +5,9 @@ import { canonical, OG_IMAGE, seoNationalities, seoPositions } from "@/lib/seoIn
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 86400;
+export const dynamicParams = true;
+
 export function generateStaticParams() {
   return seoPositions.map(position => ({ slug: position.slug }));
 }
@@ -23,7 +26,7 @@ export default async function PositionSeoPage({ params }: Props) {
   const { slug } = await params;
   const position = seoPositions.find(item => item.slug === slug);
   if (!position) notFound();
-  const players = position.players.map(player => ({ href: `/jugadores/${player.slug}`, label: player.name, detail: player.nationality }));
+  const players = position.players.map(player => ({ href: `/jugador/${player.slug}`, label: player.name, detail: player.nationality }));
   return (
     <SeoEntityPage
       eyebrow="Posición"

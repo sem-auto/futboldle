@@ -1,5 +1,5 @@
-import { bbvaPlayers } from "@/data/bbvaPlayers";
-import { activeTop10Challenges, top10Challenges, type Top10Challenge } from "@/data/top10Challenges";
+﻿import { bbvaPlayers } from "@/data/bbvaPlayers";
+import { activeTop10Challenges, type Top10Challenge } from "@/data/top10Challenges";
 import { worldCupPlayers } from "@/data/worldcups/players";
 import { worldCupTournaments } from "@/data/worldcups/tournaments";
 
@@ -86,7 +86,7 @@ export const seoPlayers = uniqueBy([
     years: player.worldCups.join(", "),
     bio: `${cleanText(player.name)} es uno de los nombres reconocibles del archivo mundialista de Futboldle. Su Mundial principal es ${player.mainWorldCup}.`,
     cardLabel: `Cromo mundialista ${cleanText(player.iconicLevel)}`,
-    games: ["Mundialdle", "Wordle Mundial", "Campeones", "Camino al Título"],
+    games: ["Mundialdle", "Wordle Mundial", "Campeones", "Camino al TÃ­tulo"],
     worldCups: player.worldCups,
     mainWorldCup: player.mainWorldCup,
   })),
@@ -176,61 +176,31 @@ export type RankingSeo = {
   intent: string;
 };
 
-const rankingIntents: Array<{ slug: string; title: string; match: string[] }> = [
-  { slug: "maximos-goleadores", title: "Máximos goleadores", match: ["goleadores"] },
-  { slug: "maximos-asistentes", title: "Máximos asistentes", match: ["asistencias", "asistentes"] },
-  { slug: "mas-expulsiones", title: "Más expulsiones", match: ["expulsiones", "rojas"] },
-  { slug: "maximos-goleadores-liga-espanola", title: "Máximos goleadores Liga Española", match: ["goleadores"] },
-  { slug: "maximos-goleadores-liga-bbva", title: "Máximos goleadores Liga BBVA", match: ["goleadores", "bbva"] },
-  { slug: "maximos-asistentes-liga-bbva", title: "Máximos asistentes Liga BBVA", match: ["asistencias", "bbva"] },
-  { slug: "maximos-goleadores-espanoles-liga-bbva", title: "Máximos goleadores españoles Liga BBVA", match: ["goleadores", "españoles"] },
-  { slug: "maximos-goleadores-extranjeros-liga-bbva", title: "Máximos goleadores extranjeros Liga BBVA", match: ["goleadores", "extranjeros"] },
-  { slug: "jugadores-con-mas-partidos-liga-bbva", title: "Jugadores con más partidos Liga BBVA", match: ["partidos", "bbva"] },
-  { slug: "porteros-mas-porterias-cero-liga-bbva", title: "Porteros con más porterías a cero Liga BBVA", match: ["porterías"] },
-  { slug: "maximos-goleadores-valencia", title: "Máximos goleadores Valencia", match: ["goleadores", "valencia"] },
-  { slug: "maximos-goleadores-villarreal", title: "Máximos goleadores Villarreal", match: ["goleadores", "villarreal"] },
-  { slug: "maximos-goleadores-sevilla", title: "Máximos goleadores Sevilla", match: ["goleadores", "sevilla"] },
-  { slug: "maximos-goleadores-atletico-madrid", title: "Máximos goleadores Atlético de Madrid", match: ["goleadores", "atlético"] },
-  { slug: "maximos-goleadores-deportivo", title: "Máximos goleadores Deportivo", match: ["goleadores", "deportivo"] },
-  { slug: "maximos-goleadores-athletic", title: "Máximos goleadores Athletic Club", match: ["goleadores", "athletic"] },
-  { slug: "maximos-goleadores-real-sociedad", title: "Máximos goleadores Real Sociedad", match: ["goleadores", "real sociedad"] },
-  { slug: "maximos-goleadores-real-betis", title: "Máximos goleadores Real Betis", match: ["goleadores", "betis"] },
-  { slug: "maximos-goleadores-malaga", title: "Máximos goleadores Málaga", match: ["goleadores", "málaga"] },
-  { slug: "maximos-goleadores-espanyol", title: "Máximos goleadores Espanyol", match: ["goleadores", "espanyol"] },
-  { slug: "mas-goles-de-penalti-liga-bbva", title: "Más goles de penalti Liga BBVA", match: ["penaltis"] },
-  { slug: "mas-goles-de-falta-liga-bbva", title: "Más goles de falta Liga BBVA", match: ["falta"] },
-  { slug: "mas-tarjetas-liga-bbva", title: "Más tarjetas Liga BBVA", match: ["tarjetas", "amarillas"] },
-  { slug: "mas-penaltis-fallados-liga-bbva", title: "Más penaltis fallados Liga BBVA", match: ["penaltis fallados"] },
-  { slug: "mas-goles-al-real-madrid", title: "Más goles al Real Madrid", match: ["real madrid"] },
-  { slug: "mas-goles-al-barcelona", title: "Más goles al Barcelona", match: ["barcelona"] },
-  { slug: "jugadores-con-mas-equipos-liga-bbva", title: "Jugadores con más equipos Liga BBVA", match: ["equipos"] },
-  { slug: "goles-desde-fuera-del-area-liga-bbva", title: "Goles desde fuera del área Liga BBVA", match: ["fuera del área"] },
-  { slug: "goles-como-suplente-liga-bbva", title: "Goles como suplente Liga BBVA", match: ["suplente"] },
+const rankingIntents: Array<{ slug: string; title: string; challengeId?: string }> = [
+  { slug: "mas-partidos-valencia-liga-bbva", title: "Mas partidos Valencia Liga BBVA", challengeId: "statbunker-valencia-bbva-2005-2016-partidos" },
+  { slug: "mas-partidos-sevilla-liga-bbva", title: "Mas partidos Sevilla Liga BBVA", challengeId: "statbunker-sevilla-bbva-2005-2016-partidos" },
+  { slug: "mas-partidos-villarreal-liga-bbva", title: "Mas partidos Villarreal Liga BBVA", challengeId: "statbunker-villarreal-bbva-2005-2016-partidos" },
+  { slug: "mas-partidos-atletico-madrid-liga-bbva", title: "Mas partidos Atletico de Madrid Liga BBVA", challengeId: "statbunker-atletico-bbva-2005-2016-partidos" },
+  { slug: "mas-partidos-athletic-club-liga-bbva", title: "Mas partidos Athletic Club Liga BBVA", challengeId: "statbunker-athletic-bbva-2005-2016-partidos" },
+  { slug: "mas-partidos-betis-liga-bbva", title: "Mas partidos Betis Liga BBVA", challengeId: "statbunker-betis-bbva-2005-2016-partidos" },
+  { slug: "mas-partidos-espanyol-liga-bbva", title: "Mas partidos Espanyol Liga BBVA", challengeId: "statbunker-espanyol-bbva-2005-2016-partidos" },
+  { slug: "mas-partidos-malaga-liga-bbva", title: "Mas partidos Malaga Liga BBVA", challengeId: "statbunker-malaga-bbva-2005-2016-partidos" },
+  { slug: "maximos-goleadores-liga-bbva", title: "Maximos goleadores Liga BBVA" },
+  { slug: "maximos-asistentes-liga-bbva", title: "Maximos asistentes Liga BBVA" },
+  { slug: "goleadores-mas-jovenes-bbva", title: "Goleadores mas jovenes BBVA" },
 ];
 
-function challengeText(challenge: Top10Challenge) {
-  return cleanText(`${challenge.title} ${challenge.subtitle} ${challenge.criterion} ${challenge.period} ${challenge.category}`).toLowerCase();
-}
-
-function findChallengeForIntent(match: string[]) {
-  const active = activeTop10Challenges.length ? activeTop10Challenges : top10Challenges;
-  return active.find(challenge => {
-    const text = challengeText(challenge);
-    return match.every(term => text.includes(cleanText(term).toLowerCase()));
-  });
-}
-
 export const seoRankings: RankingSeo[] = rankingIntents.map(intent => {
-  const challenge = findChallengeForIntent(intent.match);
+  const challenge = intent.challengeId ? activeTop10Challenges.find(item => item.id === intent.challengeId) : undefined;
   return {
     slug: intent.slug,
     title: cleanText(intent.title),
-    intent: intent.match.join(", "),
+    intent: intent.challengeId ?? "pending",
     status: challenge ? "published" : "pending",
     challenge,
     description: challenge
       ? `${intent.title}: ranking verificado con ${cleanText(challenge.sourceName)} para ${cleanText(challenge.period)}.`
-      : `${intent.title}: página preparada para publicarse cuando exista una fuente fiable y auditada.`,
+      : `${intent.title}: pÃ¡gina preparada para publicarse cuando exista una fuente fiable y auditada.`,
   };
 });
 
@@ -245,12 +215,12 @@ export const seoGamePages = [
     slug: "quiz-liga-bbva",
     title: "Quiz Liga BBVA",
     description: "Quiz diario de Liga BBVA con trayectorias, rankings, Wordle futbolero y cromos desbloqueables.",
-    keywords: ["quiz liga bbva", "quiz fútbol", "liga española antigua"],
+    keywords: ["quiz liga bbva", "quiz fÃºtbol", "liga espaÃ±ola antigua"],
   },
   {
     slug: "minijuegos-futbol",
-    title: "Minijuegos de Fútbol",
-    description: "Minijuegos rápidos de fútbol nostalgia: Wordle BBVA, Mundialdle, Top10, Statdle y retos de cromos.",
-    keywords: ["minijuegos fútbol", "juegos fútbol online", "wordle fútbol"],
+    title: "Minijuegos de FÃºtbol",
+    description: "Minijuegos rÃ¡pidos de fÃºtbol nostalgia: Wordle BBVA, Mundialdle, Top10, Statdle y retos de cromos.",
+    keywords: ["minijuegos fÃºtbol", "juegos fÃºtbol online", "wordle fÃºtbol"],
   },
 ];

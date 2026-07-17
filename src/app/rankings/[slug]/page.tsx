@@ -5,6 +5,9 @@ import { canonical, cleanText, OG_IMAGE, seoPlayers, seoRankings } from "@/lib/s
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 86400;
+export const dynamicParams = true;
+
 function publicRankingBySlug(slug: string) {
   const ranking = seoRankings.find(item => item.slug === slug);
   if (!ranking || ranking.status !== "published" || !ranking.challenge) return null;
@@ -14,6 +17,7 @@ function publicRankingBySlug(slug: string) {
 export function generateStaticParams() {
   return seoRankings
     .filter(ranking => ranking.status === "published" && ranking.challenge)
+    .slice(0, 12)
     .map(ranking => ({ slug: ranking.slug }));
 }
 
@@ -51,7 +55,7 @@ export default async function RankingSeoPage({ params }: Props) {
       item.name.toLowerCase() === name.toLowerCase()
     );
     return {
-      href: player ? `/jugador/${player.slug}` : "/tops",
+      href: player ? `/jugador/${player.slug}` : "/top10-bbva",
       label: name,
       detail: cleanText(row.detail || row.label || ""),
     };
@@ -122,8 +126,8 @@ export default async function RankingSeoPage({ params }: Props) {
               <p className="text-[12px] leading-relaxed mt-2" style={{ color: "#5f5f66" }}>
                 Este ranking alimenta los modos Top10 y el archivo de cromos de Futboldle.
               </p>
-              <Link href="/tops" className="inline-block mt-3 text-[11px] font-semibold px-3 py-2 rounded-xl" style={{ background: "#18181b", color: "white" }}>
-                Ver Top10
+              <Link href="/top10-bbva" className="inline-block mt-3 text-[11px] font-semibold px-3 py-2 rounded-xl" style={{ background: "#18181b", color: "white" }}>
+                Jugar Top10 diario
               </Link>
             </section>
           </div>

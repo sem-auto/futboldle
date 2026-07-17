@@ -69,7 +69,12 @@ export const worldCupTop10Challenges: WorldCupTop10Challenge[] = [
 ];
 
 function cleanGeneratedChallenge(challenge: WorldCupTop10Challenge): WorldCupTop10Challenge {
-  const isEditionsTop = challenge.id.includes("5-o-mas-ediciones");
+  const searchableText = `${challenge.id} ${challenge.title} ${challenge.subtitle} ${challenge.criterion}`.toLowerCase();
+  const isEditionsTop =
+    searchableText.includes("5-o-mas-ediciones") ||
+    searchableText.includes("5 o mas ediciones") ||
+    searchableText.includes("5 o más ediciones") ||
+    searchableText.includes("ediciones distintas del mundial");
   return {
     ...challenge,
     title: isEditionsTop ? "Futbolistas con 5 o mas Mundiales jugados" : challenge.title,
@@ -96,6 +101,7 @@ function isPublishableWorldCupTop10(challenge: WorldCupTop10Challenge) {
   if (challenge.status !== "active") return false;
   if (challenge.answers.length !== 10) return false;
   if (!challenge.sourceName || !challenge.sourceUrl) return false;
+  if (["https://www.fifa.com/", "https://www.statbunker.com/", "https://www.transfermarkt.com/", "https://www.transfermarkt.es/"].includes(challenge.sourceUrl)) return false;
   if (JSON.stringify(challenge).includes("Por auditar")) return false;
   return challenge.answers.every(answer =>
     answer.playerId &&

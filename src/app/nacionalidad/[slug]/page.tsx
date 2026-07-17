@@ -5,8 +5,12 @@ import { canonical, OG_IMAGE, seoNationalities, seoPositions } from "@/lib/seoIn
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 86400;
+export const dynamicParams = true;
+
 export function generateStaticParams() {
-  return seoNationalities.map(nationality => ({ slug: nationality.slug }));
+  const priority = new Set(["espana", "argentina", "brasil", "alemania", "francia", "italia", "portugal", "inglaterra", "uruguay"]);
+  return seoNationalities.filter(nationality => priority.has(nationality.slug)).map(nationality => ({ slug: nationality.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -23,7 +27,7 @@ export default async function NationalitySeoPage({ params }: Props) {
   const { slug } = await params;
   const nationality = seoNationalities.find(item => item.slug === slug);
   if (!nationality) notFound();
-  const players = nationality.players.map(player => ({ href: `/jugadores/${player.slug}`, label: player.name, detail: player.position }));
+  const players = nationality.players.map(player => ({ href: `/jugador/${player.slug}`, label: player.name, detail: player.position }));
   return (
     <SeoEntityPage
       eyebrow="Nacionalidad"

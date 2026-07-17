@@ -19,6 +19,11 @@ export interface Top10Answer {
 
 export interface Top10Challenge {
   id: string;
+  status?: "draft" | "needs_review" | "verified" | "disabled";
+  updatedAt?: string;
+  auditedAt?: string;
+  auditMethod?: string;
+  auditor?: string;
   kind: "FÁCIL" | "MEDIO" | "DIFÍCIL";
   category: Top10Category;
   topType: "TOP HISTÓRICO VERIFICADO";
@@ -7422,6 +7427,43 @@ const retiredTop10Ids = new Set<string>([
   "audited-bbva-entrenadores-con-mas-partidos-bbva-2005-06-2015-16-2005-06-2015-16",
 ]);
 
+export const top10AuditRegistry: Record<string, {
+  status: "draft" | "needs_review" | "verified" | "disabled";
+  updatedAt?: string;
+  auditedAt?: string;
+  auditMethod?: string;
+  auditor?: string;
+}> = {
+  "statbunker-valencia-bbva-2005-2016-partidos": { status: "verified", updatedAt: "2026-07-14", auditedAt: "2026-07-14", auditor: "Futboldle", auditMethod: "Fuente StatBunker de apariciones por competicion y revision manual del periodo 2005/06-2015/16." },
+  "statbunker-sevilla-bbva-2005-2016-partidos": { status: "verified", updatedAt: "2026-07-14", auditedAt: "2026-07-14", auditor: "Futboldle", auditMethod: "Fuente StatBunker de apariciones por competicion y revision manual del periodo 2005/06-2015/16." },
+  "statbunker-villarreal-bbva-2005-2016-partidos": { status: "verified", updatedAt: "2026-07-14", auditedAt: "2026-07-14", auditor: "Futboldle", auditMethod: "Fuente StatBunker de apariciones por competicion y revision manual del periodo 2005/06-2015/16." },
+  "statbunker-atletico-bbva-2005-2016-partidos": { status: "verified", updatedAt: "2026-07-14", auditedAt: "2026-07-14", auditor: "Futboldle", auditMethod: "Fuente StatBunker de apariciones por competicion y revision manual del periodo 2005/06-2015/16." },
+  "statbunker-athletic-bbva-2005-2016-partidos": { status: "verified", updatedAt: "2026-07-14", auditedAt: "2026-07-14", auditor: "Futboldle", auditMethod: "Fuente StatBunker de apariciones por competicion y revision manual del periodo 2005/06-2015/16." },
+  "statbunker-betis-bbva-2005-2016-partidos": { status: "verified", updatedAt: "2026-07-14", auditedAt: "2026-07-14", auditor: "Futboldle", auditMethod: "Fuente StatBunker de apariciones por competicion y revision manual del periodo 2005/06-2015/16." },
+  "statbunker-espanyol-bbva-2005-2016-partidos": { status: "verified", updatedAt: "2026-07-14", auditedAt: "2026-07-14", auditor: "Futboldle", auditMethod: "Fuente StatBunker de apariciones por competicion y revision manual del periodo 2005/06-2015/16." },
+  "statbunker-malaga-bbva-2005-2016-partidos": { status: "verified", updatedAt: "2026-07-14", auditedAt: "2026-07-14", auditor: "Futboldle", auditMethod: "Fuente StatBunker de apariciones por competicion y revision manual del periodo 2005/06-2015/16." },
+};
+
+export function getTop10AuditStatus(challenge: Top10Challenge) {
+  return top10AuditRegistry[challenge.id] ?? {
+    status: challenge.status ?? "needs_review",
+    updatedAt: challenge.updatedAt,
+    auditedAt: challenge.auditedAt,
+    auditMethod: challenge.auditMethod,
+    auditor: challenge.auditor,
+  };
+}
+
+function hasGenericSourceUrl(sourceUrl: string) {
+  return [
+    "https://www.statbunker.com/",
+    "https://www.transfermarkt.es/",
+    "https://www.transfermarkt.com/",
+    "https://www.fifaindex.com/",
+    "https://www.fifa.com/",
+  ].includes(sourceUrl);
+}
+
 function isCoachTop10(challenge: Top10Challenge) {
   const text = `${challenge.id} ${challenge.title} ${challenge.criterion} ${challenge.consigna}`.toLowerCase();
   return /\b(entrenador|entrenadores|seleccionador|seleccionadores|tecnico|técnico)\b/.test(text);
@@ -7432,10 +7474,14 @@ export function getTop10ValidationIssues() {
 }
 
 export const activeTop10Challenges = top10Challenges.filter(challenge =>
+  getTop10AuditStatus(challenge).status === "verified" &&
+  Boolean(getTop10AuditStatus(challenge).updatedAt) &&
+  Boolean(getTop10AuditStatus(challenge).auditedAt) &&
   !retiredTop10Ids.has(challenge.id) &&
   !isCoachTop10(challenge) &&
   challenge.answers.length === 10 &&
   Boolean(challenge.sourceUrl) &&
+  !hasGenericSourceUrl(challenge.sourceUrl) &&
   !JSON.stringify(challenge).includes("Por auditar") &&
   validateTop10Challenge(challenge).length === 0
 );

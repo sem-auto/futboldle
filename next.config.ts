@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
       { source: "/clubes/:slug", destination: "/club/:slug", permanent: true },
       { source: "/selecciones/:slug", destination: "/seleccion/:slug", permanent: true },
       { source: "/ranking/:slug", destination: "/rankings/:slug", permanent: true },
+      { source: "/tops", destination: "/admin/tops", permanent: false },
+      { source: "/guias", destination: "/blog", permanent: false },
     ];
   },
 };

@@ -5,13 +5,12 @@ import { canonical, OG_IMAGE, seoClubs, seoPlayers, seoRankings, slugify } from 
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 86400;
+export const dynamicParams = true;
+
 export function generateStaticParams() {
-  const slugs = new Set<string>();
-  for (const player of seoPlayers) {
-    slugs.add(player.slug);
-    slugs.add(slugify(player.name));
-  }
-  return Array.from(slugs).map(slug => ({ slug }));
+  const priority = new Set(["david-villa", "joaquin", "forlan", "guti", "xavi", "iniesta", "messi", "cristiano-ronaldo", "ronaldo-nazario"]);
+  return seoPlayers.filter(player => priority.has(player.slug)).map(player => ({ slug: player.slug }));
 }
 
 function findPlayerBySlug(slug: string) {
@@ -55,7 +54,7 @@ export default async function PlayerPage({ params }: Props) {
     : seoRankings
         .filter(ranking => ranking.status === "published")
         .slice(0, 6)
-        .map(ranking => ({ href: `/ranking/${ranking.slug}`, label: ranking.title, detail: "Ranking BBVA relacionado" }));
+        .map(ranking => ({ href: `/rankings/${ranking.slug}`, label: ranking.title, detail: "Ranking BBVA relacionado" }));
 
   return (
     <>
@@ -79,7 +78,7 @@ export default async function PlayerPage({ params }: Props) {
         ]}
         sections={[
           { title: "Perfil futbolero", body: `${player.name} aparece en Futboldle por su valor nostalgico, sus etapas reconocibles y su utilidad para retos diarios.`, items: clubLinks },
-          { title: "Juegos donde aparece", body: `Puede aparecer en ${player.games.join(", ")} segun el reto diario, la temporada y el tipo de pista.`, items: player.games.map(game => ({ href: "/", label: game })) },
+          { title: "Juegos donde aparece", body: `Puede aparecer en ${player.games.join(", ")} segun el reto diario, la temporada y el tipo de pista.`, items: player.games.map(game => ({ href: game.includes("Mundial") ? "/world-cups" : "/liga-bbva", label: game })) },
           { title: "Jugadores similares", body: "Perfiles cercanos por posicion, nacionalidad, club o epoca.", items: similar },
           { title: "Rankings y archivo", body: "Rankings y paginas de archivo conectadas para seguir explorando Futboldle.", items: rankingLinks },
         ]}
