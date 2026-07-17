@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import SeoEntityPage from "@/components/SeoEntityPage";
 import { canonical, OG_IMAGE, seoClubs, seoPlayers, seoRankings, slugify } from "@/lib/seoIndex";
 
@@ -37,6 +37,7 @@ export default async function PlayerPage({ params }: Props) {
   const { slug } = await params;
   const player = findPlayerBySlug(slug);
   if (!player) notFound();
+  if (slug !== player.slug) permanentRedirect(`/jugador/${player.slug}`);
 
   const clubLinks = player.clubs
     .map(club => ({ href: `/club/${seoClubs.find(item => item.name === club)?.slug ?? ""}`, label: club }))

@@ -20,9 +20,7 @@ const modes: ModeCard[] = [
   { href: "/world-cups/mundialdle", eyebrow: "Diario principal", title: "MUNDIALDLE", subtitle: "Adivina el jugador con pistas de Mundial, seleccion y club.", accent: "#174ea6", modeId: "mundialdle", visual: "trophy", primary: true },
   { href: "/world-cups/top10", eyebrow: "Ranking diario", title: "TOP10 MUNDIAL", subtitle: "Listas historicas del torneo para picarte con tu grupo.", accent: "#174ea6", modeId: "top10-mundial", visual: "podium", primary: true },
   { href: "/world-cups/wordle", eyebrow: "Reto rapido", title: "WORDLE MUNDIAL", subtitle: "Apellido mundialista sin pistas progresivas.", accent: "#174ea6", modeId: "worldcup-wordle", visual: "wordle", primary: true },
-  { href: "/world-cups/champions", eyebrow: "Archivo extra", title: "CAMPEONES", subtitle: "Sede, campeon y finalista.", accent: "#c8920a", modeId: "worldcup-champions", visual: "medals" },
-  { href: "/world-cups/camino", eyebrow: "Ruta", title: "CAMINO", subtitle: "Adivina la seleccion por sus rivales.", accent: "#c8920a", modeId: "camino-titulo", visual: "route" },
-  { href: "/world-cups/final", eyebrow: "Finales", title: "FINAL MUNDIAL", subtitle: "Marcador, rivales y año.", accent: "#c8920a", modeId: "final-mundial", visual: "final" },
+  { href: "/world-cups/archivo", eyebrow: "Archivo diario", title: "ARCHIVO MUNDIAL", subtitle: "Campeones, rutas y finales que cambian cada día.", accent: "#c8920a", modeId: "worldcup-archive", visual: "medals", primary: true },
 ];
 
 function CardVisual({ type, accent }: { type: ModeCard["visual"]; accent: string }) {
@@ -139,7 +137,7 @@ export default function WorldCupsPage() {
               <h2 className="font-bebas text-[38px] leading-none" style={{ color: "#151515" }}>Juegos Mundiales</h2>
             </div>
             <span className="hidden sm:inline-flex text-[11px] font-semibold px-3 py-1 rounded-full" style={{ color: "#174ea6", background: "#eef3ff" }}>
-              Mundialdle · Wordle · Top10 · Finales
+              Mundialdle · Wordle · Top10 · Archivo
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

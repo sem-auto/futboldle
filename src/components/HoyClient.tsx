@@ -27,16 +27,17 @@ type CardConfig = {
   accent: string;
   seasonId: string;
   modeId: string;
+  href: string;
 };
 
 const CARDS: CardConfig[] = [
-  { mode: "wordle", title: "Wordle BBVA", subtitle: "Adivina el apellido del Hombre BBVA.", badge: "Principal", accent: "#c8920a", seasonId: "bbva", modeId: "wordle-bbva" },
-  { mode: "trayectoria", title: "Trayectoria BBVA", subtitle: "Reconoce al jugador por su carrera.", badge: "BBVA", accent: "#1e6b2e", seasonId: "bbva", modeId: "trayectoria-bbva" },
-  { mode: "top10", title: "Top10 BBVA", subtitle: "Completa un ranking histórico.", badge: "Difícil", accent: "#1a4fa0", seasonId: "bbva", modeId: "top10-bbva" },
-  { mode: "statdle", title: "Statdle BBVA", subtitle: "Pistas de temporada y datos.", badge: "Datos", accent: "#18181b", seasonId: "bbva", modeId: "statdle-bbva" },
-  { mode: "mundialdle", title: "Mundialdle", subtitle: "Adivina el jugador mundialista.", badge: "Mundiales", accent: "#174ea6", seasonId: "world-cups", modeId: "mundialdle" },
-  { mode: "world-wordle", title: "Wordle Mundial", subtitle: "Apellido de un mundialista.", badge: "Extra", accent: "#0f172a", seasonId: "world-cups", modeId: "worldcup-wordle" },
-  { mode: "duelo", title: "Duelo Nostalgia", subtitle: "¿Quién tuvo más goles o asistencias?", badge: "Viral", accent: "#b81c14", seasonId: "bbva", modeId: "duelo-nostalgia" },
+  { mode: "wordle", title: "Wordle BBVA", subtitle: "Adivina el apellido del Hombre BBVA.", badge: "Principal", accent: "#c8920a", seasonId: "bbva", modeId: "wordle-bbva", href: "/wordle-bbva" },
+  { mode: "trayectoria", title: "Trayectoria BBVA", subtitle: "Reconoce al jugador por su carrera.", badge: "BBVA", accent: "#1e6b2e", seasonId: "bbva", modeId: "trayectoria-bbva", href: "/trayectoria-bbva" },
+  { mode: "top10", title: "Top10 BBVA", subtitle: "Completa un ranking histórico.", badge: "Difícil", accent: "#1a4fa0", seasonId: "bbva", modeId: "top10-bbva", href: "/top10-bbva" },
+  { mode: "statdle", title: "Statdle BBVA", subtitle: "Pistas de temporada y datos.", badge: "Datos", accent: "#18181b", seasonId: "bbva", modeId: "statdle-bbva", href: "/statdle-bbva" },
+  { mode: "mundialdle", title: "Mundialdle", subtitle: "Adivina el jugador mundialista.", badge: "Mundiales", accent: "#174ea6", seasonId: "world-cups", modeId: "mundialdle", href: "/world-cups/mundialdle" },
+  { mode: "world-wordle", title: "Wordle Mundial", subtitle: "Apellido de un mundialista.", badge: "Extra", accent: "#0f172a", seasonId: "world-cups", modeId: "worldcup-wordle", href: "/world-cups/wordle" },
+  { mode: "duelo", title: "Duelo Nostalgia", subtitle: "¿Quién tuvo más goles o asistencias?", badge: "Viral", accent: "#b81c14", seasonId: "bbva", modeId: "duelo-nostalgia", href: "/duelo-bbva" },
 ];
 
 function getDoneState(mode: CardConfig["mode"]) {
@@ -61,10 +62,11 @@ function getDoneState(mode: CardConfig["mode"]) {
   return false;
 }
 
-function HoyCard({ card, done, onClick }: { card: CardConfig; done: boolean; onClick: () => void }) {
+function HoyCard({ card, done, onOpen }: { card: CardConfig; done: boolean; onOpen: () => void }) {
   return (
-    <button
-      onClick={onClick}
+    <Link
+      href={card.href}
+      onClick={onOpen}
       className="rounded-2xl p-4 text-left min-h-[142px] flex flex-col justify-between"
       style={{ background: "white", border: `1px solid ${card.accent}33`, boxShadow: "0 7px 20px rgba(0,0,0,0.07)" }}
     >
@@ -81,7 +83,7 @@ function HoyCard({ card, done, onClick }: { card: CardConfig; done: boolean; onC
       <div className="font-oswald font-semibold uppercase tracking-wider text-[11px] mt-4" style={{ color: card.accent }}>
         {done ? "Ver resultado" : "Jugar ahora"} →
       </div>
-    </button>
+    </Link>
   );
 }
 
@@ -160,7 +162,7 @@ export default function HoyClient() {
             <span className="text-[10px] font-semibold" style={{ color: "#9a9a8a" }}>{CARDS.length} retos</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {CARDS.map((card) => <HoyCard key={card.mode} card={card} done={Boolean(doneMap[card.mode])} onClick={() => open(card)} />)}
+            {CARDS.map((card) => <HoyCard key={card.mode} card={card} done={Boolean(doneMap[card.mode])} onOpen={() => trackModeEntered(card.modeId, card.seasonId, { source: "hoy" })} />)}
           </div>
         </section>
 

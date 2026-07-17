@@ -23,11 +23,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${SITE_URL}/mundialdle`,
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
       url: `${SITE_URL}/wordle-bbva`,
       changeFrequency: "daily",
       priority: 0.85,
@@ -65,28 +60,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/world-cups/wordle`, changeFrequency: "daily", priority: 0.88 },
     { url: `${SITE_URL}/world-cups/top10`, changeFrequency: "daily", priority: 0.88 },
     { url: `${SITE_URL}/world-cups/album`, changeFrequency: "daily", priority: 0.78 },
+    { url: `${SITE_URL}/world-cups/archivo`, changeFrequency: "daily", priority: 0.84 },
     { url: `${SITE_URL}/world-cups/final`, changeFrequency: "daily", priority: 0.86 },
-    { url: `${SITE_URL}/temporadas/liga-bbva`, changeFrequency: "weekly", priority: 0.85 },
-    { url: `${SITE_URL}/temporadas/mundiales`, changeFrequency: "weekly", priority: 0.85 },
     {
       url: `${SITE_URL}/world-cups/champions`,
       changeFrequency: "daily",
       priority: 0.8,
     },
     {
-      url: `${SITE_URL}/campeones-del-mundo`,
-      changeFrequency: "daily",
-      priority: 0.82,
-    },
-    {
       url: `${SITE_URL}/world-cups/camino`,
       changeFrequency: "daily",
       priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/camino-al-titulo`,
-      changeFrequency: "daily",
-      priority: 0.82,
     },
     {
       url: `${SITE_URL}/blog`,
