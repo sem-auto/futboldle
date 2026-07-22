@@ -66,20 +66,15 @@ function countryCode(nationality: string) {
   return codes[key] ?? "WC";
 }
 
-function flagEmoji(nationality: string) {
+function flagImageCode(nationality: string) {
   const code = countryCode(nationality);
-  if (code === "ENG") return "🏴";
-  if (code === "WAL") return "🏴";
-  if (code === "WC" || code.length !== 2) return "🏳️";
-  return code
-    .toUpperCase()
-    .split("")
-    .map(char => String.fromCodePoint(127397 + char.charCodeAt(0)))
-    .join("");
+  if (code === "ENG") return "gb-eng";
+  if (code === "WAL") return "gb-wls";
+  return code.length === 2 ? code.toLowerCase() : null;
 }
 
 function FlagChip({ nationality, compact = false }: { nationality: string; compact?: boolean }) {
-  const flag = flagEmoji(nationality);
+  const flagCode = flagImageCode(nationality);
   return (
     <span
       className="inline-flex items-center justify-center gap-1 rounded-md font-oswald font-semibold shadow-sm"
@@ -89,12 +84,23 @@ function FlagChip({ nationality, compact = false }: { nationality: string; compa
         height: compact ? 24 : 30,
         background: "#f6f3ec",
         border: "1px solid rgba(23,78,166,0.16)",
-        fontSize: compact ? 16 : 20,
+        overflow: "hidden",
       }}
       aria-label={nationality}
       title={nationality}
     >
-      <span className="leading-none">{flag}</span>
+      {flagCode ? (
+        <img
+          src={`https://flagcdn.com/w40/${flagCode}.png`}
+          alt={`Bandera de ${nationality}`}
+          width={compact ? 22 : 28}
+          height={compact ? 16 : 20}
+          className="object-cover rounded-[2px]"
+          onError={event => { event.currentTarget.style.display = "none"; }}
+        />
+      ) : (
+        <span className="text-[12px]" style={{ color: "#174ea6" }}>●</span>
+      )}
     </span>
   );
 }
