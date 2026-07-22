@@ -46,8 +46,8 @@ const semifinalists = new Set([
 const notableGoals: Record<string, number> = {
   "david-villa": 5,
   "diego-forlan": 5,
-  "lionel-messi": 7,
-  "kylian-mbappe": 4,
+  "lionel-messi": 8,
+  "kylian-mbappe": 10,
   "miroslav-klose": 5,
   "ronaldo-nazario": 8,
   "wesley-sneijder": 5,
@@ -142,6 +142,12 @@ const wc = (id: string, name: string, aliases: string[], nationality: string, fl
 });
 
 export const worldCupPlayers: WorldCupPlayer[] = [
+  // Archivo histórico revisado: fichas usadas por los Top10 verificables.
+  wc("lothar-matthaus", "Lothar Matthäus", ["Matthaus", "Lothar"], "Alemania", "", "Centrocampista", [1982, 1986, 1990, 1994, 1998], 1990, "icono", "Inter", 29),
+  wc("paolo-maldini", "Paolo Maldini", ["Maldini", "Paolo"], "Italia", "", "Defensa", [1990, 1994, 1998, 2002], 1994, "icono", "AC Milan", 26),
+  wc("diego-maradona", "Diego Maradona", ["Maradona", "Diego"], "Argentina", "", "Centrocampista", [1982, 1986, 1990, 1994], 1986, "icono", "Napoli", 25),
+  wc("uwe-seeler", "Uwe Seeler", ["Seeler", "Uwe"], "Alemania", "", "Delantero", [1958, 1962, 1966, 1970], 1970, "icono", "Hamburgo", 33),
+  wc("wladyslaw-zmuda", "Władysław Żmuda", ["Zmuda", "Wladyslaw Zmuda"], "Polonia", "", "Defensa", [1974, 1978, 1982, 1986], 1974, "legendario", "Widzew Łódź", 20),
   wc("iker-casillas", "Iker Casillas", ["Casillas", "Iker"], "Espana", "", "Portero", [2002, 2006, 2010, 2014], 2010, "icono", "Real Madrid", 29),
   wc("sergio-ramos", "Sergio Ramos", ["Ramos"], "Espana", "", "Defensa", [2006, 2010, 2014, 2018], 2010, "icono", "Real Madrid", 24),
   wc("carles-puyol", "Carles Puyol", ["Puyol"], "Espana", "", "Defensa", [2002, 2006, 2010], 2010, "icono", "Barcelona", 32),
@@ -155,7 +161,7 @@ export const worldCupPlayers: WorldCupPlayer[] = [
   wc("cesc-fabregas", "Cesc Fabregas", ["Cesc", "Fabregas", "Fabregas"], "Espana", "", "Centrocampista", [2006, 2010, 2014], 2010, "core", "Arsenal", 23),
   wc("david-silva", "David Silva", ["Silva"], "Espana", "", "Centrocampista", [2010, 2014, 2018], 2010, "legendario", "Valencia", 24),
 
-  wc("lionel-messi", "Lionel Messi", ["Messi", "Leo Messi"], "Argentina", "", "Delantero", [2006, 2010, 2014, 2018, 2022], 2022, "icono", "PSG", 35),
+  wc("lionel-messi", "Lionel Messi", ["Messi", "Leo Messi"], "Argentina", "", "Delantero", [2006, 2010, 2014, 2018, 2022, 2026], 2026, "icono", "Inter Miami", 39),
   wc("sergio-aguero", "Sergio Aguero", ["Aguero", "Aguero", "Kun"], "Argentina", "", "Delantero", [2010, 2014, 2018], 2014, "legendario", "Manchester City", 26),
   wc("angel-di-maria", "Angel Di Maria", ["Di Maria", "Di Maria"], "Argentina", "", "Centrocampista", [2010, 2014, 2018, 2022], 2022, "legendario", "Juventus", 34),
   wc("javier-mascherano", "Javier Mascherano", ["Mascherano"], "Argentina", "", "Centrocampista", [2006, 2010, 2014, 2018], 2014, "legendario", "Barcelona", 30),
@@ -180,7 +186,7 @@ export const worldCupPlayers: WorldCupPlayer[] = [
 
   wc("zinedine-zidane", "Zinedine Zidane", ["Zidane", "Zizou"], "Francia", "", "Centrocampista", [2002, 2006], 2006, "icono", "Real Madrid", 34),
   wc("thierry-henry", "Thierry Henry", ["Henry"], "Francia", "", "Delantero", [2002, 2006, 2010], 2006, "legendario", "Arsenal", 28),
-  wc("kylian-mbappe", "Kylian Mbappe", ["Mbappe", "Mbappe"], "Francia", "", "Delantero", [2018, 2022], 2018, "icono", "PSG", 19),
+  wc("kylian-mbappe", "Kylian Mbappe", ["Mbappe", "Mbappé"], "Francia", "", "Delantero", [2018, 2022, 2026], 2026, "icono", "Real Madrid", 27),
   wc("antoine-griezmann", "Antoine Griezmann", ["Griezmann"], "Francia", "", "Delantero", [2014, 2018, 2022], 2018, "legendario", "Atletico de Madrid", 27),
   wc("karim-benzema", "Karim Benzema", ["Benzema"], "Francia", "", "Delantero", [2014], 2014, "legendario", "Real Madrid", 26),
   wc("paul-pogba", "Paul Pogba", ["Pogba"], "Francia", "", "Centrocampista", [2014, 2018], 2018, "legendario", "Manchester United", 25),
@@ -208,7 +214,7 @@ export const worldCupPlayers: WorldCupPlayer[] = [
   wc("marco-materazzi", "Marco Materazzi", ["Materazzi"], "Italia", "", "Defensa", [2006], 2006, "core", "Inter", 32),
   wc("fabio-grosso", "Fabio Grosso", ["Grosso"], "Italia", "", "Defensa", [2006], 2006, "core", "Palermo", 28),
 
-  wc("cristiano-ronaldo", "Cristiano Ronaldo", ["Cristiano", "Ronaldo", "CR7"], "Portugal", "", "Delantero", [2006, 2010, 2014, 2018, 2022], 2018, "icono", "Real Madrid", 33),
+  wc("cristiano-ronaldo", "Cristiano Ronaldo", ["Cristiano", "Ronaldo", "CR7"], "Portugal", "", "Delantero", [2006, 2010, 2014, 2018, 2022, 2026], 2018, "icono", "Real Madrid", 33),
   wc("luis-figo", "Luis Figo", ["Figo"], "Portugal", "", "Centrocampista", [2002, 2006], 2006, "legendario", "Inter", 33),
   wc("deco", "Deco", ["Deco"], "Portugal", "", "Centrocampista", [2006, 2010], 2006, "core", "Barcelona", 28),
   wc("pepe", "Pepe", ["Pepe"], "Portugal", "", "Defensa", [2010, 2014, 2018, 2022], 2018, "legendario", "Besiktas", 35),
@@ -218,7 +224,7 @@ export const worldCupPlayers: WorldCupPlayer[] = [
   wc("wayne-rooney", "Wayne Rooney", ["Rooney"], "Inglaterra", "", "Delantero", [2006, 2010, 2014], 2006, "legendario", "Manchester United", 20),
   wc("steven-gerrard", "Steven Gerrard", ["Gerrard"], "Inglaterra", "", "Centrocampista", [2006, 2010, 2014], 2010, "core", "Liverpool", 30),
   wc("frank-lampard", "Frank Lampard", ["Lampard"], "Inglaterra", "", "Centrocampista", [2006, 2010, 2014], 2010, "core", "Chelsea", 32),
-  wc("harry-kane", "Harry Kane", ["Kane"], "Inglaterra", "", "Delantero", [2018, 2022], 2018, "legendario", "Tottenham", 24),
+  wc("harry-kane", "Harry Kane", ["Kane", "Harry"], "Inglaterra", "", "Delantero", [2018, 2022, 2026], 2026, "legendario", "Bayern", 32),
   wc("michael-owen", "Michael Owen", ["Owen"], "Inglaterra", "", "Delantero", [2002, 2006], 2002, "core", "Liverpool", 22),
 
   wc("arjen-robben", "Arjen Robben", ["Robben"], "Holanda", "", "Delantero", [2006, 2010, 2014], 2014, "legendario", "Bayern", 30),
@@ -465,4 +471,9 @@ export const worldCupPlayers: WorldCupPlayer[] = [
   wc("marouane-fellaini", "Marouane Fellaini", ["Fellaini"], "Belgica", "", "Centrocampista", [2014, 2018], 2018, "core", "Manchester United", 30),
 ];
 
-worldCupPlayers.push(...generatedWorldCupPlayers as WorldCupPlayer[]);
+// La base editorial prevalece sobre importaciones automáticas: así un registro
+// generado no puede sobrescribir una ficha ya revisada manualmente.
+const knownWorldCupPlayerIds = new Set(worldCupPlayers.map((player) => player.id));
+worldCupPlayers.push(
+  ...(generatedWorldCupPlayers as WorldCupPlayer[]).filter((player) => !knownWorldCupPlayerIds.has(player.id)),
+);

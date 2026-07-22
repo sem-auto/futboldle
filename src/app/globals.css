@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,8 +14,9 @@
     --ink2:     #3a3a3f;
     --ink3:     #6b6b72;
     --ink4:     #9a9aa0;
-    --font-bebas: 'Arial Narrow', Impact, sans-serif;
-    --font-oswald: Arial, Helvetica, sans-serif;
+    /* Tipografía de titulares: compacta, contundente y disponible sin red. */
+    --font-bebas: 'Oswald', 'Arial Narrow', Arial, sans-serif;
+    --font-oswald: 'Oswald', 'Arial Narrow', Arial, sans-serif;
     --font-inter: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
     /* Wordle BBVA — dorado Panini */
@@ -82,8 +85,13 @@
 }
 
 @layer utilities {
-  .font-bebas  { font-family: var(--font-bebas), Impact, sans-serif; letter-spacing: 0.04em; }
-  .font-oswald { font-family: var(--font-oswald), sans-serif; }
+  .font-bebas,
+  .font-display {
+    font-family: var(--font-bebas), 'Arial Narrow', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+  .font-oswald { font-family: var(--font-oswald), Arial, sans-serif; }
 
   /* Game card hover — botón físico */
   .game-card {

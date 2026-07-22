@@ -117,6 +117,7 @@ assert(wcTop10.includes("activeWorldCupTop10Challenges"), "Falta lista publica f
 assert(wcTop10.includes('JSON.stringify(challenge).includes("Por auditar")'), "Top10 Mundial publicos deben excluir Por auditar.");
 assert(wcTop10.includes("challenge.answers.length !== 10"), "Top10 Mundial publicos deben exigir 10 respuestas.");
 assert(wcTop10.includes("https://www.fifa.com/") && wcTop10.includes("https://www.statbunker.com/"), "Top10 Mundial debe bloquear fuentes genericas.");
+assert(wcTop10.includes('!challenge.period.includes("2026")'), "Top10 Mundial debe excluir cortes anteriores a 2026 de la rotacion publica.");
 assert(!wcTop10.includes("worldCupTop10Challenges.filter(challenge => challenge.status === \"active\")"), "Top10 Mundial no debe usar solo status active.");
 
 const seoIndex = read("src/lib/seoIndex.ts");

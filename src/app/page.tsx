@@ -1202,7 +1202,7 @@ export default function HomePage() {
           <TrayCard onClick={() => openMode("trayectoria", "trayectoria-bbva")} done={trayDone} won={trayWon} difficulty={trayDifficulty} />
         </div>
 
-        <div className="grid grid-cols-2 gap-2 md:gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
           <Link href="/top10-bbva" onClick={() => trackModeEntered("top10-bbva", "bbva", { source: "home" })}
             className="w-full h-full text-left rounded-2xl overflow-hidden game-card"
             style={{ background: "white", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: "1px solid rgba(26,79,160,0.20)", display: "flex", flexDirection: "column" }}>
@@ -1224,6 +1224,14 @@ export default function HomePage() {
             </div>
           </Link>
           <MundialdleHomeCard onClick={() => openMode("mundialdle", "mundialdle", "world-cups")} done={mundialdleDone} won={mundialdleWon} difficulty={mundialdleDifficulty} />
+          <div className="col-span-2 md:col-span-1">
+            <Top10MundialHomeCard
+              onClick={() => trackModeEntered("top10-mundial", "world-cups", { source: "home" })}
+              done={top10MundialDone}
+              won={top10MundialWon}
+              difficulty={top10MundialDifficulty}
+            />
+          </div>
         </div>
 
         <Link href="/world-cups/archivo" onClick={() => trackModeEntered("worldcup-archive", "world-cups", { source: "home" })}
