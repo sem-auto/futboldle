@@ -27,7 +27,7 @@ function score(player: WorldCupPlayer, query: string) {
 }
 
 function countryCode(nationality: string) {
-  const key = normalize(nationality);
+  const key = normalize(nationality).toLowerCase();
   const codes: Record<string, string> = {
     alemania: "DE",
     argentina: "AR",
@@ -68,8 +68,9 @@ function countryCode(nationality: string) {
 
 function flagEmoji(nationality: string) {
   const code = countryCode(nationality);
-  if (code === "ENG" || code === "WAL" || code === "WC") return code;
-  if (code.length !== 2) return "WC";
+  if (code === "ENG") return "🏴";
+  if (code === "WAL") return "🏴";
+  if (code === "WC" || code.length !== 2) return "🏳️";
   return code
     .toUpperCase()
     .split("")
@@ -78,26 +79,22 @@ function flagEmoji(nationality: string) {
 }
 
 function FlagChip({ nationality, compact = false }: { nationality: string; compact?: boolean }) {
-  const code = countryCode(nationality);
   const flag = flagEmoji(nationality);
   return (
     <span
       className="inline-flex items-center justify-center gap-1 rounded-md font-oswald font-semibold shadow-sm"
       style={{
-        minWidth: compact ? 34 : 48,
-        paddingInline: compact ? 5 : 7,
+        minWidth: compact ? 30 : 38,
+        paddingInline: compact ? 3 : 5,
         height: compact ? 24 : 30,
-        background: "linear-gradient(135deg,#0f172a,#174ea6)",
-        color: "white",
-        border: "1px solid rgba(255,255,255,0.28)",
-        fontSize: compact ? 11 : 13,
-        letterSpacing: "0.04em",
+        background: "#f6f3ec",
+        border: "1px solid rgba(23,78,166,0.16)",
+        fontSize: compact ? 16 : 20,
       }}
       aria-label={nationality}
       title={nationality}
     >
-      <span>{flag}</span>
-      {!compact ? <span className="text-[10px] opacity-80">{code}</span> : null}
+      <span className="leading-none">{flag}</span>
     </span>
   );
 }
@@ -319,23 +316,23 @@ export default function Top10Mundial({ onBack }: { onBack?: () => void }) {
           </div>
         ) : null}
 
-        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
           {challenge.answers.map((answer, index) => {
             const revealed = guessed.includes(answer.playerId) || finished;
             return (
-              <div key={`${answer.playerId}-${index}`} className="rounded-xl px-3 py-2.5 flex items-center gap-3" style={{ background: revealed ? "#eef3ff" : "#fbfaf7", border: `1px solid ${revealed ? "rgba(23,78,166,0.18)" : "rgba(0,0,0,0.07)"}` }}>
-                <div className="w-9 h-9 rounded-full flex items-center justify-center font-bebas text-[20px]" style={{ background: revealed ? "#174ea6" : "#e6e0d6", color: revealed ? "white" : "#9a9a8a" }}>{index + 1}</div>
+              <div key={`${answer.playerId}-${index}`} className="rounded-xl px-3 py-2 flex items-center gap-3" style={{ background: revealed ? "#eef3ff" : "#fbfaf7", border: `1px solid ${revealed ? "rgba(23,78,166,0.18)" : "rgba(0,0,0,0.07)"}` }}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bebas text-[18px]" style={{ background: revealed ? "#174ea6" : "#e6e0d6", color: revealed ? "white" : "#9a9a8a" }}>{index + 1}</div>
                 <div className="min-w-0 flex-1">
                   <div className="font-oswald font-semibold text-[15px]" style={{ color: revealed ? "#18181b" : "#9a9a8a" }}>
                     {revealed ? <><FlagChip nationality={answer.nationality} compact /> <span className="ml-2">{answer.name}</span></> : "?????"}
                   </div>
-                  <div className="mt-1">
+                  <div className="mt-0.5">
                     {revealed ? (
                       <span className="text-[10px]" style={{ color: "#8a8a80" }}>{answer.label}</span>
                     ) : (
                       <div className="flex items-center gap-2">
                         <FlagChip nationality={answer.nationality} />
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#9a9a8a" }}>Bandera</span>
+                        <span className="text-[10px] font-semibold" style={{ color: "#9a9a8a" }}>Pista de selección</span>
                       </div>
                     )}
                   </div>
